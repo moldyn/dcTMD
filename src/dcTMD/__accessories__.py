@@ -4,7 +4,7 @@
 __all__ = []
 
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 def gausfilter_friction(x_length, frict, sigma):
     """
@@ -59,18 +59,27 @@ def smooth_friction(x, frict, sigma=False):
     return frict_smooth, sigma
 
 
-def plot_dG_frict_twinax(ax, x, dG, frict, dG_color='black', frict_color='cyan'):
+def plot_dG(ax1, x, dG, dG_color='black'):
     # TODO: test this an debug..
-    import matplotlib.pyplot as plt
-    ax.plot(x, dG, lw=1, color=dG_color, label=r'PMF$_{tot}$')
-    ax.plot([0, 1], [0, 1], color=frict_color, alpha=0, label=r'$\Gamma$')
-    ax.legend()
-    ax2 = ax.twinx()
-    ax2.plot(x, frict, lw=2, label=r'gauss filtered $\Gamma$')
+    ax1.plot(x, dG, lw=1, color=dG_color, label=r'PMF$_{tot}$')
+    ax1.set_ylabel(r'$\Delta$G [kJ/mol]')
+    ax1.set_xlabel('pulling distance [nm]')
+    ax1.grid(False)
+    ax1.legend()
+    return
+
+
+def plot_Gamma_twinax(ax1, x, frict, frict_color='blue'):
+    # TODO: test this an debug..
+    ax2 = ax1.twinx()
+    ax2.plot(x, frict, c=frict_color, lw=1, label=r'gauss filtered $\Gamma$')
     ax2.spines['right'].set_color(frict_color)
     ax2.set_ylabel(r'$\Gamma$ [kg mol$^{-1}$ ns$^{-1}]$',
                    color=frict_color)
     ax2.tick_params(axis='y', color=frict_color, labelcolor=frict_color)
-    return ax, ax2
+    ax2.grid(False)
+    return ax1, ax2
+
+
 
 

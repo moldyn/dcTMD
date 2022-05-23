@@ -11,6 +11,8 @@ import click
 import dcTMD
 
 import numpy as np
+import matplotlib.pyplot as plt
+from .__accessories__ import plot_dG, plot_Gamma_twinax
 from .__clickextensions__ import Mutex
 
 MODES = ['work', 'force']
@@ -104,6 +106,12 @@ MODES = ['work', 'force']
               show_default=True,
               help='Enable verbose mode.'
               )
+@click.option('--plot',
+              is_flag=True,
+              default=False,
+              show_default=True,
+              help='creates plot of free energy and smoothed friction vs s'
+              )
 def main(calc_dG,
          calc_friction,
          mode,
@@ -116,6 +124,7 @@ def main(calc_dG,
          res,
          sigma,
          verbose,
+         plot
          ) -> None:
     """
     \b
@@ -214,7 +223,16 @@ velocity: {vel}\n resolution: {res}\n sigma: {sigma}\n verbose: \
                         Wdiss=Wdiss, dG=dG, Gamma=Gamma, 
                         Gamma_smooth=Gamma_smooth, errors=args)
 
- 
+    if plot:
+        fig, ax1 = plt.subplots(figsize=(5, 2.2))
+        plot_dG(ax1, x, dG)
+        if calc_friction:
+            plot_Gamma_twinax(ax1, x, Gamma_smooth)
+
+        plt.tight_layout()
+        plt.savefig(outname + '.pdf')
+        
+
 if __name__ == '__main__':
     main()
 
