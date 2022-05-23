@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import re
+import sys
+
+########## 
+# Crappy fix that unsures that the dcTMD module is in sys.path
+import os
+sys.path.append(os.getcwd() + '/src/')
+#sys.path.append("~/code_projects/dcTMD/dcTMD-main" + '/src/')
+
+##########
+
+from src.dcTMD.__main__ import main
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(main())
