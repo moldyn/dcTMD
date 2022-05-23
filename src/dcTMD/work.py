@@ -18,6 +18,71 @@ from typing import Optional
 import gc
 
 
+def read_testfile(file_names: list, skip: int =17, verbose=False):
+    """ read test file to allocate memory and detremine t
+    
+    input:
+        
+        file_names:
+            list or 1D np.array containing file_names
+            len(file_names) = number_of_files
+
+        skip: int
+            number of lines to skip in pullf.xvg file
+        
+    out:
+
+        t: np.array; contains time
+    """
+
+    if verbose:
+        print("using {} to initialize arrays".format(file_names[0]))
+
+    test_file = pd.read_csv(file_names[0],
+                            sep='\s+', 
+                            header=None, 
+                            skiprows=skip, 
+                            dtype=float,
+                            usecols=[0]
+                            ).to_numpy()
+
+    return test_file[:,0] 
+
+
+def fill_work_array(t:np.ndarray, file_names: list, vel: float, skip: int =17, 
+                        verbose=False, res=1):
+
+    # allocate memory
+    work_array = np.zeros((len(file_names), len(t[::res])))
+    work_array_names = []
+    
+    x = t * vel
+    # read in data and fill work_array
+    for i, current_file_name in enumerate(file_names):
+        if verbose:
+            print("reading file {}".format(current_file_name))
+        input_data = pd.read_csv(current_file_name,
+                                 sep='\s+',
+                                 header=None,
+                                 skiprows=skip,
+                                 dtype=float,
+                                 usecols=[1],
+                                 ).to_numpy()
+        # test if file is corrupted
+        if input_data[:,0].shape != t.shape:
+            print("skip file {}".format(current_file_name))
+            print("shape is {}".format(input_data.shape))
+            continue
+        # force in units kJ/(mol*nm), work in units kJ/mol
+        work_array[i, :] = cumtrapz(input_data[:,0], x, initial=0)[::res]
+        work_array_names.append(current_file_name)
+
+    # removing rows with only zero
+    work_array = work_array[~np.all(work_array == 0, axis=1)]
+    
+    return work_array, work_array_names
+
+
 def pullf_to_work_array(file_names: list, vel: float, skip: int =17, 
                         verbose=False, res=1):
     """ Writes data of GROMACS pullf.xvg in np.array full_force_set
@@ -56,55 +121,17 @@ def pullf_to_work_array(file_names: list, vel: float, skip: int =17,
             to be performed.
 
     """
-    # prepare array and testfile
-    number_of_files = len(file_names)
-    print("{} files found".format(number_of_files))
-    if verbose:
-        print("reading file {}".format(file_names[0]))
-    test_file = pd.read_csv(file_names[0],
-                            sep='\s+', 
-                            header=None, 
-                            skiprows=skip, 
-                            dtype=float,
-                            usecols=[0]
-                            ).to_numpy()
 
-    t = test_file
-    x = t * vel
+    # read testfile and determine t
+    t = read_testfile(file_names, skip, verbose)
     
-    length_data = len(t)
-    red_length_data = len(t[::res])
-
     if verbose:
-        print('length of pullf file is {}'.format(length_data))
-        print('output length is {}'.format(red_length_data))
-    #~~~~~~~~~~~~
+        print('length of pullf file is {}'.format(len(t)))
+        print('output length is {}'.format(len(t[::res])))
 
-    work_array = np.zeros((number_of_files, red_length_data))
-    work_array_names = []
-    
-    # read in data and fill work_array
-    for i, current_file_name in enumerate(file_names):
-        if verbose:
-            print("reading file {}".format(current_file_name))
-        input_data = pd.read_csv(current_file_name,
-                                 sep='\s+',
-                                 header=None,
-                                 skiprows=skip,
-                                 dtype=float,
-                                 #usecols=[1],
-                                 ).to_numpy().T
-        # test if file is corrupted
-        if input_data.shape != test_file.shape:
-            print("skip file {}".format(current_file_name))
-            print("shape is {}".format(input_data.shape))
-            continue
-        # force in units kJ/(mol*nm), work in units kJ/mol
-        work_array[i, :] = cumtrapz(input_data[1], x, initial=0)[::res]
-        work_array_names.append(current_file_name)
-
-    # removing rows with only zero
-    work_array = work_array[~np.all(work_array == 0, axis=1)]
+    work_array, work_array_names = fill_work_array(
+                                    t, file_names, vel, skip, 
+                                    verbose, res)
 
     return work_array, t[::res], work_array_names
 
