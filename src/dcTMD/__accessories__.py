@@ -22,6 +22,7 @@ def gausfilter_friction(x_length, frict, sigma):
 
 
 def smooth_friction(x, frict, sigma=False):
+    from scipy.ndimage.filters import gaussian_filter
     """
     smoothes friction data from NEQGamma
     input:
@@ -60,7 +61,7 @@ def smooth_friction(x, frict, sigma=False):
 
 def plot_dG_frict_twinax(ax, x, dG, frict, dG_color='black', frict_color='cyan'):
     # TODO: test this an debug..
-
+    import matplotlib.pyplot as plt
     ax.plot(x, dG, lw=1, color=dG_color, label=r'PMF$_{tot}$')
     ax.plot([0, 1], [0, 1], color=frict_color, alpha=0, label=r'$\Gamma$')
     ax.legend()
