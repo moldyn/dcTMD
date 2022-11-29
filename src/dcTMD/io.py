@@ -12,7 +12,7 @@ def load_pullf(pullf_glob_pattern, pullf_files):
         import glob
         files = glob.glob(pullf_glob_pattern)
     if pullf_files!=None:
-        files = np.loadtxt(pullf_files)  # TODO reshape input?
+        files = np.loadtxt(pullf_files, dtype=str)  # TODO reshape input?
     return files
 
 

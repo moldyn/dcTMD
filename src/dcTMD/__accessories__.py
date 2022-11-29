@@ -6,12 +6,22 @@ __all__ = []
 import numpy as np
 import matplotlib.pyplot as plt
 
-def gausfilter_friction(x_length, frict, sigma):
+def gausfilter_friction(timestep: float, frict:np.ndarray, sigma: float):
     """
     smoothes friction data from NEQGamma
+    input:
+        timestep: float 
+            length of simulation timestep in [nm]
+
+        frict: 1d np array
+            array that contains friction
+
+        sigma: float
+            window size for smoothing in [nm] e.g. 0.1
+        
     """
     from math import ceil
-    blur = ceil(sigma/x_length)
+    blur = ceil(sigma / timestep)
     blurred = np.zeros(frict.shape)
     #print(input_file_data[:, 0:10])
     from scipy.ndimage.filters import gaussian_filter
@@ -21,7 +31,7 @@ def gausfilter_friction(x_length, frict, sigma):
     return blurred
 
 
-def smooth_friction(x, frict, sigma=False):
+def smooth_friction_iterate(x, frict, sigma=False):
     from scipy.ndimage.filters import gaussian_filter
     """
     smoothes friction data from NEQGamma

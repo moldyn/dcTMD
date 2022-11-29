@@ -59,15 +59,6 @@ MODES = ['work', 'force']
               cls=Mutex,
               not_required_if=['pullf_files']
               )
-@click.option('-s',
-              '--skip',
-              'skip',
-              help='Input: number of rows to skip when reading in pullf file.',
-              default = 17,
-              show_default=True, 
-              type= int,
-              required=False,
-              )
 @click.option('-o',
               '--outname',
               type=click.Path(),
@@ -117,7 +108,6 @@ def main(calc_dG,
          mode,
          pullf_files,
          pullf_glob_pattern,
-         skip,
          outname,
          T,
          vel,
@@ -132,13 +122,14 @@ def main(calc_dG,
     |         dcTMD         |
     -------------------------
     TODO: lizenz and paper
-    Calculates dG and friction for given constraint force files.
+    Calculates dG and friction for given constraint force files.\\
+        use pip -e to install package
     """
     # Click aftercare
     if verbose:
         click.echo(f'Input:\n calc_dG: {calc_dG};\n calc_friction: \
 {calc_friction};\n mode: {mode}\n file: {pullf_files}\n glob: \
-{pullf_glob_pattern}\n skip: {skip}\n outname: {outname}\n temperature: {T}\n \
+{pullf_glob_pattern}\n outname: {outname}\n temperature: {T}\n \
 velocity: {vel}\n resolution: {res}\n sigma: {sigma}\n verbose: \
 {verbose}\n')
     if not calc_dG and not calc_friction:
@@ -172,8 +163,7 @@ velocity: {vel}\n resolution: {res}\n sigma: {sigma}\n verbose: \
     
     # Generate work/force set
     dataset, t, filenames = pullf_to_dataset(files, 
-                                            vel, skip, 
-                                            verbose, res)
+                                            vel, verbose, res)
     
     """
     # save dataset for debugging 

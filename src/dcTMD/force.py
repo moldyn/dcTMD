@@ -10,8 +10,71 @@ import numpy as np
 import pandas as pd
 
 
+def _read_testfile(file_names: list, verbose=False):
+    """ read test file to allocate memory and detremine t
+    
+    input:
+        
+        file_names:
+            list or 1D np.array containing file_names
+            len(file_names) = number_of_files
+        
+    out:
 
-def pullf_to_force_array(file_names: list, vel: float, skip: int =17,
+        t: np.array; contains time
+    """
+
+    if verbose:
+        print("using {} to initialize arrays".format(file_names[0]))
+
+    test_file = np.loadtxt(file_names[0], comments=("@", "#"))
+
+    return test_file[:,0] 
+
+
+def _fill_force_array(t:np.ndarray, file_names: list, verbose=False):
+    """ fill force array
+
+    input: 
+        t: 
+            time in ps
+
+        file_names: 
+            list or 1D np.array containing file_names
+            len(file_names) = number_of_files
+
+    out: 
+        force_array:  
+            force array with shape=(len(file_names), len(t))
+        
+        force_array_names:
+            list with forcefilenames important for path separation
+    """
+
+    # allocate memory
+    force_array = np.zeros((len(file_names), len(t)))
+    force_array_names = []
+    
+    # read in data and fill force_array
+    for i, current_file_name in enumerate(file_names):
+        if verbose:
+            print("reading file {}".format(current_file_name))
+        input_data = np.loadtxt(current_file_name, comments=("@", "#"))
+        # test if inpufile is corrupted
+        if input_data[:,0].shape != t.shape:
+            print("skip file {}\n".format(current_file_name))
+            print("shape is {}".format(input_data.shape))
+            continue
+        force_array[i, :] = input_data[:,1]
+        force_array_names.append(current_file_name)
+
+    # removing rows with only zero
+    force_array = force_array[~np.all(force_array == 0, axis=1)]
+
+    return force_array, force_array_names
+
+
+def pullf_to_force_array(file_names: list, vel: float,
                              verbose=False, res=1):
     """ Writes data of GROMACS pullf.xvg in np.array force_array
     
@@ -20,9 +83,6 @@ def pullf_to_force_array(file_names: list, vel: float, skip: int =17,
         file_names: 
             list or 1D np.array containing file_names
             len(file_names) = number_of_files
-        
-        skip: 
-            number of lines to skip in pullf.xvg file
 
     out: 
         
@@ -42,51 +102,17 @@ def pullf_to_force_array(file_names: list, vel: float, skip: int =17,
             to be performed.
 
     """
-    # prepare np.array
-    number_of_files = len(file_names)
-    print("{} files found".format(number_of_files))
-    if verbose:
-        print("reading file {}".format(file_names[0]))
-    test_file = pd.read_csv(file_names[0],
-                            sep='\s+', 
-                            header=None, 
-                            skiprows=skip, 
-                            dtype=float
-                            ).to_numpy().T
-
-    t = test_file[0]
-    length_data = len(t)
-
-    if verbose:
-        print('length of pullf file is {}'.format(length_data))
     
-    force_array = np.zeros((number_of_files, length_data))
-    force_array_names = np.empty(number_of_files, dtype=str)
+    # read testfile and determine t
+    t = _read_testfile(file_names, verbose)
+    
+    if verbose:
+        print('length of pullf file is {}'.format(len(t)))
+        print('output length is {}'.format(len(t[::res])))
 
-    # read in data and fill force_array
-    for i, current_file_name in enumerate(file_names):
-        if verbose:
-            print("reading file {}".format(current_file_name))
-        input_data = pd.read_csv(current_file_name,
-                                 sep='\s+',
-                                 header=None,
-                                 skiprows=skip,
-                                 dtype=float,
-                                 #usecols=[1],
-                                 ).to_numpy().T
-        # test if inpufile is corrupted
-        if input_data.shape != test_file.shape:
-            print("skip file {}\n".format(current_file_name))
-            print("shape is {}".format(input_data.shape))
-            continue
-        force_array[i, :] = input_data[1]
-        force_array_names[i] = current_file_name
-
-    # removing rows with only zero
-    force_array = force_array[~np.all(force_array == 0, axis=1)]
-    # TODO: fix this
-    #force_array_names = force_array_names[~np.all(force_array_names == '')]
-
+    # fill arrays with data
+    force_array, force_array_names = _fill_force_array(t, file_names, verbose)
+    
     return force_array, t, force_array_names
 
 
@@ -208,7 +234,7 @@ def calc_dG_and_friction(force_array: np.ndarray, T: float, t, vel: float,
     force_mean = np.mean(force_array, axis=0)  # shape: (length_data)
     W_mean = scipy.integrate.cumtrapz(force_mean, x, initial=0)
     # calculate $\delta f_c(t) = f_c(t) - \left< f_c (t) \right>_N$ for all t
-    delta_force_array = force_array - force_mean
+    delta_force_array = force_array - force_mean # shape: (N, length_data)
 
     # ~~~ evaluation
     """
@@ -245,12 +271,40 @@ def calc_dG_and_friction(force_array: np.ndarray, T: float, t, vel: float,
             gamma[::res], gamma_smooth[::res]
 
 
-def memory_kernel():
+def memory_kernel(delta_force_array: np.ndarray, X: np.ndarray):
     """
-    TODO
-    calculate memory kernel at position x
+    calculate memory kernel at positions X "forward" in time
+    from fluctuation-dissipation 
+    see e.g. R. Zwanzig, “Nonequilibrium statistical mechanics”, Oxford University Press (2001).
+
+    input:
+        delta_force_array: np.ndarray
+
+            shape: (N, length_data)
+            calculted via delta_force_array = force_array - force_mean
+            with force_mean = np.mean(force_array, axis=0) an ensemble everage in each time step
+
+        X: np.ndarray
+
+            shape: 1d
+            index at which memory kernel is direved
+
+    output:
+        corr_set: np.array
+
+            shape: (len(X), length_data)
+            NaN are set to zero
+
     corr_set[n,i] = delta_force_array[n,i]*delta_force_array[n,int((length_data*args.x)-1)]
     """
+    N, length_data = delta_force_array.shape
+    corr_set = np.zeros((len(X), length_data))
+
+    for i, t in enumerate(range(length_data)):
+        corr_set[i, t:-2] = np.mean(delta_force_array[:,t:-2]*delta_force_array[:,t+1:-1], axis=0)
+
+    return corr_set
+
 
 def gausfilter_friction(frict, sigma, x_length):
     """

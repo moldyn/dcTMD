@@ -18,7 +18,7 @@ from typing import Optional
 import gc
 
 
-def read_testfile(file_names: list, skip: int =17, verbose=False):
+def _read_testfile(file_names: list, verbose=False):
     """ read test file to allocate memory and detremine t
     
     input:
@@ -26,9 +26,6 @@ def read_testfile(file_names: list, skip: int =17, verbose=False):
         file_names:
             list or 1D np.array containing file_names
             len(file_names) = number_of_files
-
-        skip: int
-            number of lines to skip in pullf.xvg file
         
     out:
 
@@ -38,18 +35,12 @@ def read_testfile(file_names: list, skip: int =17, verbose=False):
     if verbose:
         print("using {} to initialize arrays".format(file_names[0]))
 
-    test_file = pd.read_csv(file_names[0],
-                            sep='\s+', 
-                            header=None, 
-                            skiprows=skip, 
-                            dtype=float,
-                            usecols=[0]
-                            ).to_numpy()
+    test_file = np.loadtxt(file_names[0], comments=("@", "#"))
 
     return test_file[:,0] 
 
 
-def fill_work_array(t:np.ndarray, file_names: list, vel: float, skip: int =17, 
+def _fill_work_array(t:np.ndarray, file_names: list, vel: float, 
                         verbose=False, res=1):
 
     # allocate memory
@@ -61,20 +52,14 @@ def fill_work_array(t:np.ndarray, file_names: list, vel: float, skip: int =17,
     for i, current_file_name in enumerate(file_names):
         if verbose:
             print("reading file {}".format(current_file_name))
-        input_data = pd.read_csv(current_file_name,
-                                 sep='\s+',
-                                 header=None,
-                                 skiprows=skip,
-                                 dtype=float,
-                                 usecols=[1],
-                                 ).to_numpy()
+        input_data = np.loadtxt(current_file_name, comments=("@", "#"))
         # test if file is corrupted
         if input_data[:,0].shape != t.shape:
             print("skip file {}".format(current_file_name))
             print("shape is {}".format(input_data.shape))
             continue
         # force in units kJ/(mol*nm), work in units kJ/mol
-        work_array[i, :] = cumtrapz(input_data[:,0], x, initial=0)[::res]
+        work_array[i, :] = cumtrapz(input_data[:,1], x, initial=0)[::res]
         work_array_names.append(current_file_name)
 
     # removing rows with only zero
@@ -83,7 +68,7 @@ def fill_work_array(t:np.ndarray, file_names: list, vel: float, skip: int =17,
     return work_array, work_array_names
 
 
-def pullf_to_work_array(file_names: list, vel: float, skip: int =17, 
+def pullf_to_work_array(file_names: list, vel: float, 
                         verbose=False, res=1):
     """ Writes data of GROMACS pullf.xvg in np.array full_force_set
     
@@ -92,9 +77,6 @@ def pullf_to_work_array(file_names: list, vel: float, skip: int =17,
         file_names: 
             list or 1D np.array containing file_names
             len(file_names) = number_of_files
-        
-        skip: int
-            number of lines to skip in pullf.xvg file
         
         vel: float
             pulling velocity in nm/ps
@@ -123,14 +105,15 @@ def pullf_to_work_array(file_names: list, vel: float, skip: int =17,
     """
 
     # read testfile and determine t
-    t = read_testfile(file_names, skip, verbose)
+    t = _read_testfile(file_names, verbose)
     
     if verbose:
         print('length of pullf file is {}'.format(len(t)))
         print('output length is {}'.format(len(t[::res])))
 
-    work_array, work_array_names = fill_work_array(
-                                    t, file_names, vel, skip, 
+    # fill arrays with data
+    work_array, work_array_names = _fill_work_array(
+                                    t, file_names, vel, 
                                     verbose, res)
 
     return work_array, t[::res], work_array_names
@@ -218,6 +201,7 @@ def calc_dG(work_set: np.ndarray, T: float, errors=False,
 def calc_friction(W_diss, vel, time_step): #calc_gamma_from_W_diss
     """
     TODO: check if time step implementation is coorect!!!
+            delta_x instead of time_step in  function!
 
     Calculate friction.
     gamma = d/dx W_diss(x)
