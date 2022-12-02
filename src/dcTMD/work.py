@@ -6,121 +6,104 @@ changelog:
     - error estimation for dG and gamma added
 """
 
-__all__ = []
+__all__ = ['pullf_to_work_array', 'calc_dG', 'calc_friction']
 
-
-from typing import Optional
+import math
 import numpy as np
 import pandas as pd
-import math
-from scipy.integrate import cumtrapz
-from typing import Optional
-import gc
+from beartype import beartype
+from beartype.typing import Any, Dict, Optional
 
 
-def _read_testfile(file_names: list, verbose=False):
+@beartype
+def _read_testfile(
+    file_names: list, verbose=False
+) -> Any:
     """ read test file to allocate memory and detremine t
-    
     input:
-        
         file_names:
             list or 1D np.array containing file_names
             len(file_names) = number_of_files
-        
     out:
-
         t: np.array; contains time
     """
-
     if verbose:
-        print("using {} to initialize arrays".format(file_names[0]))
-
-    test_file = np.loadtxt(file_names[0], comments=("@", "#"))
-
-    return test_file[:,0] 
+        print(f'using {file_names[0]} to initialize arrays')
+    test_file = np.loadtxt(file_names[0], comments=['@', '#'])
+    return test_file[:, 0]
 
 
-def _fill_work_array(t:np.ndarray, file_names: list, vel: float, 
-                        verbose=False, res=1):
-
+def _fill_work_array(t: np.ndarray, file_names: list, vel: float,
+                     verbose=False, res=1):
+    """
+    """
+    from scipy.integrate import cumulative_trapezoid
     # allocate memory
     work_array = np.zeros((len(file_names), len(t[::res])))
     work_array_names = []
-    
     x = t * vel
     # read in data and fill work_array
     for i, current_file_name in enumerate(file_names):
         if verbose:
-            print("reading file {}".format(current_file_name))
-        input_data = np.loadtxt(current_file_name, comments=("@", "#"))
-        # test if file is corrupted
-        if input_data[:,0].shape != t.shape:
-            print("skip file {}".format(current_file_name))
-            print("shape is {}".format(input_data.shape))
-            continue
-        # force in units kJ/(mol*nm), work in units kJ/mol
-        work_array[i, :] = cumtrapz(input_data[:,1], x, initial=0)[::res]
-        work_array_names.append(current_file_name)
-
+            print(f'reading file {current_file_name}')
+        current_file_data = np.loadtxt(current_file_name, comments=['@', '#'])
+        # test if file is corrupted, else add it
+        if current_file_data[:, 0].shape != t.shape:
+            print(f'skip file {current_file_name}')
+            print(f'shape is {current_file_data.shape}')
+        else:  # force in units kJ/(mol*nm), work in units kJ/mol
+            work_array[i, :] = cumulative_trapezoid(current_file_data[:, 1],
+                                                    x,
+                                                    initial=0,
+                                                    )[::res]
+            work_array_names.append(current_file_name)
     # removing rows with only zero
     work_array = work_array[~np.all(work_array == 0, axis=1)]
-    
     return work_array, work_array_names
 
 
-def pullf_to_work_array(file_names: list, vel: float, 
+def pullf_to_work_array(file_names: list, vel: float,
                         verbose=False, res=1):
     """ Writes data of GROMACS pullf.xvg in np.array full_force_set
-    
     input:
-        
         file_names: 
             list or 1D np.array containing file_names
             len(file_names) = number_of_files
-        
         vel: float
             pulling velocity in nm/ps
-        
         res: int
             striding
-
     out: 
-        
         work_array: 
             np.arrray which contains force data 
             shape (number_of_files, length_data[::res]) 
-
         x: 1D np.array
             in [nm]; len(t) = length_data[::res]
-
         t[1]: float
             timestep of the pullf.xvg file [ps]
             this information is needed later for gamma smoothing 
-        
         work_array_names: 
             1D np.array which contains the file_names coorrespoonding
             to full_force_set. This is useful when a pathseparation needs
             to be performed.
-
     """
-
     # read testfile and determine t
     t = _read_testfile(file_names, verbose)
-    
     if verbose:
-        print('length of pullf file is {}'.format(len(t)))
-        print('output length is {}'.format(len(t[::res])))
-
+        print(f'length of pullf file is {len(t)}')
+        print(f'output length is {len(t[::res])}')
     # fill arrays with data
-    work_array, work_array_names = _fill_work_array(
-                                    t, file_names, vel, 
-                                    verbose, res)
-
+    work_array, work_array_names = _fill_work_array(t, 
+                                                    file_names, 
+                                                    vel,
+                                                    verbose, 
+                                                    res,
+                                                    )
     return work_array, t[::res], work_array_names
 
 
-def calc_dG(work_set: np.ndarray, T: float, errors=False, 
-                N_resamples:Optional[int]=None):
+def calc_dG(work_set: np.ndarray, T: float, errors=False,
+            N_resamples: Optional[int] = None):
     """ calculate dG from dG = <W> - 1/(2kbT) <dW^2> 
         with optional bootstrap errors
 
@@ -133,57 +116,50 @@ def calc_dG(work_set: np.ndarray, T: float, errors=False,
     serves as an estimated error.
     (1) Manually check convergence!
     (2) Supply sufficient data (many trajectories)!
-
-    input:
-        work_set: np.array
-        
-        T: float
-            simulation temperature in [K]
-        
-        optional:
-        errors: bool
-        
-        N_resamples: int
-
-    out:
-        W_mean: 1D np.array
-            average work in [kJ/mol]
-
-        W_diss: 1D np.array
-            dissipative work in [kJ/mol]
-
-        W_mean-W_diss: 1D np.array
-            dissipation corrected work or \Delta G in [kJ/mol]
-
-        optional:
-        np.std(s_W_mean, axis=0): 1D np.array
-            bootstrap error of average work in [kJ/mol]
-
-        np.std(s_W_diss, axis=0): 1D np.array
-            bootstrap error of dissipative work in [kJ/mol]
-        
-        np.std(s_dG, axis=0): 1D np.array
-            bootstrap error of \Delta G in [kJ/mol]
     
+    Parameters
+    ----------
+        work_set: np.array
+        T: float
+            simulation temperature in K
+        errors: bool, optional
+            decides if bootstrap errors are calculated and returned
+        N_resamples: int, optional
+            number of drawn resamples for bootstrapping error analysis
+        
+    Returns
+    -------
+        W_mean: 1D np.array
+            average work in kJ/mol
+        W_diss: 1D np.array
+            dissipative work in kJ/mol
+        W_mean-W_diss: 1D np.array
+            dissipation corrected work or \Delta G in kJ/mol
+        np.std(s_W_mean, axis=0): 1D np.array, optional
+            bootstrap error of average work in kJ/mol
+        np.std(s_W_diss, axis=0): 1D np.array, optional
+            bootstrap error of dissipative work in kJ/mol
+        np.std(s_dG, axis=0): 1D np.array, optional
+            bootstrap error of \Delta G in kJ/mol
     """
     from scipy.constants import R
-    RT = R*T/1e3            #[R]=[kJ/(mol K)]
-                    
+    RT = R*T/1e3  # [R]=[kJ/(mol K)]
+
     N, length_data = np.shape(work_set)
 
     W_mean = np.mean(work_set, axis=0)  # shape: (length_data); kJ/mol
     W_var = np.var(work_set, axis=0)    # shape: (length_data); (kJ/mol)^2
-    W_diss =  1/(2*RT)*W_var
-    if not(errors):
+    W_diss = 1/(2*RT)*W_var
+    if not (errors):
         return W_mean, W_diss, W_mean-W_diss
     else:
         from sklearn.utils import resample
         s_W_mean = np.empty((N_resamples, length_data))
         s_W_diss = np.empty((N_resamples, length_data))
         s_dG = np.empty((N_resamples, length_data))
-        
+
         for i in range(N_resamples):
-            if np.mod(i, 100)==0:
+            if np.mod(i, 100) == 0:
                 print(i, end=' ', flush=True)
             re_work_set = resample(work_set, n_samples=None)
             # random_indices = np.random.randint(0, N, N)
@@ -198,40 +174,33 @@ def calc_dG(work_set: np.ndarray, T: float, errors=False,
             np.std(s_W_diss, axis=0), np.std(s_dG, axis=0)
 
 
-def calc_friction(W_diss, vel, time_step): #calc_gamma_from_W_diss
+def calc_friction(W_diss, vel, time_step):  # calc_gamma_from_W_diss
     """
     TODO: check if time step implementation is coorect!!!
             delta_x instead of time_step in  function!
-
     Calculate friction.
     gamma = d/dx W_diss(x)
-
     input:
         W_diss: 1D np.array
             dissipative work from calc_dG()
-
         vel: float
             pulling velocity in [nm/ps]
-
         time_step: float
             time step of pullf.xvg files in [ps]
-
     out: 
         Gamma: 1D np.array
             in [kJ/mol/(nm^2/ps)]
-
     """
-    #time_step in ps; x in nm, d/dx --> delta x
+    # time_step in ps; x in nm, d/dx --> delta x
     delta_x = time_step * vel
-    print('calculating friction\n\
-            timestep = {}ps \ndelta_x = {}nm'.format(time_step, delta_x))
-    gamma = np.diff(W_diss, prepend=W_diss[0]) / (delta_x * vel)
-
-    return gamma
+    print(f'calculating friction\n\
+            timestep = {time_step}ps \ndelta_x = {delta_x}nm')
+    return np.diff(W_diss, prepend=W_diss[0]) / (delta_x * vel)
 
 
 def calc_dG_and_friction(work_set: np.ndarray, T: float, vel: float,
-                        time_step: float, sigma: float, errors=False, N_resamples=None):
+                         time_step: float, sigma: float, errors=False, 
+                         N_resamples=None):
     """
     Calculate \Delta G and friction from work set.
     dG = <W> - 1/2kbT <dW^2> 
@@ -248,68 +217,56 @@ def calc_dG_and_friction(work_set: np.ndarray, T: float, vel: float,
     (1) Manually check convergence!
     (2) Supply sufficient data (many trajectories)!
 
-    input:
+    Parameters
+    ----------
         W_diss: 1D np.array
-            dissipative work from calc_dG()
-
+            dissipative work
         T: float
-            simulation temperature in [K]
-
+            simulation temperature in K
         vel: float
-            pulling velocity in [nm/ps]
-
+            pulling velocity in nm/ps
         time_step: float
-            time step of pullf.xvg files in [ps] 
+            time step of pullf.xvg files in ps
+        errors: bool, optional
+            decides if bootstrap errors are calculated and returned
+        N_resamples: int, optional
+            number of drawn resamples for bootstrapping error analysis
 
-        optional:
-        errors: bool
-        
-        N_resamples: int
-
-    out: 
+    Returns
+    -------
         W_mean: 1D np.array
-            average work in [kJ/mol]
-
+            average work in kJ/mol
         W_diss: 1D np.array
-            dissipative work in [kJ/mol]
-
+            dissipative work in kJ/mol
         W_mean-W_diss: 1D np.array
-            dissipation corrected work or \Delta G in [kJ/mol]
-        
+            dissipation corrected work or \Delta G in kJ/mol
         Gamma: 1D np.array
-            in [kJ/mol/(nm^2/ps)]
-
-        optional:
-        np.std(s_W_mean, axis=0): 1D np.array
-            bootstrap error of average work in [kJ/mol]
-
-        np.std(s_W_diss, axis=0): 1D np.array
-            bootstrap error of dissipative work in [kJ/mol]
-        
-        np.std(s_dG, axis=0): 1D np.array
-            bootstrap error of \Delta G in [kJ/mol]
-
-        np.std(s_gamma, axis=0): 1D np.array
-            bootstrap error of gamma in [kJ/mol/(nm^2/ps)]
+            in kJ/mol/(nm^2/ps)
+        np.std(s_W_mean, axis=0): 1D np.array, optional
+            bootstrap error of average work in kJ/mol
+        np.std(s_W_diss, axis=0): 1D np.array, optional
+            bootstrap error of dissipative work in kJ/mol
+        np.std(s_dG, axis=0): 1D np.array, optional
+            bootstrap error of \Delta G in kJ/mol
+        np.std(s_gamma, axis=0): 1D np.array, optional
+            bootstrap error of gamma in kJ/mol/(nm^2/ps)
     """
     from scipy.constants import R
-    #RT = R*T/1e3  # TODO test this
-    RT = 0.0083144598*T                     #[R]=[kJ/(mol K)]
+    # RT = R*T/1e3  # TODO test this
+    RT = 0.0083144598*T  # [R] = kJ/(mol K)
     N, length_data = np.shape(work_set)
-    
+
     # calculate dG
     W_mean = np.mean(work_set, axis=0)  # shape: (length_data); kJ/mol
     W_var = np.var(work_set, axis=0)    # shape: (length_data); (kJ/mol)^2
-    W_diss =  1/(2*RT)*W_var
+    W_diss = 1/(2*RT)*W_var
 
     # calculate friction
     # time_step in ps; x in nm, d/dx --> delta x
     delta_x = time_step * vel
-    #print('calculating friction\n\
-    #        timestep = {}ps \ndelta_x = {}nm'.format(time_step, delta_x))
     gamma = np.diff(W_diss, prepend=W_diss[0]) / (delta_x * vel)
     gamma_smooth = gausfilter_friction(gamma, sigma, time_step*vel)
-    if not(errors):
+    if not (errors):
         return W_mean, W_diss, W_mean-W_diss, gamma, gamma_smooth
     else:
         from sklearn.utils import resample
@@ -318,20 +275,20 @@ def calc_dG_and_friction(work_set: np.ndarray, T: float, vel: float,
         s_dG = np.empty_like(s_W_mean)
         s_gamma = np.empty_like(s_W_mean)
         s_gamma_smooth = np.empty_like(s_W_mean)
-        
+
         n_samples = math.ceil(0.9 * N)
-        print("start resampling; n_sample={}".format(n_samples))
+        print(f'start resampling; n_sample={n_samples}')
         for i in range(N_resamples):
-            if np.mod(i, 100)==0:
+            if np.mod(i, 100) == 0:
                 print(i, end=' ', flush=True)
-            
+
             re_work_set = resample(work_set, n_samples=n_samples)
             # random_indices = np.random.randint(0, N, N)
             # re_work_set = work_set[random_indices]
             W_mean_re, W_diss_re, dG_re, gamma_re, gamma_smooth_re = \
-                                calc_dG_and_friction(re_work_set, T, 
-                                                     vel, time_step,
-                                                     sigma, errors=False)
+                calc_dG_and_friction(re_work_set, T,
+                                     vel, time_step,
+                                     sigma, errors=False)
             s_W_mean[i] = W_mean_re
             s_W_diss[i] = W_diss_re
             s_dG[i] = dG_re
