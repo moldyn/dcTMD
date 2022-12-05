@@ -88,7 +88,7 @@ MODES = ['work', 'force']
               )
 @click.option('--sigma',
               type=float,
-              help='Sigma windown size from gaussian filter in nm',
+              help='Sigma window size from gaussian filter in nm',
               )
 @click.option('-v',
               '--verbose',
