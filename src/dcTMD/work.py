@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+"""Calculate dcTMD quantities via the cumulants of the work."""
 __all__ = ['pullf_to_work_array', 'calc_dG', 'calc_friction']
 
 import numpy as np
@@ -135,21 +135,21 @@ def pullf_to_work_array(
 def calc_dG(
     work_set: Float2DArray,
     temp: Float,
-    errors: bool = False,
     N_resamples: Optional[Int] = None,
     verbose: bool = False,
 ) -> Tuple[Float1DArray, ...]:
     """
     Estimate free energy with cumulant expansion & optional bootstrapping.
 
-    For a bootstrapping error estimation, set errors=True and pass a
-    N_resamples. The latter defines how many times trajectories are randomly
-    drawn with replacement. Hence, they may be drawn multiple times or not at
-    all. Note: n_samples=None means that the new sample is as large as the
-    original sample. The standard deviation of the bootstrap sample results
-    serves as an estimated error.
-    (1) Manually check convergence!
-    (2) Supply sufficient data (many trajectories)!
+    For a bootstrapping error estimation, set pass N_resamples. The latter
+    defines how many random sets of trajectories are drawn with replacement.
+    The new samples have the size of the original work set. Hence, in a given
+    set, some trajectories may be drawn multiple times and others not at all.
+    The standard deviation of the bootstrap sample results serves as an
+    estimated error.
+    (1) Please ensure convergence.
+    (2) Supply sufficient data, i.e. many trajectories.
+    (3) Inspect the distributions.
 
     Parameters
     ----------
@@ -158,8 +158,6 @@ def calc_dG(
         constraint work.
     temp: float
         Simulation temperature in K.
-    errors: bool, optional
-        Decides if bootstrap errors are calculated and returned.
     N_resamples: int, optional
         Number of drawn resamples for bootstrapping error analysis.
     verbose: bool, optional
@@ -190,7 +188,7 @@ def calc_dG(
     W_var = np.var(work_set, axis=0)    # shape: (length_data); (kJ/mol)^2
     W_diss = 1 / (2 * RT) * W_var
     dG = W_mean - W_diss
-    if errors:
+    if N_resamples is not None:
         s_W_mean, s_W_diss, s_dG = _calc_dG_errors(
             work_set,
             temp,
@@ -248,7 +246,7 @@ def _calc_dG_errors(
         W_mean, W_diss, dG = calc_dG(
             re_work_set,
             temp,
-            errors=False,
+            N_resamples=None,
         )
         s_W_mean[ind] = W_mean
         s_W_diss[ind] = W_diss
@@ -264,23 +262,23 @@ def calc_friction(
     vel: Float,
     time: Float1DArray,
     sigma: Optional[Float] = None,
-    errors: bool = False,
-    temp: Optional[Float] = None,
     N_resamples: Optional[Int] = None,
+    temp: Optional[Float] = None,
     work_set: Optional[Float2DArray] = None,
     verbose: bool = False,
 ) -> Union[Tuple[Float1DArray, ...], Float1DArray]:
     """
     Calculate (& smooth) friction from the dissipative work via its derivative.
 
-    For a bootstrapping error estimation, set errors=True and pass N_resamples.
-    The latter defines how many random sets of trajectories are drawn with
-    replacement. The new samples have the size of the original work set. Hence,
-    in a given set, some trajectories may be drawn multiple times and others
-    not at all. The standard deviation of the bootstrap sample results serves
-    as an estimated error.
+    For a bootstrapping error estimation, set pass N_resamples. The latter
+    defines how many random sets of trajectories are drawn with replacement.
+    The new samples have the size of the original work set. Hence, in a given
+    set, some trajectories may be drawn multiple times and others not at all.
+    The standard deviation of the bootstrap sample results serves as an
+    estimated error.
     (1) Please ensure convergence.
     (2) Supply sufficient data, i.e. many trajectories.
+    (3) Inspect the distributions.
 
     TODO: check if time step implementation is coorect!!!
             delta_x instead of time_step in  function!
@@ -295,15 +293,13 @@ def calc_friction(
         Time trace corresponding to force file entries.
     sigma : float, optional
         Width in nm of a Gaussian filter to smooth the friction factor.
-    errors : bool, optional
-        Decides if bootstrap errors are calculated and returned.
-    temp : float, optional
-        Simulation temperature in K, needed for bootstrapping error analysis.
     N_resamples : int, optional
         Number of drawn resamples for bootstrapping error analysis.
+    temp : float, optional
+        Simulation temperature in K, needed for bootstrapping error analysis.
     work_set : np.array, optional
         Numpy array of shape (trajectories, time), containing the
-        constraint work.
+        constraint work, needed for bootstrapping error analysis.
     verbose : bool, optional
         Enables verbose mode.
 
@@ -330,7 +326,7 @@ def calc_friction(
     if sigma is not None:
         from dcTMD.utils import gaussfilter_friction
         returns = (*returns, gaussfilter_friction(friction, pos, sigma))
-    if errors:
+    if N_resamples is not None:
         returns = (*returns, *_calc_friction_errors(
             work_set,
             temp,
@@ -371,7 +367,7 @@ def _calc_friction_errors(
         Pulling velocity in nm/ps.
     time : np.ndarray
         Time trace corresponding to force file entries.
-    N_resamles : int
+    N_resamples : int
         Number of drawn resamples for bootstrapping error analysis.
     sigma : float, optional
         Standard deviation of gaussian kernel in nm, used for error of smoothed
@@ -402,7 +398,7 @@ def _calc_friction_errors(
         _, W_diss, _ = calc_dG(
             re_work_set,
             temp,
-            errors=False,
+            N_resamples=None,
             verbose=False,
         )
         frictions = calc_friction(
@@ -410,7 +406,7 @@ def _calc_friction_errors(
             vel,
             time,
             sigma,
-            errors=False,
+            N_resamples=None,
             verbose=False,
         )
         if sigma is None:

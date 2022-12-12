@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-"""
+"""Calculate dcTMD quantities via the autocovariance function of the force."""
 __all__ = []
 
 
@@ -17,16 +16,17 @@ from dcTMD._typing import (
 
 
 @beartype
-def _fill_force_array(t: Float1DArray,
-                      file_names: ArrayLikeStr,
-                      verbose: bool = False,
-                      ) -> Tuple[Float2DArray, ArrayLikeStr]:
-    """ 
+def _fill_force_array(
+    time: Float1DArray,
+    file_names: ArrayLikeStr,
+    verbose: bool = False,
+) -> Tuple[Float2DArray, ArrayLikeStr]:
+    """
     Fill the force array by reading in force files.
 
     Parameters
     ----------
-    t : np.ndarray
+    time : np.ndarray
         Time trace in ps.
     file_names: array_like
         Contains force file names.
@@ -34,27 +34,26 @@ def _fill_force_array(t: Float1DArray,
     Returns
     -------
     force_array: np.ndarray
-        Array containing constraint forces with shape=(len(file_names), 
+        Array containing constraint forces with shape=(len(file_names),
         len(t)).
     force_array_names : list
         List with force file names.
     """
-
     # allocate memory
-    force_array = np.zeros((len(file_names), len(t)))
+    force_array = np.zeros((len(file_names), len(time)))
     force_array_names = []
 
     # read in data and fill force_array
-    for i, current_file_name in enumerate(file_names):
+    for ind, current_file_name in enumerate(file_names):
         if verbose:
-            print("reading file {}".format(current_file_name))
-        input_data = np.loadtxt(current_file_name, comments=("@", "#"))
+            print(f'reading file {current_file_name}')
+        input_data = np.loadtxt(current_file_name, comments=('@', '#'))
         # test if inpufile is corrupted
-        if input_data[:, 0].shape != t.shape:
-            print("skip file {}\n".format(current_file_name))
-            print("shape is {}".format(input_data.shape))
+        if input_data[:, 0].shape != time.shape:
+            print(f'skip file {current_file_name}\n')
+            print(f'shape is {input_data.shape}')
             continue
-        force_array[i, :] = input_data[:, 1]
+        force_array[ind, :] = input_data[:, 1]
         force_array_names.append(current_file_name)
 
     # removing rows with only zero
@@ -63,11 +62,12 @@ def _fill_force_array(t: Float1DArray,
     return force_array, force_array_names
 
 
-def pullf_to_force_array(file_names: ArrayLikeStr,
-                         verbose: bool = False,
-                         res: Int = 1,
-                         ) -> Tuple[Float2DArray, Float1DArray, ArrayLikeStr]:
-    """ 
+def pullf_to_force_array(
+    file_names: ArrayLikeStr,
+    verbose: bool = False,
+    res: Int = 1,
+) -> Tuple[Float2DArray, Float1DArray, ArrayLikeStr]:
+    """
     Write data of GROMACS pullf.xvg in np.ndarray.
 
     Parameters
@@ -87,28 +87,32 @@ def pullf_to_force_array(file_names: ArrayLikeStr,
         Contains positions related to the time trace, in nm.
     time_step: float
         Timestep of the pullf.xvg file
-    force_array_names : 1D np.ndarray 
+    force_array_names : 1D np.ndarray
         Contains the file names corresponding to the force_array.
     """
-
     # read testfile and determine t
     from dcTMD.io import _read_testfile
-    t = _read_testfile(file_names, verbose)
+    time = _read_testfile(file_names, verbose)
 
     # fill arrays with data
-    force_array, force_array_names = _fill_force_array(t, file_names, verbose)
+    force_array, force_array_names = _fill_force_array(
+        time, file_names, verbose,
+    )
 
-    return force_array, t, force_array_names
+    return force_array, time, force_array_names
 
 
-def calc_dG(force_array: Float1DArray,
-            T: Float,
-            t: Float1DArray,
-            vel: Float,
-            res: Int = 1,
-            ) -> Tuple[Float1DArray, Float1DArray, Float1DArray]:
-    """ 
-    Estimates free energy via the dissipation correction in three steps:
+def calc_dG(
+    force_array: Float1DArray,
+    temp: Float,
+    time: Float1DArray,
+    vel: Float,
+    res: Int = 1,
+) -> Tuple[Float1DArray, Float1DArray, Float1DArray]:
+    """
+    Estimate free energy via the dissipation correction.
+
+    Three steps:
         1) calculate force ACF
         2) calculate W_diss from integrate force ACF
         3) calculate dG from  dG = <W> - W_diss
@@ -117,9 +121,9 @@ def calc_dG(force_array: Float1DArray,
     ----------
     force_array : np.array
         Contains time traces of the constraint forces for each simulation.
-    T : float
+    temp : float
         Simulation temperature in K.
-    t : 1D np.array
+    time : 1D np.array
         Times related to the entries in the force time trace in ps.
     vel : float
         Pulling velocity in nm/ps.
@@ -136,8 +140,9 @@ def calc_dG(force_array: Float1DArray,
         Free energy estimate in kJ/mol.
     """
     from scipy.integrate import cumulative_trapezoid
-    RT = 0.0083144598*T  # [R]=[kJ/(mol K)]
-    x = t * vel
+    R = 0.0083144598  # noqa: WPS111
+    RT = R * temp  # [R]=[kJ/(mol K)]
+    pos = time * vel
     """
     * force average: calculate < f_c (t) >_N.
     **Important:** this is an ensemble average over the trajectory ensemble N,
@@ -145,19 +150,23 @@ def calc_dG(force_array: Float1DArray,
     """
     # average and variance over all trajectories in each time step
     force_mean = np.mean(force_array, axis=0)  # shape: (length_data)
-    W_mean = cumulative_trapezoid(force_mean, x, initial=0)
+    W_mean = cumulative_trapezoid(force_mean, pos, initial=0)
     # calculate $\delta f_c(t) = f_c(t) - \left< f_c (t) \right>_N$ for all t
     delta_force_array = force_array - force_mean
     """
     * optimized algorithm for numerical evaluation:
     * integrate: $\int_0^t dt' \delta f_c(t')$ for all $t'$
-    * multiply by $\delta f_c(t)$ to yield $\int_0^t dt'\delta f_c(t) \delta 
+    * multiply by $\delta f_c(t)$ to yield $\int_0^t dt'\delta f_c(t) \delta
     * f_c(t')$ for $t$ with all $t' \leq t$ each
-    * then calculate the ensemble average $\left< \int_0^t dt' \delta f_c(t) 
+    * then calculate the ensemble average $\left< \int_0^t dt' \delta f_c(t)
     * \delta f_c(t') \right>$
     """
-    int_delta_force_array = cumulative_trapezoid(delta_force_array, t,
-                                                 axis=-1, initial=0)
+    int_delta_force_array = cumulative_trapezoid(
+        delta_force_array,
+        time,
+        axis=-1,
+        initial=0,
+    )
     intcorr = np.multiply(delta_force_array, int_delta_force_array)
     """
     # same as:
@@ -167,20 +176,24 @@ def calc_dG(force_array: Float1DArray,
     """
     gamma = np.mean(intcorr, axis=0) / RT
     # * $W_{diss}$ from integration:
-    print("calculating dissipative work...\n")
-    W_diss = cumulative_trapezoid(gamma, x, initial=0) * vel
-    return W_mean[::res], W_diss[::res], W_mean[::res] - W_diss[::res]
+    print('calculating dissipative work...')
+    W_diss = cumulative_trapezoid(gamma, pos, initial=0) * vel
+    dG = W_mean[::res] - W_diss[::res]
+    return W_mean[::res], W_diss[::res], dG
 
 
-def calc_dG_and_friction(force_array: Float2DArray,
-                         T: Float,
-                         t: Float1DArray,
-                         vel: Float,
-                         sigma: Float,
-                         res: Int = 1,
-                         ) -> Tuple[Float1DArray, Float1DArray, Float1DArray,
-                                    Float1DArray, Float1DArray]:
-    """ calculate Gamma and dG dissipation correction
+def calc_dG_and_friction(
+    force_array: Float2DArray,
+    temp: Float,
+    time: Float1DArray,
+    vel: Float,
+    sigma: Float,
+    res: Int = 1,
+) -> Tuple[Float1DArray, ...]:
+    """
+    Calculate friction Gamma and free energy dG by dissipation correction.
+
+    Steps:
         1) calculate force ACF
         2) calculate Gamma
         3) calculate W_diss from integrate force ACF
@@ -188,9 +201,9 @@ def calc_dG_and_friction(force_array: Float2DArray,
 
     force_array : np.ndarray
         Contains time traces of the constraint forces for each simulation.
-    T : float
+    temp : float
         Simulation temperature in K.
-    t : 1D np.ndarray
+    time : 1D np.ndarray
         Times related to the entries in the force time trace in ps.
     vel : float
         Pulling velocity in nm/ps.
@@ -215,10 +228,10 @@ def calc_dG_and_friction(force_array: Float2DArray,
     from dcTMD.utils import gaussfilter_friction
     from scipy.integrate import cumulative_trapezoid
 
-    x = t * vel
-    x_length = x[1]-x[0]
-
-    RT = 0.0083144598*T  # [R]=[kJ/(mol K)]
+    pos = time * vel
+    x_length = pos[1] - pos[0]
+    R = 0.0083144598  # noqa: WPS111
+    RT = R * temp  # [R]=[kJ/(mol K)]
     """
     * force average: calculate < f_c (t) >_N.
     **Important:** this is an ensemble average over the trajectory ensemble N,
@@ -226,7 +239,7 @@ def calc_dG_and_friction(force_array: Float2DArray,
     """
     # average and variance over all trajectories in each time step
     force_mean = np.mean(force_array, axis=0)  # shape: (length_data)
-    W_mean = cumulative_trapezoid(force_mean, x, initial=0)
+    W_mean = cumulative_trapezoid(force_mean, pos, initial=0)
     # calculate $\delta f_c(t) = f_c(t) - \left< f_c (t) \right>_N$ for all t
     delta_force_array = force_array - force_mean  # shape: (N, length_data)
 
@@ -234,11 +247,17 @@ def calc_dG_and_friction(force_array: Float2DArray,
     """
     * optimized algorithm for numerical evaluation:
     * integrate: $\int_0^t dt' \delta f_c(t')$ for all $t'$
-    * multiply by $\delta f_c(t)$ to yield $\int_0^t dt'\delta f_c(t) \delta f_c(t')$ for $t$ with all $t' \leq t$ each
-    * then calculate the ensemble average $\left< \int_0^t dt' \delta f_c(t) \delta f_c(t') \right>$
+    * multiply by $\delta f_c(t)$ to yield $\int_0^t dt'\delta f_c(t)
+    * \delta f_c(t')$ for $t$ with all $t' \leq t$ each then calculate the
+    * ensemble average $\left< \int_0^t dt' \delta f_c(t) \delta f_c(t')
+    * \right>$
     """
-    int_delta_force_array = cumulative_trapezoid(delta_force_array, t,
-                                                 axis=-1, initial=0)
+    int_delta_force_array = cumulative_trapezoid(
+        delta_force_array,
+        time,
+        axis=-1,
+        initial=0,
+    )
     intcorr = np.multiply(delta_force_array, int_delta_force_array)
     """
     # similar to :
@@ -250,7 +269,8 @@ def calc_dG_and_friction(force_array: Float2DArray,
     gamma_smooth = gaussfilter_friction(gamma, sigma, x_length)
     """
     # * autocorrelation function evaluation:
-    # * calculate $\left< \delta f_c(t) \delta f_c(t') \right>$ for the last $t$
+    # * calculate $\left< \delta f_c(t) \delta f_c(t') \right>$ for the last
+    # * $t$
     corr_set = np.zeros(np.shape(force_array))
     print("calculating and processing ACF...\n")
     for n in range(N):
@@ -258,29 +278,40 @@ def calc_dG_and_friction(force_array: Float2DArray,
     autocorr_set = np.mean(corr_set, axis=0)
     """
     # * $W_{diss}$ from integration:
-    print("calculating dissipative work...\n")
-    W_diss = cumulative_trapezoid(gamma, x, initial=0) * vel
+    print('Calculating dissipative work...')
+    W_diss = cumulative_trapezoid(gamma, pos, initial=0) * vel
 
-    return W_mean[::res], W_diss[::res], W_mean[::res]-W_diss[::res], \
-        gamma[::res], gamma_smooth[::res]
+    # Reduce resolution
+    W_mean = W_mean[::res]
+    W_diss = W_diss[::res]
+    dG = W_mean - W_diss
+    gamma = gamma[::res]
+    gamma_smooth = gamma_smooth[::res]
+    return W_mean, W_diss, dG, gamma, gamma_smooth
 
 
-def memory_kernel(delta_force_array: Float2DArray,
-                  X: Float1DArray,
-                  ) -> Float1DArray:
+def memory_kernel(
+    delta_force_array: Float2DArray,
+    x_indices: Float1DArray,
+) -> Float1DArray:
     """
+    Calculate memory kernel at positions X "forward" in time.
+
     Calculate memory kernel at positions X "forward" in time
-    from fluctuation-dissipation 
-    see e.g. R. Zwanzig, “Nonequilibrium statistical mechanics”, 
+    from fluctuation-dissipation.
+    see e.g. R. Zwanzig, “Nonequilibrium statistical mechanics”,
     Oxford University Press (2001).
+    corr_set[n,i] = delta_force_array[n,i]*delta_force_array[n,int
+    ((length_data*args.x)-1)]
+
 
     Parameters
     ----------
     delta_force_array : np.ndarray
         Calculted via delta_force_array = force_array - force_mean
-        with force_mean = np.mean(force_array, axis=0), an ensemble everage 
+        with force_mean = np.mean(force_array, axis=0), an ensemble everage
         in each time step.
-    X : np.ndarray
+    x_indices : np.ndarray
         Indices at which memory kernel is calculated.
 
     Returns
@@ -288,15 +319,15 @@ def memory_kernel(delta_force_array: Float2DArray,
     corr_set : np.ndarray
         shape: (len(X), length_data)
         NaN are set to zero
-
-        corr_set[n,i] = delta_force_array[n,i]*delta_force_array[n,int
-        ((length_data*args.x)-1)]
     """
-    N, length_data = delta_force_array.shape
-    corr_set = np.zeros((len(X), length_data))
+    _, length_data = delta_force_array.shape
+    corr_set = np.zeros((len(x_indices), length_data))
 
-    for i, t in enumerate(range(length_data)):
-        corr_set[i, t:-2] = np.mean(delta_force_array[:, t:-2]
-                                    * delta_force_array[:, t+1:-1],
-                                    axis=0)
+    for ind, tt in enumerate(range(length_data)):
+        entries = delta_force_array[:, tt:-2] * \
+            delta_force_array[:, tt + 1:-1]  # noqa: WPS221
+        corr_set[ind, tt:-2] = np.mean(
+            entries,
+            axis=0,
+        )
     return corr_set

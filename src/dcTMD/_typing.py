@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Class for defining typing.
+"""
+Class for defining typing.
 
-In this module all type hint types are defined. Adapted copy of the file with 
+In this module all type hint types are defined. Adapted copy of the file with
 the same name from MoSAIC (github.com/moldyn/MoSAIC).
 
 MIT License
