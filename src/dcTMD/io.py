@@ -1,20 +1,24 @@
 # -*- coding: utf-8 -*-
-"""
-"""
-__all__ = []
+"""Module handling the input/output functions."""
+__all__ = ['write_output']
 
 import numpy as np
 from beartype import beartype
-from beartype.typing import Any, Optional
-from typing import List
+
+from dcTMD._typing import (
+    ArrayLikeStr,
+    Float1DArray,
+    Int,
+    Str,
+)
 
 
 @beartype
-def _read_testfile(file_names: List[str],
-                   verbose: bool = False,
-                   ) -> np.ndarray:
-    """ 
-    Read test force file to determine t and its length.
+def _read_testfile(
+    file_names: ArrayLikeStr,
+    verbose: bool = False,
+) -> Float1DArray:
+    """Read test force file to determine t and its length.
 
     Parameters
     ----------
@@ -35,35 +39,43 @@ def _read_testfile(file_names: List[str],
 
 
 @beartype
-def load_pullf(pullf_glob_pattern: str,
-               pullf_files: str,
-               ) -> np.ndarray:
+def _load_pullf(
+    pullf_glob_pattern: Str,
+    pullf_files: Str,
+) -> ArrayLikeStr:
     """Return force file names via glob or from file."""
-    if pullf_glob_pattern != None:
+    if pullf_glob_pattern is not None:
         import glob
         files = glob.glob(pullf_glob_pattern)
-    if pullf_files != None:
+    if pullf_files is not None:
         files = np.loadtxt(pullf_files, dtype=str)  # TODO reshape input?
     return files
 
 
 @beartype
-def write_output(o: str, 
-                 N: int, 
-                 **kwargs,
-                 ) -> None:
+def write_output(
+    out: Str,
+    N_traj: Int,
+    **kwargs,
+) -> None:
+    """Take all calculated quantities and save them."""
     print('writing dG...')
-    results = np.asarray([(name, a) for name, a in kwargs.items()
-                          if name != 'errors'], dtype=object)
+    results = [(key, item) for key, item in kwargs.items() if key != 'errors']
+    results = np.asarray(results, dtype=object)
     header = results.T[0]
     arrays = np.vstack(results.T[1])
-    if kwargs["errors"]:
+    if kwargs['errors']:
         header = np.append(
-            header, ['s_' + name for name in header if name != 'x'])
+            header, [f's_{name}' for name in header if name != 'x'],
+        )
         arrays = np.vstack([arrays, kwargs['errors']])
-    np.savetxt(o + "_" + str(N) + '_dG.dat',
-               arrays.T,
-               fmt='%20.8f',
-               header='    '.join(header),
-               )
-    
+    np.savetxt(
+        f'{out}_{N_traj}_dG.dat',
+        arrays.T,
+        fmt='%20.8f',  # noqa: WPS323
+        header='    '.join(header),
+    )
+    np.savez(
+        f'{out}_{N_traj}_dG.npz',
+        kwargs,
+    )

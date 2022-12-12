@@ -3,7 +3,7 @@
 CLI of dcTMD.
 
 MIT License
-Copyright (c) 2021, Victor Taenzel, Miriam Jaeger
+Copyright (c) 2021, Victor Tanzel, Miriam Jaeger
 All rights reserved.
 
 """
@@ -162,7 +162,7 @@ velocity: {vel}\n resolution: {res}\n sigma: {sigma}\n verbose: \
         outname += '_from_forceacf'
 
     # Loading constraint force files
-    files = dcTMD.io.load_pullf(pullf_glob_pattern, pullf_files)
+    files = dcTMD.io._load_pullf(pullf_glob_pattern, pullf_files)
 
     # Generate work/force set
     dataset, t, filenames = pullf_to_dataset(files, vel, verbose, res)
@@ -210,8 +210,6 @@ velocity: {vel}\n resolution: {res}\n sigma: {sigma}\n verbose: \
         plot_dG(ax1, x, dG)
         if calc_friction:
             plot_Gamma_twinax(ax1, x, Gamma_smooth)
-
-        plt.tight_layout()
         plt.savefig(outname + '.pdf')
 
 

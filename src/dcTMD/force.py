@@ -6,16 +6,21 @@ __all__ = []
 
 import numpy as np
 from beartype import beartype
-from beartype.typing import Any, Optional
-from typing import List
-
+from beartype.typing import Tuple
+from dcTMD._typing import (
+    Int,
+    Float,
+    ArrayLikeStr,
+    Float1DArray,
+    Float2DArray,
+)
 
 
 @beartype
-def _fill_force_array(t: np.ndarray,
-                      file_names: List[str],
-                      verbose=False,
-                      ) -> Any:
+def _fill_force_array(t: Float1DArray,
+                      file_names: ArrayLikeStr,
+                      verbose: bool = False,
+                      ) -> Tuple[Float2DArray, ArrayLikeStr]:
     """ 
     Fill the force array by reading in force files.
 
@@ -58,10 +63,10 @@ def _fill_force_array(t: np.ndarray,
     return force_array, force_array_names
 
 
-def pullf_to_force_array(file_names: List[str],
-                         verbose=False,
-                         res=1,
-                         ) -> Any:
+def pullf_to_force_array(file_names: ArrayLikeStr,
+                         verbose: bool = False,
+                         res: Int = 1,
+                         ) -> Tuple[Float2DArray, Float1DArray, ArrayLikeStr]:
     """ 
     Write data of GROMACS pullf.xvg in np.ndarray.
 
@@ -72,7 +77,7 @@ def pullf_to_force_array(file_names: List[str],
     verbose : bool, optional.
         Enables verbose mode.
     res : int, optional.
-        Striding for returned quantities.
+        Unused and kept for compatibiltiy.
 
     Returns
     -------
@@ -90,22 +95,18 @@ def pullf_to_force_array(file_names: List[str],
     from dcTMD.io import _read_testfile
     t = _read_testfile(file_names, verbose)
 
-    if verbose:
-        print('length of pullf file is {}'.format(len(t)))
-        print('output length is {}'.format(len(t[::res])))
-
     # fill arrays with data
     force_array, force_array_names = _fill_force_array(t, file_names, verbose)
 
     return force_array, t, force_array_names
 
 
-def calc_dG(force_array: np.ndarray,
-            T: float,
-            t: np.ndarray,
-            vel: float,
-            res: int,
-            ) -> Any:
+def calc_dG(force_array: Float1DArray,
+            T: Float,
+            t: Float1DArray,
+            vel: Float,
+            res: Int = 1,
+            ) -> Tuple[Float1DArray, Float1DArray, Float1DArray]:
     """ 
     Estimates free energy via the dissipation correction in three steps:
         1) calculate force ACF
@@ -122,7 +123,7 @@ def calc_dG(force_array: np.ndarray,
         Times related to the entries in the force time trace in ps.
     vel : float
         Pulling velocity in nm/ps.
-    res : int
+    res : int, optional
         Striding for returned quantities.
 
     Returns
@@ -171,13 +172,14 @@ def calc_dG(force_array: np.ndarray,
     return W_mean[::res], W_diss[::res], W_mean[::res] - W_diss[::res]
 
 
-def calc_dG_and_friction(force_array: np.ndarray,
-                         T: float,
-                         t: np.ndarray,
-                         vel: float,
-                         sigma: float,
-                         res: int = 1,
-                         ) -> Any:
+def calc_dG_and_friction(force_array: Float2DArray,
+                         T: Float,
+                         t: Float1DArray,
+                         vel: Float,
+                         sigma: Float,
+                         res: Int = 1,
+                         ) -> Tuple[Float1DArray, Float1DArray, Float1DArray,
+                                    Float1DArray, Float1DArray]:
     """ calculate Gamma and dG dissipation correction
         1) calculate force ACF
         2) calculate Gamma
@@ -210,7 +212,7 @@ def calc_dG_and_friction(force_array: np.ndarray,
     gamma_smooth
         Smoothed fricion in kJ/mol/(nm^2/ps).
     """
-    from .utils import gaussfilter_friction
+    from dcTMD.utils import gaussfilter_friction
     from scipy.integrate import cumulative_trapezoid
 
     x = t * vel
@@ -263,9 +265,9 @@ def calc_dG_and_friction(force_array: np.ndarray,
         gamma[::res], gamma_smooth[::res]
 
 
-def memory_kernel(delta_force_array: np.ndarray,
-                  X: np.ndarray,
-                  ) -> np.ndarray:
+def memory_kernel(delta_force_array: Float2DArray,
+                  X: Float1DArray,
+                  ) -> Float1DArray:
     """
     Calculate memory kernel at positions X "forward" in time
     from fluctuation-dissipation 
