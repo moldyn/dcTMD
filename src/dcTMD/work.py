@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Calculate dcTMD quantities via the cumulants of the work."""
+
 __all__ = ['pullf_to_work_array', 'calc_dG', 'calc_friction']
 
 import numpy as np
