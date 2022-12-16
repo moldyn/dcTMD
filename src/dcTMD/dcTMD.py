@@ -12,7 +12,7 @@ __all__ = []
 
 import numpy as np
 from beartype import beartype
-from beartype.typing import Optional, Union
+from beartype.typing import Union
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from dcTMD._typing import (
@@ -32,7 +32,17 @@ def _bootstrap_mode_reducer(obj, *args):
     
     Reduces sequences of a resampled statistics by calculating standard
     deviations or confidence intervals, depending on the 'mode' attribute of
-    the given object.    
+    the given object.
+    
+    Parameters
+    ----------
+    *args :
+        Resampled statistics, to be reduced.
+    
+    Returns
+    -------
+    tuple :
+        Tuple of reduced statistics.
     """
     if obj.mode == 'std':
         def reducer(x):
@@ -51,7 +61,7 @@ def _bootstrap_mode_reducer(obj, *args):
 
 
 
-def Boris(TransformerMixin, BaseEstimator):
+class Boris(TransformerMixin, BaseEstimator):
     @beartype
     def __init__(
         self,
@@ -64,21 +74,53 @@ def Boris(TransformerMixin, BaseEstimator):
     @beartype
     def fit(
         self,
-        work_set: Float2DArray,
+        work_set,
     ):
+        """
+        Estimate free energy and friction.
+        
+        Parameters
+        ----------
+        work_set :
+            Instance of a WorkSet containing constraint forces, for which the 
+            free energy and friction are estimated.
+        
+        Returns
+        -------
+        self :
+            Fitted estimator.
+        """
         self.work_set = work_set
         self.estimate_free_energy()
         return self
 
     @beartype
     def estimate_free_energy(self, work_set=None):
+        """
+        Estimate free energy.
+        
+        Parameters
+        ----------
+        work_set : optional
+            Instance of a WorkSet containing constraint forces, for which the 
+            free energy and friction are estimated.
+        
+        Returns
+        -------
+        W_mean : 1D np.array
+            Average work, in kJ/mol.
+        W_diss : 1D np.array
+            Dissipative work, in kJ/mol.
+        dG : 1D np.array
+            Free energy estimate, in kJ/mol.
+        """
         if work_set is None:
             work_set = self.work_set
         from scipy.constants import R  # noqa: WPS347
         RT = R * self.temperature / 1e3
 
-        self.W_mean_ = np.mean(work_set, axis=0)
-        W_var = np.var(work_set, axis=0)
+        self.W_mean_ = np.mean(work_set.work_, axis=0)
+        W_var = np.var(work_set.work_, axis=0)
         self.W_diss_ = 1 / (2 * RT) * W_var
         self.dG_ = self.W_mean_ - self.W_diss_
         return self.W_mean_, self.W_diss_, self.dG_
@@ -113,7 +155,6 @@ def Boris(TransformerMixin, BaseEstimator):
             Error estimate of the mean work.
         s_dG_ :
             Error estimate of free energy.
-            
         """
         self.N_resamples = N_resamples
         self.mode = mode
@@ -126,7 +167,7 @@ def Boris(TransformerMixin, BaseEstimator):
     ):
         """Perform bootstrapping for the free energy."""
         import tqdm
-        N_traj, length_data = np.shape(self.work_set)
+        N_traj, length_data = np.shape(self.work_set.work_)
 
         W_mean_resampled = np.empty((self.N_resamples, length_data))
         W_diss_resampled = np.empty((self.N_resamples, length_data))
@@ -137,7 +178,7 @@ def Boris(TransformerMixin, BaseEstimator):
             desc='Bootstrapping progress',
         ):
             random_indices = np.random.randint(0, N_traj, N_traj)
-            work_set_resampled = self.work_set[random_indices]
+            work_set_resampled = self.work_set.work_[random_indices]
             W_mean, W_diss, dG = self.estimate_free_energy(
                 work_set=work_set_resampled,
             )
