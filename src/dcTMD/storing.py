@@ -12,7 +12,7 @@ __all__ = ['WorkSet', 'ForceSet']
 
 import numpy as np
 from beartype import beartype
-from beartype.typing import Optional, Union, Tuple
+from beartype.typing import Optional
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from dcTMD._typing import (
@@ -35,7 +35,7 @@ def _get_time_from_testfile(manager):
         print(f'reduced length is {time_length_reduced}')
     manager.time_ = np.loadtxt(
         manager.X[0],
-        comments=['@', '#'],
+        comments=('@', '#'),
         usecols=[0],
     )
 
@@ -84,18 +84,10 @@ class WorkSet(TransformerMixin, BaseEstimator):
         resolution: Int = 1,
         verbose: bool = False,
     ) -> None:
+        """Initialize WorkSet class."""
         self.velocity = velocity
         self.resolution = resolution
         self.verbose = verbose
-
-    def __repr__(self) -> None:
-        """Define representation of class via its parameters."""
-        classdict = vars(self)
-        params = [f'{key}: {classdict[key]}' for key in classdict
-                  if key[-1] != '_' and key != 'X'
-                  ]
-        paramsstr = ', '.join(params)
-        return f'WorkSet({paramsstr})'
 
     @beartype
     def fit(self, X: ArrayLikeStr, y: Optional[np.ndarray] = None):
@@ -122,6 +114,11 @@ class WorkSet(TransformerMixin, BaseEstimator):
         return self
 
     @beartype
+    def transform(self, X, y=None):
+        """Return work set."""
+        return self.work_
+
+    @beartype
     def _fill_work(self) -> None:
         """
         Help integrate the force files.
@@ -144,7 +141,7 @@ class WorkSet(TransformerMixin, BaseEstimator):
                 pbar.write(f'Reading file {file_name}')
             file_data = np.loadtxt(
                 file_name,
-                comments=['@', '#'],
+                comments=('@', '#'),
                 usecols=[1],
             )
             # test if file is corrupted, else add it

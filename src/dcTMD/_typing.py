@@ -39,12 +39,16 @@ class DType:
 # error, see beartype #153
 IsDTypeLike = Is[lambda dtype: np.issubdtype(dtype, np.generic)]
 IsPositive = Is[lambda arr: bool(np.all(arr >= 0))]
+IsStd = Is[lambda val: val in ['std']]
+IsLessThanOne = Is[lambda arr: bool(np.all(arr <= 1))]
+IsStrictlyPositive = Is[lambda arr: bool(np.all(arr > 0))]
 
 # Define Types
 # # scalar datatypes
 Int = Union[int, np.integer]
 Float = Union[float, np.floating]
 Str = Union[str, np.str_]
+NumInRange0to1 = Annotated[Union[Int, Float], IsPositive & IsLessThanOne]
 
 # beartype substitute for np.typing.DTypeLike
 DTypeLike = Annotated[type, IsDTypeLike]
@@ -53,6 +57,7 @@ DTypeLike = Annotated[type, IsDTypeLike]
 IntNDArray = Annotated[np.ndarray, DType[np.integer]]
 FloatNDArray = Annotated[np.ndarray, DType[np.floating]]
 StrNDArray = Annotated[np.ndarray, DType[np.str_]]
+StrStd = Annotated[Str, IsStd]
 
 Index1DArray = Annotated[IntNDArray, NDim[1] & IsPositive]
 Float1DArray = Annotated[FloatNDArray, NDim[1]]
