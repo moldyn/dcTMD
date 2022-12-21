@@ -19,7 +19,7 @@ from dcTMD._typing import (
     Int,
     Float,
     ArrayLikeStr,
-    Float1DArray,
+    Index1DArray,
     Float2DArray,
 )
 
@@ -67,14 +67,21 @@ class WorkSet(TransformerMixin, BaseEstimator):
     Examples
     --------
     # Load some file names listed in 'filenames'
-    >>> import glob
+    >>> import numpy as np
     >>> from dcTMD.storing import WorkSet
     >>> work_set = WorkSet(velocity=0.001, resolution=1)
-    >>> work_set.fit(testfiles)
+    >>> work_set.fit(filenames)
     Loading & integrating force files: 100%|████| X/X [XX:XX<00:00,  X.XX/it]
-    WorkSet(velocity=0.001, resolution=1)
+    WorkSet(velocity=0.001)
     >>> work_set.work_.shape
     (N_trajectories_, len(time_))
+
+    # Reduce work by selecting some trajectories via their indices,
+    # for example the first three, and receive a new WorkSet instance
+    >>> indices = np.array([0, 1, 2])
+    >>> reduced_set = work_set.reduce(indices)
+    >>> reduced_set.work_.shape
+    (3, len(time_))
     """
 
     @beartype
@@ -98,7 +105,7 @@ class WorkSet(TransformerMixin, BaseEstimator):
         ----------
         X :
             File names of constraint force files to be read in and integrated.
-        y : Ignored
+        y :
             Not used, present for scikit API consistency by convention.
 
         Returns
@@ -114,22 +121,42 @@ class WorkSet(TransformerMixin, BaseEstimator):
         return self
 
     @beartype
-    def transform(self, X, y=None):
+    def transform(self, X, y=None) -> Float2DArray:
         """Return work set."""
         return self.work_
 
     @beartype
+    def reduce(self, indices: Index1DArray):
+        """
+        Reduce work set to a chosen subset and return new instance.
+
+        Parameters
+        ----------
+        indices :
+            Indices corresponding to the work trajectories that are kept in the
+            work set.
+
+        Returns
+        -------
+        self :
+            Instance of WorkSet.
+        """
+        import copy
+        reduced_work_set = copy.deepcopy(self)
+        reduced_work_set.work_ = reduced_work_set.work_[indices]
+        reduced_work_set.names_ = reduced_work_set.names_[indices]
+        return reduced_work_set
+    
+    @beartype
     def _fill_work(self) -> None:
-        """
-        Help integrate the force files.
-        """
+        """Help integrate the force files."""
         import tqdm
         from scipy.integrate import cumulative_trapezoid
         self.work_ = np.zeros(
             (len(self.X), len(self.time_[::self.resolution])),
             dtype=float,
         )
-        self.names_ = []
+        self.names_ = np.array([])
         self.positions_ = self.time_ * self.velocity
         # read in data and fill work_array
         for idx, file_name in (pbar := tqdm.tqdm)(
@@ -151,10 +178,11 @@ class WorkSet(TransformerMixin, BaseEstimator):
                     self.positions_,
                     initial=0,
                 )[::self.resolution]
-                self.names_.append(file_name)
+                self.names_ = np.append(self.names_, file_name)
             else:
                 pbar.write(f'skip file {file_name}')
                 pbar.write(
                     f'shape is {file_data.shape} and not {self.time_.shape}')
-        # removing rows with only zero
+        # removing rows with only zero, reduce positions resolution
         self.work_ = self.work_[~np.all(self.work_ == 0, axis=1)]
+        self.positions_ = self.positions_[::self.resolution]
