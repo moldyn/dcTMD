@@ -10,14 +10,16 @@ All rights reserved.
 
 __all__ = ['WorkSet', 'ForceSet']
 
+import joblib
 import numpy as np
 from beartype import beartype
-from beartype.typing import Optional
+from beartype.typing import Optional, Any
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from dcTMD._typing import (
     Int,
     Float,
+    Str,
     ArrayLikeStr,
     Index1DArray,
     Float2DArray,
@@ -25,16 +27,64 @@ from dcTMD._typing import (
 
 
 @beartype
-def _get_time_from_testfile(manager):
+def save(
+    obj,
+    filename: Str,
+) -> None:
+    r"""
+    Save a data manager.
+
+    Parameters
+    ----------
+    obj :
+        Instance of the data manager, i.e. a WorkSet or ForceSet instance.
+    filename :
+        File name to which `obj` is saved.
+
+    Examples
+    --------
+    # Save a WorkSet instance named work_set and load it again:
+    >>> from dcTMD.storing import save load
+    >>> save(work_set, 'my_workset.joblib')
+    >>> my_workset = load('my_workset.joblib')
+    """
+    joblib.dump(obj, filename)
+
+
+@beartype
+def load(
+    filename: Str,
+) -> Any:
+    r"""
+    Load a data manager.
+
+    Parameters
+    ----------
+    filename :
+        Name of the file containing the data manager.
+
+    Examples
+    --------
+    # Save a WorkSet instance named work_set and load it again:
+    >>> from dcTMD.storing import save load
+    >>> save(work_set, 'my_workset.joblib')
+    >>> my_workset = load('my_workset.joblib')
+    """
+    obj = joblib.load(filename)
+    return obj
+
+
+@beartype
+def _get_time_from_testfile(obj):
     """Read test force file to determine the time trace for a data manager."""
-    if manager.verbose:
-        print(f'Using {manager.X[0]} to initialize arrays.')
-        time_length = len(manager.time)
-        time_length_reduced = len(manager.time[::manager.resolution])
+    if obj.verbose:
+        print(f'Using {obj.X[0]} to initialize arrays.')
+        time_length = len(obj.time_)
+        time_length_reduced = len(obj.time_[::obj.resolution])
         print(f'length of pullf file is {time_length}')
         print(f'reduced length is {time_length_reduced}')
-    manager.time_ = np.loadtxt(
-        manager.X[0],
+    obj.time_ = np.loadtxt(
+        obj.X[0],
         comments=('@', '#'),
         usecols=[0],
     )
@@ -97,7 +147,12 @@ class WorkSet(TransformerMixin, BaseEstimator):
         self.verbose = verbose
 
     @beartype
-    def fit(self, X: ArrayLikeStr, y: Optional[np.ndarray] = None):
+    def fit(
+            self,
+            X:
+            ArrayLikeStr,
+            y: Optional[np.ndarray] = None,
+    ):
         """
         Loads constraint force files and calculates work time traces.
 
@@ -146,7 +201,7 @@ class WorkSet(TransformerMixin, BaseEstimator):
         reduced_work_set.work_ = reduced_work_set.work_[indices]
         reduced_work_set.names_ = reduced_work_set.names_[indices]
         return reduced_work_set
-    
+
     @beartype
     def _fill_work(self) -> None:
         """Help integrate the force files."""
@@ -171,7 +226,7 @@ class WorkSet(TransformerMixin, BaseEstimator):
                 comments=('@', '#'),
                 usecols=[1],
             )
-            # test if file is corrupted, else add it
+            # test if file is not corrupted, else add it
             if file_data.shape == self.time_.shape:
                 self.work_[idx, :] = cumulative_trapezoid(
                     file_data,

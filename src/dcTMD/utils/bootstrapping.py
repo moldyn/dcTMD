@@ -70,7 +70,6 @@ def bootstrapping(
     obj,
     func: Callable,
     descriptor: dict,
-    seed: Optional[int] = None,
     verbose: bool = False,
 ):
     """Bootstrapping."""
@@ -91,6 +90,7 @@ def bootstrapping(
         length_data,
     ))
     # Initialize RNG.
+    seed = descriptor['seed']
     rng = np.random.default_rng(seed)
     for ind in tqdm.tqdm(
         range(descriptor['n_resamples']),

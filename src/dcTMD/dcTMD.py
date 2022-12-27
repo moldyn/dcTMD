@@ -18,10 +18,9 @@ from dcTMD.utils import bootstrapping
 from dcTMD._typing import (
     Int,
     Float,
-    Float2DArray,
-    Float3DArray,
     StrStd,
     NumInRange0to1,
+    Float1DArray,
 )
 
 
@@ -105,7 +104,19 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         return self
 
     @beartype
-    def estimate_free_energy(self, work_set=None):
+    def transform(
+        self,
+        X,
+        y=None,
+    ) -> Tuple[Float1DArray, Float1DArray]:
+        """Return free energy and friction estimates."""
+        return self.dG_, self.friction_
+
+    @beartype
+    def estimate_free_energy(
+        self,
+        work_set=None,
+    ) -> Tuple[Float1DArray, Float1DArray, Float1DArray]:
         """
         Estimate free energy.
 
@@ -153,7 +164,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         self,
         n_resamples: Int,
         mode: Union[StrStd, NumInRange0to1],
-    ):
+        seed: Optional[Int] = None,
+    ) -> Tuple[Float1DArray, Float1DArray, Float1DArray]:
         """
         Estimate bootstrapping errors for the free energy estimate.
 
@@ -182,6 +194,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         self.free_energy_error_ = {
             'mode': mode,
             'n_resamples': n_resamples,
+            'seed': seed,
         }
         self._bootstrap_free_energy()
         return self.s_W_mean_, self.s_W_diss_, self.s_dG_
@@ -189,7 +202,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
     @beartype
     def _bootstrap_free_energy(
         self,
-    ):
+    ) -> None:
         # Prepare and run bootstrapper
         def func(x):
             return self.estimate_free_energy(x)
@@ -200,14 +213,17 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         )
         # Save error estimates and bootstrapped quantities
         self.s_W_mean_ = s_quantity[0, 0]
-        self.s_W_diss_= s_quantity[0, 1]
+        self.s_W_diss_ = s_quantity[0, 1]
         self.s_dG_ = s_quantity[0, 2]
         self.W_mean_resampled_ = quantity_resampled[0]
         self.W_diss_resampled_ = quantity_resampled[1]
         self.dG_resampled_ = quantity_resampled[2]
 
     @beartype
-    def estimate_friction(self, W_diss=None):
+    def estimate_friction(
+        self,
+        W_diss: Float1DArray = None,
+    ) -> Float1DArray:
         """Estimate bootstrapping errors for the friction."""
         # Besides calculating dcTMD quantitites to the class, this function
         # is also called from the bootstrapping routine. In the latter case,
@@ -238,28 +254,26 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         self,
         n_resamples: Int,
         mode: Union[StrStd, NumInRange0to1],
-    ):
+        seed: Optional[Int] = None,
+    ) -> Float1DArray:
         """Estimate bootstrapping errors for """
-        self.n_resamples = n_resamples
-        self.mode = mode
-
         self.friction_error_ = {
-            'mode': mode,
             'n_resamples': n_resamples,
+            'mode': mode,
+            'seed': seed,
         }
-
         self._bootstrap_friction()
         return self.s_friction_
 
     @beartype
     def _bootstrap_friction(
         self,
-    ):
+    ) -> None:
         # Prepare and run bootstrapper
         def func(x):
             return self.estimate_friction(
                 self.estimate_free_energy(x)[1]
-                )
+            )
         s_quantity, quantity_resampled = bootstrapping.bootstrapping(
             self,
             func=func,
