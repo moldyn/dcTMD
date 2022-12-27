@@ -7,66 +7,22 @@ Copyright (c) 2022, Victor Tänzel, Miriam Jäger
 All rights reserved.
 """
 
-__all__ = ['Boris']
+__all__ = ['WorkEstimator']
 
 import numpy as np
 from beartype import beartype
-from beartype.typing import Union, Tuple
+from beartype.typing import Union, Tuple, Callable, Optional
 from sklearn.base import BaseEstimator, TransformerMixin
 
+from dcTMD.utils import bootstrapping
 from dcTMD._typing import (
     Int,
     Float,
-    Float1DArray,
     Float2DArray,
+    Float3DArray,
     StrStd,
     NumInRange0to1,
 )
-
-
-@beartype
-def _bootstrap_mode_reducer(
-    obj,
-    *args: Float2DArray,
-) -> Tuple[
-    Union[Float1DArray, Tuple[Float1DArray, Float1DArray]],
-    ...,
-]:
-    """
-    Perform the last bootstrap step.
-
-    Reduces sequences of a resampled statistics by calculating standard
-    deviations or confidence intervals, depending on the 'mode' attribute of
-    the given object obj. If obj.mode is a real number in [0, 1), confidence
-    intervals will be computed. If it is the string 'std', then the standard
-    deviation is calculated.
-
-    Parameters
-    ----------
-    obj :
-        Instance of Boris which provides its 'mode' attribute.
-    *args :
-        Resampled statistics, to be reduced.
-
-    Returns
-    -------
-    tuple :
-        Tuple of reduced statistics.
-    """
-    if obj.mode_ == 'std':
-        def reducer(x):
-            return np.std(x, axis=0)
-    else:
-        import scipy.stats as st
-
-        def reducer(x):
-            return st.t.interval(
-                obj.mode_,
-                len(x)-1,
-                loc=np.mean(x),
-                scale=st.sem(x),
-            )
-    return tuple(reducer(arg) for arg in args)
 
 
 class WorkEstimator(TransformerMixin, BaseEstimator):
@@ -92,13 +48,13 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         Parameter of estimate_free_energy_errors(). Decides how the
         bootstrapping errors are calculated.        
     s_W_mean_ :
-        Boostrapping error of the mean work. Calculated via 
+        Bootstrapping error of the mean work. Calculated via 
         estimate_free_energy_errors().
     s_W_diss_ :
-        Boostrapping error of the dissipative work. Calculated via
+        Bootstrapping error of the dissipative work. Calculated via
         estimate_free_energy_errors().
     s_dG_ :
-        Boostrapping error of the free energy estimate. Calculated via
+        Bootstrapping error of the free energy estimate. Calculated via
         estimate_free_energy_errors().
     W_mean_resampled_ :
         Resampled mean work, needed to inspect its distribution. Calculated
@@ -195,19 +151,19 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
     @beartype
     def estimate_free_energy_errors(
         self,
-        N_resamples: Int,
+        n_resamples: Int,
         mode: Union[StrStd, NumInRange0to1],
     ):
         """
         Estimate bootstrapping errors for the free energy estimate.
 
-        Boostrapping errors are calculated for the free energy estimate and the
+        Bootstrapping errors are calculated for the free energy estimate and the
         related quantities mean and dissipative work. Return matches the one of
         estimate_free_energy().
 
         Parameters
         ----------
-        N_resamples :
+        n_resamples :
             Number of drawn resamples for bootstrapping error analysis.
         mode :
             Chooses between reducing the resampled statistic via (1) 'std' the
@@ -223,8 +179,10 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         s_dG_ :
             Error estimate of free energy.
         """
-        self.N_resamples = N_resamples
-        self.mode_ = mode
+        self.free_energy_error_ = {
+            'mode': mode,
+            'n_resamples': n_resamples,
+        }
         self._bootstrap_free_energy()
         return self.s_W_mean_, self.s_W_diss_, self.s_dG_
 
@@ -232,53 +190,28 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
     def _bootstrap_free_energy(
         self,
     ):
-        """Perform bootstrapping for the free energy."""
-        import tqdm
-        N_traj, length_data = np.shape(self.work_set.work_)
-
-        W_mean_resampled = np.empty((self.N_resamples, length_data))
-        W_diss_resampled = np.empty((self.N_resamples, length_data))
-        dG_resampled = np.empty((self.N_resamples, length_data))
-
-        for ind in tqdm.tqdm(
-            range(self.N_resamples),
-            desc='Bootstrapping progress',
-        ):
-            # Draw random work time traces
-            random_indices = np.random.randint(0, N_traj, N_traj)
-            work_set_resampled = self.work_set.work_[random_indices]
-            # Calculate and save the relevant statistics
-            W_mean, W_diss, dG = self.estimate_free_energy(
-                work_set=work_set_resampled,
-            )
-            W_mean_resampled[ind] = W_mean
-            W_diss_resampled[ind] = W_diss
-            dG_resampled[ind] = dG
-        # There are now boostrapped quantities in the '_resampled' variables.
-        # We are interested in the element-wise distributions and thus
-        # calculate (1) the standard distribution of the resampled quantity
-        # at all points or (2) confidence intervals.
-        s_W_mean, s_W_diss, s_dG,  = _bootstrap_mode_reducer(
+        # Prepare and run bootstrapper
+        def func(x):
+            return self.estimate_free_energy(x)
+        s_quantity, quantity_resampled = bootstrapping.bootstrapping(
             self,
-            W_mean_resampled,
-            W_diss_resampled,
-            dG_resampled,
+            func=func,
+            descriptor=self.free_energy_error_,
         )
-        self.s_W_mean_ = s_W_mean
-        self.s_W_diss_ = s_W_diss
-        self.s_dG_ = s_dG
-        # The distributions of the '_resampled' variables must be inspected
-        # and are thus saved as attributes.
-        self.W_mean_resampled_ = W_mean_resampled
-        self.W_diss_resampled_ = W_diss_resampled
-        self.dG_resampled_ = dG_resampled
+        # Save error estimates and bootstrapped quantities
+        self.s_W_mean_ = s_quantity[0, 0]
+        self.s_W_diss_= s_quantity[0, 1]
+        self.s_dG_ = s_quantity[0, 2]
+        self.W_mean_resampled_ = quantity_resampled[0]
+        self.W_diss_resampled_ = quantity_resampled[1]
+        self.dG_resampled_ = quantity_resampled[2]
 
     @beartype
     def estimate_friction(self, W_diss=None):
         """Estimate bootstrapping errors for the friction."""
         # Besides calculating dcTMD quantitites to the class, this function
         # is also called from the bootstrapping routine. In the latter case,
-        # which comes with a passed work_set parameter, attributes should not
+        # which comes with a passed W_diss parameter, attributes should not
         # be overwritten.
         if W_diss is None:
             is_bootstrapping = False
@@ -297,52 +230,41 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             W_diss, prepend=W_diss[0]
         ) / (delta_x * self.work_set.velocity)
         if not is_bootstrapping:
-            self.friction = friction
+            self.friction_ = friction
         return friction
 
     @beartype
     def estimate_friction_errors(
         self,
-        N_resamples: Int,
+        n_resamples: Int,
         mode: Union[StrStd, NumInRange0to1],
     ):
         """Estimate bootstrapping errors for """
-        self.N_resamples = N_resamples
-        self.mode_ = mode
+        self.n_resamples = n_resamples
+        self.mode = mode
+
+        self.friction_error_ = {
+            'mode': mode,
+            'n_resamples': n_resamples,
+        }
+
         self._bootstrap_friction()
-        return self.s_friction
+        return self.s_friction_
 
     @beartype
     def _bootstrap_friction(
         self,
     ):
-        """Perform bootstrapping for the free energy."""
-        import tqdm
-        N_traj, length_data = np.shape(self.work_set.work_)
-        friction_resampled = np.empty((self.N_resamples, length_data))
-
-        for ind in tqdm.tqdm(
-            range(self.N_resamples),
-            desc='Bootstrapping progress',
-        ):
-            # Draw random work time traces
-            random_indices = np.random.randint(0, N_traj, N_traj)
-            work_set_resampled = self.work_set.work_[random_indices]
-            # Calculate and save the relevant statistics
-            _, W_diss, _ = self.estimate_free_energy(
-                work_set=work_set_resampled,
-            )
-            friction = self.estimate_friction(W_diss=W_diss)
-            friction_resampled[ind] = friction
-        # There are now boostrapped quantities in the '_resampled' variables.
-        # We are interested in the element-wise distributions and thus
-        # calculate (1) the standard distribution of the resampled quantity
-        # at all points or (2) confidence intervals.
-        s_friction,  = _bootstrap_mode_reducer(
+        # Prepare and run bootstrapper
+        def func(x):
+            return self.estimate_friction(
+                self.estimate_free_energy(x)[1]
+                )
+        s_quantity, quantity_resampled = bootstrapping.bootstrapping(
             self,
-            friction,
+            func=func,
+            descriptor=self.friction_error_,
         )
-        self.s_friction_ = s_friction
-        # The distributions of the '_resampled' variables must be inspected
-        # and are thus saved as attributes.
-        self.friction_resampled_ = friction_resampled
+        # Save error estimates and bootstrapped quantities
+        self.s_friction_ = s_quantity[0, 0]
+        self.friction_resampled_ = quantity_resampled[:, 0, :]

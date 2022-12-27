@@ -62,6 +62,7 @@ StrStd = Annotated[Str, IsStd]
 Index1DArray = Annotated[IntNDArray, NDim[1] & IsPositive]
 Float1DArray = Annotated[FloatNDArray, NDim[1]]
 Float2DArray = Annotated[FloatNDArray, NDim[2]]
+Float3DArray = Annotated[FloatNDArray, NDim[3]]
 Str1DArray = Annotated[StrNDArray, NDim[1]]
 
 ArrayLikeFloat = Union[List[float], FloatNDArray]

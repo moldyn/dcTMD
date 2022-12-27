@@ -61,7 +61,7 @@ class WorkSet(TransformerMixin, BaseEstimator):
         Constraint force file names corresponding to work time traces.
     time_ :
         Time trace corresponding to the work, in ps.
-    positions_ :
+    position_ :
         Positions time trace, product of time trace and velocity, in nm.
 
     Examples
@@ -157,7 +157,7 @@ class WorkSet(TransformerMixin, BaseEstimator):
             dtype=float,
         )
         self.names_ = np.array([])
-        self.positions_ = self.time_ * self.velocity
+        self.position_ = self.time_ * self.velocity
         # read in data and fill work_array
         for idx, file_name in (pbar := tqdm.tqdm)(
             enumerate(self.X),
@@ -175,7 +175,7 @@ class WorkSet(TransformerMixin, BaseEstimator):
             if file_data.shape == self.time_.shape:
                 self.work_[idx, :] = cumulative_trapezoid(
                     file_data,
-                    self.positions_,
+                    self.position_,
                     initial=0,
                 )[::self.resolution]
                 self.names_ = np.append(self.names_, file_name)
@@ -185,4 +185,4 @@ class WorkSet(TransformerMixin, BaseEstimator):
                     f'shape is {file_data.shape} and not {self.time_.shape}')
         # removing rows with only zero, reduce positions resolution
         self.work_ = self.work_[~np.all(self.work_ == 0, axis=1)]
-        self.positions_ = self.positions_[::self.resolution]
+        self.position_ = self.position_[::self.resolution]
