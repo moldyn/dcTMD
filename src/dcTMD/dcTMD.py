@@ -166,12 +166,12 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         mode: Union[StrStd, NumInRange0to1],
         seed: Optional[Int] = None,
     ) -> Tuple[Float1DArray, Float1DArray, Float1DArray]:
-        """
+        r"""
         Estimate bootstrapping errors for the free energy estimate.
 
-        Bootstrapping errors are calculated for the free energy estimate and the
-        related quantities mean and dissipative work. Return matches the one of
-        estimate_free_energy().
+        Bootstrapping errors are calculated for the free energy estimate and 
+        the related quantities mean and dissipative work. Return matches the 
+        one of estimate_free_energy().
 
         Parameters
         ----------
@@ -180,7 +180,9 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         mode :
             Chooses between reducing the resampled statistic via (1) 'std' the
             element-wise calculation of standard deviations or (2) confidence
-            intervals if 'mode' is a float in [0, 1).
+            intervals if `mode` is a float in [0, 1).
+        seed :
+            Seed for the random number generator.
 
         Returns
         -------
@@ -203,6 +205,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
     def _bootstrap_free_energy(
         self,
     ) -> None:
+        """Use utils/bootstrapper.py for error estimation."""
         # Prepare and run bootstrapper
         def func(x):
             return self.estimate_free_energy(x)
@@ -215,20 +218,35 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         self.s_W_mean_ = s_quantity[0, 0]
         self.s_W_diss_ = s_quantity[0, 1]
         self.s_dG_ = s_quantity[0, 2]
-        self.W_mean_resampled_ = quantity_resampled[0]
-        self.W_diss_resampled_ = quantity_resampled[1]
-        self.dG_resampled_ = quantity_resampled[2]
+        print(quantity_resampled.shape)
+        self.W_mean_resampled_ = quantity_resampled[:, 0]
+        self.W_diss_resampled_ = quantity_resampled[:, 1]
+        self.dG_resampled_ = quantity_resampled[:, 2]
 
     @beartype
     def estimate_friction(
         self,
-        W_diss: Float1DArray = None,
+        W_diss: Optional[Float1DArray] = None,
     ) -> Float1DArray:
-        """Estimate bootstrapping errors for the friction."""
-        # Besides calculating dcTMD quantitites to the class, this function
-        # is also called from the bootstrapping routine. In the latter case,
-        # which comes with a passed W_diss parameter, attributes should not
-        # be overwritten.
+        """
+        Estimate bootstrapping errors for the friction.
+
+        Besides calculating dcTMD quantitites to the class, this function
+        is also called from the bootstrapping routine. In the latter case,
+        which comes with a passed `W_diss` parameter, attributes should not
+        be overwritten.
+
+        Parameters
+        ----------
+        W_diss :
+            Dissipative work, in kJ/mol. Is passed if this function is used
+            during bootstrapping.
+
+        Returns
+        -------
+        friction :
+            Friction factor in kJ/mol/(nm^2/ps).
+        """
         if W_diss is None:
             is_bootstrapping = False
             try:
@@ -256,7 +274,29 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         mode: Union[StrStd, NumInRange0to1],
         seed: Optional[Int] = None,
     ) -> Float1DArray:
-        """Estimate bootstrapping errors for """
+        r"""
+        Estimate bootstrapping errors for the free energy estimate.
+
+        Bootstrapping errors are calculated for the free energy estimate and 
+        the related quantities mean and dissipative work. Return matches the 
+        one of estimate_free_energy().
+
+        Parameters
+        ----------
+        n_resamples :
+            Number of drawn resamples for bootstrapping error analysis.
+        mode :
+            Chooses between reducing the resampled statistic via (1) 'std' the
+            element-wise calculation of standard deviations or (2) confidence
+            intervals if `mode` is a float in [0, 1).
+        seed :
+            Seed for the random number generator.
+
+        Returns
+        -------
+        s_friction_ :
+            Bootstrap error of the friction factor in kJ/mol/(nm^2/ps).
+        """
         self.friction_error_ = {
             'n_resamples': n_resamples,
             'mode': mode,
@@ -269,6 +309,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
     def _bootstrap_friction(
         self,
     ) -> None:
+        """Use utils/bootstrapper.py for error estimation."""
         # Prepare and run bootstrapper
         def func(x):
             return self.estimate_friction(
@@ -281,4 +322,4 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         )
         # Save error estimates and bootstrapped quantities
         self.s_friction_ = s_quantity[0, 0]
-        self.friction_resampled_ = quantity_resampled[:, 0, :]
+        self.friction_resampled_ = quantity_resampled[:, 0]

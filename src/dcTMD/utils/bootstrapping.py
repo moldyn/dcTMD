@@ -23,6 +23,7 @@ from dcTMD._typing import (
     NumInRange0to1,
 )
 
+
 @beartype
 def _bootstrap_reducer(
     descriptor: dict,
@@ -53,15 +54,9 @@ def _bootstrap_reducer(
         def reducer(x):
             return np.std(x, axis=0)
     else:
-        import scipy.stats as st
-
+        # Implement the confidence intervals here.
         def reducer(x):
-            return st.t.interval(
-                descriptor['mode'],
-                len(x)-1,
-                loc=np.mean(x),
-                scale=st.sem(x),
-            )
+            pass
     return tuple(reducer(arg) for arg in args)
 
 
