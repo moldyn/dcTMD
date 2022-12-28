@@ -267,7 +267,7 @@ class ForceSet(TransformerMixin, BaseEstimator):
 
     Examples
     --------
-    # Load some file names listed in 'filenames'
+    >>> # Load some file names listed in 'filenames'
     >>> import numpy as np
     >>> from dcTMD.storing import ForceSet
     >>> force_set = ForceSet(velocity=0.001, resolution=1)

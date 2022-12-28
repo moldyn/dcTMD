@@ -11,7 +11,7 @@ __all__ = ['WorkEstimator']
 
 import numpy as np
 from beartype import beartype
-from beartype.typing import Union, Tuple, Callable, Optional
+from beartype.typing import Union, Tuple, Optional
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from dcTMD.utils import bootstrapping
@@ -45,9 +45,9 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         Free energy estimate, in kJ/mol.
     mode_ :
         Parameter of estimate_free_energy_errors(). Decides how the
-        bootstrapping errors are calculated.        
+        bootstrapping errors are calculated.
     s_W_mean_ :
-        Bootstrapping error of the mean work. Calculated via 
+        Bootstrapping error of the mean work. Calculated via
         estimate_free_energy_errors().
     s_W_diss_ :
         Bootstrapping error of the dissipative work. Calculated via
@@ -66,9 +66,17 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         Calculated via estimate_free_energy_errors().
 
     Examples :
-
-
+    >>> from dcTMD.dcTMD import WorkEstimator
+    >>> from dcTMD.storing import load
+    >>> work = load('my_work_set')
+    >>> # Instantiate a WorkEstimator instance and fit it with the WorkSet
+    >>> # instance work
+    >>> work_estimator = WorkEstimator(temperature=290.15)
+    >>> work_estimator.fit(work)
+    >>> work_estimator.dG_
+    array([..., ])
     """
+
     @beartype
     def __init__(
         self,
@@ -123,7 +131,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         Parameters
         ----------
         work_set : optional
-            Instance of a WorkSet containing constraint forces, for which the 
+            Instance of a WorkSet containing constraint forces, for which the
             free energy and friction are estimated.
 
         Returns
@@ -166,11 +174,11 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         mode: Union[StrStd, NumInRange0to1],
         seed: Optional[Int] = None,
     ) -> Tuple[Float1DArray, Float1DArray, Float1DArray]:
-        r"""
+        """
         Estimate bootstrapping errors for the free energy estimate.
 
-        Bootstrapping errors are calculated for the free energy estimate and 
-        the related quantities mean and dissipative work. Return matches the 
+        Bootstrapping errors are calculated for the free energy estimate and
+        the related quantities mean and dissipative work. Return matches the
         one of estimate_free_energy().
 
         Parameters
@@ -207,8 +215,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
     ) -> None:
         """Use utils/bootstrapper.py for error estimation."""
         # Prepare and run bootstrapper
-        def func(x):
-            return self.estimate_free_energy(x)
+        def func(my_work_set):
+            return self.estimate_free_energy(my_work_set)
         s_quantity, quantity_resampled = bootstrapping.bootstrapping(
             self,
             func=func,
@@ -251,7 +259,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             is_bootstrapping = False
             try:
                 W_diss = self.W_diss_
-            except:
+            except AttributeError:
                 self.estimate_free_energy()
                 W_diss = self.W_diss_
         else:
@@ -261,7 +269,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         if self.verbose:
             print(f'calculating friction, delta_x: {delta_x}nm')
         friction = np.diff(
-            W_diss, prepend=W_diss[0]
+            W_diss, prepend=W_diss[0],
         ) / (delta_x * self.work_set.velocity)
         if not is_bootstrapping:
             self.friction_ = friction
@@ -274,11 +282,11 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         mode: Union[StrStd, NumInRange0to1],
         seed: Optional[Int] = None,
     ) -> Float1DArray:
-        r"""
+        """
         Estimate bootstrapping errors for the free energy estimate.
 
-        Bootstrapping errors are calculated for the free energy estimate and 
-        the related quantities mean and dissipative work. Return matches the 
+        Bootstrapping errors are calculated for the free energy estimate and
+        the related quantities mean and dissipative work. Return matches the
         one of estimate_free_energy().
 
         Parameters
@@ -311,9 +319,9 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
     ) -> None:
         """Use utils/bootstrapper.py for error estimation."""
         # Prepare and run bootstrapper
-        def func(x):
+        def func(my_work_set):
             return self.estimate_friction(
-                self.estimate_free_energy(x)[1]
+                self.estimate_free_energy(my_work_set)[1],
             )
         s_quantity, quantity_resampled = bootstrapping.bootstrapping(
             self,
