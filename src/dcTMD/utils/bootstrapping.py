@@ -12,15 +12,10 @@ __all__ = ['bootstrapping']
 import numpy as np
 from beartype import beartype
 from beartype.typing import Union, Callable, Optional
-from sklearn.base import BaseEstimator, TransformerMixin
 
 from dcTMD._typing import (
-    Int,
-    Float,
     Float2DArray,
     Float3DArray,
-    StrStd,
-    NumInRange0to1,
 )
 
 
@@ -32,11 +27,11 @@ def _bootstrap_reducer(
     """
     Perform the last bootstrap step.
 
-    Reduces sequences of a resampled statistics by calculating standard
-    deviations or confidence intervals, depending on the 'mode' attribute of
-    the given object obj. If mode is a real number in [0, 1), confidence
-    intervals will be computed. If it is the string 'std', then the standard
-    deviation is calculated.
+    Reduces arrays of resampled statistics by calculating standard deviations
+    or confidence intervals, depending on the 'mode' attribute of the given
+    object obj. If mode is a real number in [0, 1), confidence intervals will
+    be computed. If it is the string 'std', then the standard deviation is
+    calculated.
 
     Parameters
     ----------
@@ -65,7 +60,7 @@ def bootstrapping(
     obj,
     func: Callable,
     descriptor: dict,
-    verbose: bool = False,
+    verbose: Optional[bool] = False,
 ):
     """Bootstrapping."""
     import tqdm
@@ -87,7 +82,7 @@ def bootstrapping(
     # Initialize RNG.
     seed = descriptor['seed']
     rng = np.random.default_rng(seed)
-    for ind in tqdm.tqdm(
+    for idx in tqdm.tqdm(
         range(descriptor['n_resamples']),
         desc='Bootstrapping progress',
     ):
@@ -97,7 +92,7 @@ def bootstrapping(
 
         # Calculate and save the relevant statistic
         quantity = func(work_set_resampled)
-        quantity_resampled[ind] = quantity
+        quantity_resampled[idx] = quantity
     # There are now boostrapped quantities in the '_resampled' variables.
     # We are interested in the element-wise distributions and thus
     # calculate (1) the standard distribution of the resampled quantity
