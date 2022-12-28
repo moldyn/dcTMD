@@ -133,7 +133,6 @@ class WorkSet(TransformerMixin, BaseEstimator):
     >>> reduced_set.work_.shape
     (3, len(time_))
     """
-
     @beartype
     def __init__(
         self,
@@ -148,10 +147,9 @@ class WorkSet(TransformerMixin, BaseEstimator):
 
     @beartype
     def fit(
-            self,
-            X:
-            ArrayLikeStr,
-            y: Optional[np.ndarray] = None,
+        self,
+        X: ArrayLikeStr,
+        y: Optional[np.ndarray] = None,
     ):
         """
         Loads constraint force files and calculates work time traces.
@@ -241,3 +239,90 @@ class WorkSet(TransformerMixin, BaseEstimator):
         # removing rows with only zero, reduce positions resolution
         self.work_ = self.work_[~np.all(self.work_ == 0, axis=1)]
         self.position_ = self.position_[::self.resolution]
+
+
+class ForceSet(TransformerMixin, BaseEstimator):
+    """
+    Class for managing constraint force data.
+
+    Parameters
+    ----------
+    velocity :
+        Pulling velocity in nm/ps.
+    resolution :
+        Striding to reduce work time trace.
+    verbose :
+        Enables verbose mode.
+
+    Attributes
+    ----------
+    force_:
+        Constraint force time traces, in kJ/mol.
+    names_ :
+        Constraint force file names corresponding to work time traces.
+    time_ :
+        Time trace corresponding to the work, in ps.
+    position_ :
+        Positions time trace, product of time trace and velocity, in nm.
+
+    Examples
+    --------
+    # Load some file names listed in 'filenames'
+    >>> import numpy as np
+    >>> from dcTMD.storing import ForceSet
+    >>> force_set = ForceSet(velocity=0.001, resolution=1)
+    >>> force_set.fit(filenames)
+    Loading force files: 100%|████| X/X [XX:XX<00:00,  X.XX/it]
+    ForceSet(velocity=0.001)
+    >>> force_set.work_.shape
+    (N_trajectories_, len(time_))
+    """
+    @beartype
+    def __init__(
+        self,
+        velocity: Float,
+        resolution: Int = 1,
+        verbose: bool = False,
+    ) -> None:
+        """Initialize WorkSet class."""
+        self.velocity = velocity
+        self.resolution = resolution
+        self.verbose = verbose
+
+    @beartype
+    def fit(
+        self,
+        X: ArrayLikeStr,
+        y: Optional[np.ndarray] = None,
+    ):
+        """
+        Loads constraint force files.
+
+        Parameters
+        ----------
+        X :
+            File names of constraint force files to be read in.
+        y :
+            Not used, present for scikit API consistency by convention.
+
+        Returns
+        -------
+        self:
+            Fitted estimator.
+        """
+        self.X = X
+        # read a test file for the time trace
+        _get_time_from_testfile(self)
+        # fill arrays with data
+        self._fill_force()
+        return self
+
+    @beartype
+    def transform(self, X, y=None) -> Float2DArray:
+        """Return force set."""
+        return self.force_
+
+    @beartype
+    def _fill_force(self) -> None:
+        """Help load the force files."""
+        self.force_ = None
