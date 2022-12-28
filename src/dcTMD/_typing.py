@@ -39,7 +39,7 @@ class DType:
 # error, see beartype #153
 IsDTypeLike = Is[lambda dtype: np.issubdtype(dtype, np.generic)]
 IsPositive = Is[lambda arr: bool(np.all(arr >= 0))]
-IsStd = Is[lambda val: val in ['std']]
+IsStd = Is[lambda val: val == 'std']
 IsLessThanOne = Is[lambda arr: bool(np.all(arr <= 1))]
 IsStrictlyPositive = Is[lambda arr: bool(np.all(arr > 0))]
 
