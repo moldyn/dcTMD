@@ -8,7 +8,7 @@ Copyright (c) 2022, Victor Tänzel, Miriam Jäger
 All rights reserved.
 """
 
-__all__ = ['WorkSet', 'ForceSet']
+__all__ = ['WorkSet', 'ForceSet', 'save', 'load']
 
 import joblib
 import numpy as np
@@ -33,17 +33,19 @@ def save(
     filename: Str,
 ) -> None:
     r"""
-    Save a data handler.
+    Save a data handler or an estimator.
 
     Parameters
     ----------
     handler :
-        Instance of the data handler, i.e. a WorkSet or ForceSet instance.
+        Instance of the data handler, i.e. a WorkSet or ForceSet instance, or
+        of an estimator, i.e. a WorkEstimator or ForceEstimator instance.
     filename :
         File name to which `handler` is saved.
 
     Examples
     --------
+    # May save Estimators and data handlers. Here: WorkSet.
     # Save a WorkSet instance named work_set and load it again:
     >>> from dcTMD.storing import save load
     >>> save(work_set, 'my_workset.joblib')
@@ -66,6 +68,7 @@ def load(
 
     Examples
     --------
+    # May save Estimators and data handlers. Here: WorkSet.
     # Save a WorkSet instance named work_set and load it again:
     >>> from dcTMD.storing import save load
     >>> save(work_set, 'my_workset.joblib')
