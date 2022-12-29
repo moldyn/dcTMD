@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Tests for the clustering module.
+Tests for the work module.
 
 MIT License
-Copyright (c) 2021-2022, Daniel Nagel
+Copyright (c) 2021-2022, Victor Tänzel
 All rights reserved.
 """
 
-import numpy as np
-import pytest
-
 import dcTMD
-
+import pytest
+import numpy as np
 
 
 

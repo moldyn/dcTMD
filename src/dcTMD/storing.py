@@ -244,7 +244,8 @@ class WorkSet(TransformerMixin, BaseEstimator):
             else:
                 pbar.write(f'skip file {file_name}')
                 pbar.write(
-                    f'shape is {file_data.shape} and not {self.time_.shape}')
+                    f'shape is {file_data.shape} and not {self.time_.shape}'
+                )
         # removing rows with only zero, reduce positions resolution
         self.work_ = self.work_[~np.all(self.work_ == 0, axis=1)]
         self.position_ = self.position_[::self.resolution]
