@@ -22,7 +22,7 @@
 > This package is still in beta stage. Please open an issue if you encounter
 > any bug/error.
 
-This package aids in the analysis of dissipation-corrected targeted molecular dynamics (dcTMD) simulations. The simulaiton method enforces rare unbinding events of ligands from proteins via a constraint pulling bias. Subsequently, free energy profiles and friction factors are estimated along the unbinding coordinate. For a methological overview, see our [article](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835)
+This package aids in the analysis of dissipation-corrected targeted molecular dynamics (dcTMD) simulations. The method enforces rare unbinding events of ligands from proteins via a constraint pulling bias. Subsequently, free energy profiles and friction factors are estimated along the unbinding coordinate. For a methological overview, see our [article](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835)
 
 > S. Wolf, and G. Stock,
 > *Targeted molecular dynamics calculations of free energy profiles using a nonequilibrium friction correction.*,
@@ -31,20 +31,20 @@ This package aids in the analysis of dissipation-corrected targeted molecular dy
 This package will be published soon:
 
 > V. Tänzel, and M. Jäger, and S. Wolf,
-> *Dissipation Corrected Targeted Molecular Dynamics
-> in preparation
+> *Dissipation Corrected Targeted Molecular Dynamics*,
+> in preparation (2022)
 
 We kindly ask you to cite these articles in case you use this software package for published works.
 
 ## Features
-- Intuitive usage via module and via CI
+- Intuitive usage via module and CI
 - Sklearn-style API for fast integration into your Python workflow
-- Supports Python 3.6-3.10
+- Supports Python 3.8-3.10
 - Multitude of [publications](https://www.moldyn.uni-freiburg.de/publications.html) with dcTMD
 
 ## Implemented Key Functionalities
 - Estimation of free energy profiles and friction factors along the unbinding coordinate of ligands as decribed by [Wolf and Stock 2018](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835).
-- Analysis of separate unbinding pathways as decribed by [Wolf et al. 2018](https://arxiv.org/abs/2212.07154).
+- Analysis of separate unbinding pathways as decribed by [Wolf et al. 2022](https://arxiv.org/abs/2212.07154).
 
 ## Installation
 The package will be available on pipy and conda. Until then, install it via:
@@ -63,10 +63,8 @@ Tier 1:
 - Save & load Estimator instances.
 - Rewrite CLI.
 - Smoothing of friction within Estimators.
-
 - Tests
 - Linting
-
 - Documentation
 - Tutorial
 - Pathway separation tutorial
@@ -86,5 +84,5 @@ Tier 2:
 
 Tier 3:
 - Design logo.
-- Publish to pipy & conda.
+- Publish to pypi & conda.
 - Publish publication note.
