@@ -98,8 +98,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         Parameters
         ----------
         work_set :
-            Instance of WorkSet containing constraint forces, for which the
-            free energy and friction are estimated.
+            Instance of WorkSet containing constraint force work time traces,
+            for which the free energy and friction are estimated.
 
         Returns
         -------
@@ -331,3 +331,204 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         # Save error estimates and bootstrapped quantities
         self.s_friction_ = s_quantity[0, 0]
         self.friction_resampled_ = quantity_resampled[:, 0]
+
+
+class ForceEstimator(TransformerMixin, BaseEstimator):
+    """
+    Class for performing dcTMD analysis on a force set.
+
+    Parameters
+    ----------
+    temperature :
+        Temperature at which the simulations were carried out, in K.
+    verbose :
+        Enables verbose mode.
+
+    Attributes
+    ----------
+    W_mean_ :
+        Mean work, in kJ/mol.
+    W_diss_ :
+        Dissipative work, in kJ/mol.
+    dG_ :
+        Free energy estimate, in kJ/mol.
+    friction_ :
+        Friction factor in kJ/mol/(nm^2/ps).
+    delta_force
+
+    Examples :
+    >>> from dcTMD.dcTMD import ForceEstimator
+    >>> from dcTMD.storing import load
+    >>> force = load('my_force_set')
+    >>> # Instantiate a ForceEstimator instance and fit it with the ForceSet
+    >>> # instance
+    >>> force_estimator = ForceEstimator(temperature=290.15)
+    >>> force_estimator.fit(force)
+    >>> force_estimator.dG_
+    array([..., ])
+    """
+
+    @beartype
+    def __init__(
+        self,
+        temperature: Float,
+        verbose: bool = False,
+    ) -> None:
+        """Initialize class."""
+        self.temperature = temperature
+        self.verbose = verbose
+
+    @beartype
+    def fit(
+        self,
+        force_set,
+    ):
+        """
+        Estimate free energy and friction.
+
+        Parameters
+        ----------
+        force_set :
+            Instance of ForceSet containing constraint forces, for which the
+            free energy and friction are estimated.
+
+        Returns
+        -------
+        self :
+            Fitted estimator.
+        """
+        self.force_set = force_set
+        self.estimate_free_energy_friction()
+        return self
+
+    @beartype
+    def transform(
+        self,
+        X,
+        y=None,
+    ) -> Tuple[Float1DArray, Float1DArray]:
+        """Return free energy and friction estimates."""
+        return self.dG_, self.friction_
+
+    @beartype
+    def estimate_free_energy_friction(
+        self,
+    ) -> Tuple[Float1DArray, Float1DArray, Float1DArray, Float1DArray]:
+        """
+        Estimate free energy and friction.
+
+        Returns
+        -------
+        W_mean :
+            Mean work, in kJ/mol.
+        W_diss :
+            Dissipative work, in kJ/mol.
+        dG :
+            Free energy estimate, in kJ/mol.
+        friction : 
+        """
+        from scipy.constants import R  # noqa: WPS347
+        from scipy.integrate import cumulative_trapezoid
+        RT = R * self.temperature / 1e3
+
+        """
+        * force average: calculate < f_c (t) >_N.
+        **Important:** this is an ensemble average over the trajectory ensemble N,
+        not the time average over t
+        """
+        # average and variance over all trajectories in each time step
+        # shape: (length_data)
+        force_mean = np.mean(self.force_set.force_, axis=0)
+        W_mean = cumulative_trapezoid(
+            force_mean,
+            self.force_set.position_,
+            initial=0,
+        )
+        # calculate $\delta f_c(t) = f_c(t) - \left< f_c (t) \right>_N$ for all t
+        delta_force = self.force_set.force_ - force_mean
+        # shape: (N, length_data)
+
+        # ~~~ evaluation
+        """
+        * optimized algorithm for numerical evaluation:
+        * integrate: $\int_0^t dt' \delta f_c(t')$ for all $t'$
+        * multiply by $\delta f_c(t)$ to yield $\int_0^t dt'\delta f_c(t)
+        * \delta f_c(t')$ for $t$ with all $t' \leq t$ each then calculate the
+        * ensemble average $\left< \int_0^t dt' \delta f_c(t) \delta f_c(t')
+        * \right>$
+        """
+        int_delta_force = cumulative_trapezoid(
+            delta_force,
+            self.force_set.time_,
+            axis=-1,
+            initial=0,
+        )
+        intcorr = np.multiply(delta_force, int_delta_force)
+        """
+        # similar to :
+        for n in range(N):
+        for i in range(length_data):
+            intcorr[n,i] = delta_force[n,i]*delta_force[n,i]
+        """
+        gamma = np.mean(intcorr, axis=0) / RT
+        """
+        # * autocorrelation function evaluation:
+        # * calculate $\left< \delta f_c(t) \delta f_c(t') \right>$ for the last
+        # * $t$
+        corr_set = np.zeros(np.shape(force_array))
+        print("calculating and processing ACF...\n")
+        for n in range(N):
+            corr_set[n, :] = delta_force[n, :]*delta_force[n, -1]
+        autocorr_set = np.mean(corr_set, axis=0)
+        """
+        # * $W_{diss}$ from integration:
+        print('Calculating dissipative work...')
+        W_diss = cumulative_trapezoid(
+            gamma,
+            self.force_set.position_,
+            initial=0,
+        ) * self.force_set.velocity
+
+        # Reduce resolution
+        self.W_mean_ = W_mean[::self.force_set.resolution]
+        self.W_diss_ = W_diss[::self.force_set.resolution]
+        self.dG_ = W_mean - W_diss
+        self.friction_ = gamma[::self.force_set.resolution]
+        self.delta_force_array_ = delta_force
+
+        return self.W_mean_, self.W_diss_, self.dG_, self.friction_
+
+    def memory_kernel(
+        self,
+        x_indices: Float1DArray,
+    ) -> Float1DArray:
+        """
+        Calculate memory kernel at positions X "forward" in time.
+
+        Calculate memory kernel at positions X "forward" in time
+        from fluctuation-dissipation.
+        see e.g. R. Zwanzig, “Nonequilibrium statistical mechanics”,
+        Oxford University Press (2001).
+
+        Parameters
+        ----------
+        x_indices : np.ndarray
+            Indices at which memory kernel is calculated.
+
+        Returns
+        -------
+        corr_set : np.ndarray
+            shape: (len(X), length_data)
+        NaN are set to zero
+        """
+        _, length_data = self.delta_force_.shape
+        corr_set = np.zeros((len(x_indices), length_data))
+
+        for ind, tt in enumerate(range(length_data)):
+            entries = self.delta_force_[:, tt:-2] * \
+                self.delta_force_[:, tt + 1:-1]
+            corr_set[ind, tt:-2] = np.mean(
+                entries,
+                axis=0,
+            )
+        return corr_set
