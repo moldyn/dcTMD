@@ -28,18 +28,18 @@ from dcTMD._typing import (
 
 @beartype
 def save(
-    obj,
+    handler,
     filename: Str,
 ) -> None:
     r"""
-    Save a data manager.
+    Save a data handler.
 
     Parameters
     ----------
-    obj :
-        Instance of the data manager, i.e. a WorkSet or ForceSet instance.
+    handler :
+        Instance of the data handler, i.e. a WorkSet or ForceSet instance.
     filename :
-        File name to which `obj` is saved.
+        File name to which `handler` is saved.
 
     Examples
     --------
@@ -48,7 +48,7 @@ def save(
     >>> save(work_set, 'my_workset.joblib')
     >>> my_workset = load('my_workset.joblib')
     """
-    joblib.dump(obj, filename)
+    joblib.dump(handler, filename)
 
 
 @beartype
@@ -56,12 +56,12 @@ def load(
     filename: Str,
 ) -> Any:
     r"""
-    Load a data manager.
+    Load a data handler.
 
     Parameters
     ----------
     filename :
-        Name of the file containing the data manager.
+        Name of the file containing the data handler.
 
     Examples
     --------
@@ -70,21 +70,20 @@ def load(
     >>> save(work_set, 'my_workset.joblib')
     >>> my_workset = load('my_workset.joblib')
     """
-    obj = joblib.load(filename)
-    return obj
+    return joblib.load(filename)
 
 
 @beartype
-def _get_time_from_testfile(obj):
-    """Read test force file to determine the time trace for a data manager."""
-    if obj.verbose:
-        print(f'Using {obj.X[0]} to initialize arrays.')
-        time_length = len(obj.time_)
-        time_length_reduced = len(obj.time_[::obj.resolution])
+def _get_time_from_testfile(handler):
+    """Read test force file to determine the time trace for a data handler."""
+    if handler.verbose:
+        print(f'Using {handler.X[0]} to initialize arrays.')
+        time_length = len(handler.time_)
+        time_length_reduced = len(handler.time_[::handler.resolution])
         print(f'length of pullf file is {time_length}')
         print(f'reduced length is {time_length_reduced}')
-    obj.time_ = np.loadtxt(
-        obj.X[0],
+    handler.time_ = np.loadtxt(
+        handler.X[0],
         comments=('@', '#'),
         usecols=[0],
     )
