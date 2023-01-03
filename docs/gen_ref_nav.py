@@ -21,7 +21,7 @@ for path in sorted(Path('src').glob('**/*.py')):
         parts = parts[:-1]
         doc_path = doc_path.with_name('index.md')
         full_doc_path = full_doc_path.with_name('index.md')
-    elif parts[-1] == '__main__':
+    elif parts[-1].startswith('_'):
         continue
 
     nav[parts] = doc_path
@@ -31,5 +31,5 @@ for path in sorted(Path('src').glob('**/*.py')):
         fd.writelines('::: {m}'.format(m=module_string))
     mkdocs_gen_files.set_edit_path(full_doc_path, Path('../') / path)
 
-with mkdocs_gen_files.open('reference/SUMMARY.md', 'w') as nav_file:
+with mkdocs_gen_files.open('reference/index.md', 'w') as nav_file:
     nav_file.writelines(nav.build_literate_nav())
