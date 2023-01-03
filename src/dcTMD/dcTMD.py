@@ -7,7 +7,7 @@ Copyright (c) 2022, Victor Tänzel, Miriam Jäger
 All rights reserved.
 """
 
-__all__ = ['WorkEstimator']
+__all__ = ['WorkEstimator', 'ForceEstimator']
 
 import numpy as np
 from beartype import beartype
