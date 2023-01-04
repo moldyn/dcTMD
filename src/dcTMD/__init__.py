@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ['work', 'force', 'io', 'utils']
+__all__ = ['dcTMD', 'io', 'utils']
 
 
-from dcTMD import work
-from dcTMD import force
+from dcTMD import dcTMD
+from dcTMD import storing
 from dcTMD import io
 from dcTMD import utils
 

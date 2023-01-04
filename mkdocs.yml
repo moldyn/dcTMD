@@ -1,0 +1,122 @@
+site_name: "dcTMD"
+site_description: "Dissipation Corrected Targeted Molecular Dynamics."
+site_url: "https://moldyn.github.io/dcTMD"
+repo_url: "https://github.com/moldyn/dcTMD"
+edit_uri: "blob/main/docs/"
+repo_name: "moldyn/dcTMD"
+site_dir: "site"
+copyright: Copyright &copy; 2022 Biomolecular Dynamics
+watch: [src/dcTMD]
+
+nav:
+- Home:
+  - Overview: index.md
+  - Changelog: changelog.md
+  - License: license.md
+- Code Reference: reference/
+- Development:
+  - Contributing: contributing.md
+- MolDyn Freiburg: https://moldyn.uni-freiburg.de/
+
+theme:
+  name: material
+  favicon: icon.png
+  logo_slate_mode: logo_dark.svg
+  logo_default_mode: logo_light.svg
+  custom_dir: docs/overrides
+  features:
+  - content.code.annotate
+  - navigation.tabs
+  - navigation.top
+  font:
+    text: Roboto
+    headline: Playfair Display
+    code: Roboto Mono
+  palette:
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: white
+    toggle:
+      icon: material/weather-sunny
+      name: Switch to dark mode
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: black
+    toggle:
+      icon: material/weather-night
+      name: Switch to light mode
+
+markdown_extensions:
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - nl2br
+  - toc:
+      permalink: true
+
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+plugins:
+- search
+- gen-files:
+    scripts:
+    - docs/gen_ref_nav.py
+- literate-nav:
+    nav_file: SUMMARY.md
+- mkdocstrings:
+    handlers:
+      python:
+        paths: [src]
+        import:
+        - https://numpy.org/doc/stable/objects.inv
+        options:
+          members_order: "source"
+          docstring_style: "numpy"
+          docstring_section_style: "list"
+          merge_init_into_class: True
+          filters: ["!^_"]
+
+extra_css:
+  - css/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+extra:
+  social:
+  - icon: fontawesome/solid/globe
+    link: https://www.moldyn.uni-freiburg.de
+  - icon: fontawesome/brands/github
+    link: https://github.com/moldyn
+  - icon: fontawesome/brands/twitter
+    link: https://twitter.com/MolDynFR

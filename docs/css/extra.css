@@ -1,0 +1,41 @@
+/* increase icon size */
+.md-nav--primary .md-nav__title {
+  height: 7.6rem;
+  padding: 5rem 0.8rem 0.2rem;
+}
+
+.md-nav__title .md-nav__button.md-logo :is(img, svg) {
+    height: 4.4rem;
+}
+
+.md-header__button.md-logo :is(img, svg) {
+    height: 1.4rem;
+}
+
+/* change icon depending on light/dark mode */
+#logo_default_mode {
+    display: var(--md-logo-default-mode);
+}
+
+#logo_slate_mode {
+    display: var(--md-logo-slate-mode);
+}
+
+[data-md-color-scheme="default"] {
+    --md-logo-slate-mode: none;
+    --md-logo-default-mode: block;
+}
+
+[data-md-color-scheme="slate"] {
+    --md-logo-slate-mode: block;
+    --md-logo-default-mode: none;
+}
+
+body {
+    --md-headline-font-family: var(--md-headline-font,_),-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+}
+
+.md-typeset h1, .md-typeset h2, .md-typeset h3, .md-header__title {
+  font-family: var(--md-headline-font-family);
+  font-weight: 700;
+}

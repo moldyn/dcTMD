@@ -16,7 +16,7 @@ def gaussfilter_friction(
     sigma: Float,
 ) -> Float1DArray:
     """
-    Smoothes friction with a gaussian kernel and reflective borders.
+    Smoothes friction with a gaussian kernel and 'nearest' borders.
 
     Parameters
     ----------
@@ -35,4 +35,4 @@ def gaussfilter_friction(
     from scipy.ndimage import gaussian_filter
     delta_x = pos[1] - pos[0]
     blur = np.ceil(sigma / delta_x).astype(int)
-    return gaussian_filter(friction, sigma=blur, mode='reflect')
+    return gaussian_filter(friction, sigma=blur, mode='nearest')
