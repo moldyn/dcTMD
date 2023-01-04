@@ -12,6 +12,7 @@ __all__ = ['WorkSet', 'ForceSet', 'save', 'load']
 
 import joblib
 import numpy as np
+from os.path import basename
 from beartype import beartype
 from beartype.typing import Optional, Any
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -29,19 +30,19 @@ from dcTMD._typing import (
 
 @beartype
 def save(
-    handler,
     filename: Str,
+    object,
 ) -> None:
     r"""
     Save a data handler or an estimator.
 
     Parameters
     ----------
-    handler :
-        Instance of the data handler, i.e. a WorkSet or ForceSet instance, or
-        of an estimator, i.e. a WorkEstimator or ForceEstimator instance.
     filename :
         File name to which `handler` is saved.
+    object :
+        Instance of the data handler, i.e. a WorkSet or ForceSet instance, or
+        of an estimator, i.e. a WorkEstimator or ForceEstimator instance.
 
     Examples
     --------
@@ -51,7 +52,7 @@ def save(
     >>> save(work_set, 'my_workset.joblib')
     >>> my_workset = load('my_workset.joblib')
     """
-    joblib.dump(handler, filename)
+    joblib.dump(object, filename)
 
 
 @beartype
@@ -94,17 +95,18 @@ def _integrate_force(
 @beartype
 def _get_time_from_testfile(handler):
     """Read test force file to determine the time trace for a data handler."""
+    handler.time_ = np.loadtxt(
+        handler.X[0],
+        comments=('@', '#'),
+        usecols=[0],
+    )
     if handler.verbose:
         print(f'Using {handler.X[0]} to initialize arrays.')
         time_length = len(handler.time_)
         time_length_reduced = len(handler.time_[::handler.resolution])
         print(f'length of pullf file is {time_length}')
         print(f'reduced length is {time_length_reduced}')
-    handler.time_ = np.loadtxt(
-        handler.X[0],
-        comments=('@', '#'),
-        usecols=[0],
-    )
+
 
 
 class WorkSet(TransformerMixin, BaseEstimator):
@@ -243,7 +245,8 @@ class WorkSet(TransformerMixin, BaseEstimator):
             # test if file is not corrupted, else add it
             if file_data.shape == self.time_.shape:
                 self.work_[idx, :] = _integrate_force(self, file_data)
-                self.names_ = np.append(self.names_, file_name)
+                short_name = basename(file_name)
+                self.names_ = np.append(self.names_, short_name)
             else:
                 pbar.write(f'skip file {file_name}')
                 pbar.write(

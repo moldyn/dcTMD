@@ -65,7 +65,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         Resampled free energy estimate, needed to inspect its distribution.
         Calculated via estimate_free_energy_errors().
 
-    Examples :
+    Examples
+    --------
     >>> from dcTMD.dcTMD import WorkEstimator
     >>> from dcTMD.storing import load
     >>> work = load('my_work_set')
@@ -179,7 +180,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
 
         Bootstrapping errors are calculated for the free energy estimate and
         the related quantities mean and dissipative work. Return matches the
-        one of estimate_free_energy().
+        one of [dcTMD.dcTMD.WorkEstimator.estimate_free_energy][].
 
         Parameters
         ----------
@@ -294,9 +295,9 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         n_resamples :
             Number of drawn resamples for bootstrapping error analysis.
         mode :
-            Chooses between reducing the resampled statistic via (1) 'std' the
-            element-wise calculation of standard deviations or (2) confidence
-            intervals if `mode` is a float in [0, 1).
+            Chooses between reducing the resampled statistic via 
+                1.  'std' the element-wise calculation of standard deviations, 
+                2.  confidence intervals if `mode` is a float in [0, 1).
         seed :
             Seed for the random number generator.
 

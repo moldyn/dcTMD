@@ -58,21 +58,19 @@ Check out the documentation for an overview over all modules as well as the tuto
 ## Roadmap
 
 Tier 1:
-- Finish ForceSet, ForceEstimator
-- Rewrite IO of results.
-- Save & load Estimator instances.
-- Rewrite CLI.
-- Smoothing of friction within Estimators.
-- Tests
-- Linting
-- Documentation
-- Tutorial
-- Pathway separation tutorial
-- Github page
+- [ ] Finish ForceSet, ForceEstimator
+- [ ] Rewrite IO of results.
+- [ ] Rewrite CLI.
+- [ ] Smoothing of friction within Estimators.
+- [ ] Tests
+- [ ] Linting
+- [ ] Documentation
+- [ ] Tutorial
+- [ ] Pathway separation tutorial
+- [ ] Github pages
 
 Tier 2:
 - RAM estimator schreiben
-- Set up package
 - Gaussian error estimation
 - WorkSet plots: 1d, 2d distributions
 - Estimator plots: free energy, friction & both

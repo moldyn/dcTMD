@@ -24,7 +24,6 @@ def get_extra_requirements(path, add_all=True):
             extra_deps['all'] = {
                 tag for tags in extra_deps.values() for tag in tags
             }
-
     return extra_deps
 
 
@@ -39,7 +38,7 @@ setup(
     description='Analyse targeted molecular dynamics data with dcTMD',
     long_description=README,
     keywords=[
-        'enhance sampling',
+        'enhanced sampling',
         'friction',
         'MD analysis',
     ],
@@ -55,7 +54,7 @@ setup(
     python_requires='>=3.8',
     install_requires=[
         'numpy>=1.21.0',
-        'matplotlib',
+        'scikit-learn',
         'beartype>=0.10.4',
         'scipy',
         'tqdm',
