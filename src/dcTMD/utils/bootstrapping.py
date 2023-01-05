@@ -67,13 +67,13 @@ def bootstrapping(
     The bootstrapping error analysis is performed using a given function `func`
     by drawing random work trajectories from the `estimator`'s WorkSet
     instance with replacement. The quantity of interest is then calculated for
-    the new sample and stored in quantity_resampled. This process is repeated
-    `n_resamples` times, which is a key of the `descriptor`. The random number
-    generator can be fed a `seed`, the second key of the `descriptor` which is
-    optional. Thirdly, a `mode` must be in the `descriptor`, which can either
-    be the string 'std' for a standard distribution of the resampled quantitity
-    or a number in the interval [0, 1) which yields confidence intervals
-    instead.
+    the new sample and stored in `quantity_resampled`. This process is repeated
+    `n_resamples` times, which is a key of the `descriptor` dictionary. The
+    random number generator can be fed a `seed`, the second key of the
+    `descriptor` which is optional. Thirdly, a `mode` must be in the
+    `descriptor`, which can either be the string 'std' for a standard
+    distribution of the resampled quantitity or a number in the interval [0, 1)
+    which yields confidence intervals instead.
 
     Parameters
     ----------
