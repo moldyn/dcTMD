@@ -46,9 +46,9 @@ def save(
 
     Examples
     --------
-    # May save Estimators and data handlers. Here: WorkSet.
-    # Save a WorkSet instance named work_set and load it again:
-    >>> from dcTMD.storing import save load
+    >>> # Save Estimators and data handlers. Here: WorkSet.
+    >>> # Save a WorkSet instance named work_set and load it again:
+    >>> from dcTMD.storing import save, load
     >>> save(work_set, 'my_workset.joblib')
     >>> my_workset = load('my_workset.joblib')
     """
@@ -60,7 +60,7 @@ def load(
     filename: Str,
 ) -> Any:
     r"""
-    Load a data handler.
+    Load a data handler or an estimator.
 
     Parameters
     ----------
@@ -69,9 +69,9 @@ def load(
 
     Examples
     --------
-    # May save Estimators and data handlers. Here: WorkSet.
-    # Save a WorkSet instance named work_set and load it again:
-    >>> from dcTMD.storing import save load
+    >>> # Loads estimators and data handlers. Here: WorkSet.
+    >>> # Save a WorkSet instance named work_set and load it again:
+    >>> from dcTMD.storing import save, load
     >>> save(work_set, 'my_workset.joblib')
     >>> my_workset = load('my_workset.joblib')
     """
@@ -135,7 +135,7 @@ class WorkSet(TransformerMixin, BaseEstimator):
 
     Examples
     --------
-    # Load some file names listed in 'filenames'
+    >>> # Load some file names listed in 'filenames'
     >>> import numpy as np
     >>> from dcTMD.storing import WorkSet
     >>> work_set = WorkSet(velocity=0.001, resolution=1)
@@ -145,8 +145,8 @@ class WorkSet(TransformerMixin, BaseEstimator):
     >>> work_set.work_.shape
     (N_trajectories_, len(time_))
 
-    # Reduce work by selecting some trajectories via their indices,
-    # for example the first three, and receive a new WorkSet instance
+    >>> # Reduce work by selecting some trajectories via their indices,
+    >>> # for example the first three, and receive a new WorkSet instance
     >>> indices = np.array([0, 1, 2])
     >>> reduced_set = work_set.reduce(indices)
     >>> reduced_set.work_.shape

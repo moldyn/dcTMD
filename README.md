@@ -57,30 +57,30 @@ Check out the documentation for an overview over all modules as well as the tuto
 
 ## Roadmap
 
-Tier 1:
-- [ ] Finish ForceSet, ForceEstimator
-- [ ] Rewrite IO of results.
-- [ ] Rewrite CLI.
-- [ ] Smoothing of friction within Estimators.
-- [ ] Tests
-- [ ] Linting
-- [ ] Documentation
-- [ ] Tutorial
-- [ ] Pathway separation tutorial
-- [ ] Github pages
+Next steps:
+- [ ] Finish ForceSet, ForceEstimator.
+- [ ] Rewrite IO of results (discuss this).
+- [ ] Rewrite CLI and provide only simplest case: Estimation of free energy and friction from list of files plus saving.
+- [ ] Smoothing of friction within Estimators via self.smooth_friction() methods. Better(?) even: Write abstract parent class which provides this smoothing method and inherit it.
+- [ ] Tests for all functionality. So far, only the WorkSet has two tests. Add tests for the ForceSet, for the Estimators WorkEstimator and ForceEstimator as well as all their methods. Also provide tests for the io and for the utils, so smoothing and bootstrapping.
+- [ ] Linting using [wemake](https://github.com/wemake-services/wemake-python-styleguide). Provide short explanation for ignores.
+- [ ] Documentation: (1) Go through the MkDoc pages and check the automatically generated documentation based on the docstrings. Often, there are minor mistakes in content and formatting. (2) Create index pages, which are so far empty. (3) Link the tutorials in the navigation bar by adding notebook support.
+- [ ] Tutorials: (1) For dcTMD analysis with this package, (2) for pathway separation following the work for trypsin.
+- [ ] Set repo to public and make sure the documentation page works, as well as the tests. Enforce high test coverage.
 
-Tier 2:
-- RAM estimator schreiben
-- Gaussian error estimation
-- WorkSet plots: 1d, 2d distributions
-- Estimator plots: free energy, friction & both
-- Confidence intervals
-- Check if smoothing width works as expected
-- Discuss gaussian kernel borders
-- Normality plot
-- Exponential estimator
+Secondary importance:
+- [ ] New Features: 
+    - [ ] RAM estimator
+    - [ ] Gaussian error estimation
+    - [ ] WorkSet plots: 1d, 2d distributions
+    - [ ] Estimator plots: free energy, friction & both
+    - [ ] Normality plot
+    - [ ] Confidence intervals
+    - [ ] Exponential estimator class
+- [ ] Check if smoothing width works as expected
+- [ ] Discuss gaussian kernel borders
 
-Tier 3:
-- Design logo.
-- Publish to pypi & conda.
-- Publish publication note.
+Finishing steps:
+- [ ] Design logo.
+- [ ] Publish to pypi & conda.
+- [ ] Publish publication note.
