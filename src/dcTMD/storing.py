@@ -266,7 +266,8 @@ class ForceSet(TransformerMixin, BaseEstimator):
     velocity :
         Pulling velocity in nm/ps.
     resolution :
-        Striding to reduce work time trace.
+        Striding to reduce work time trace. This parameter
+        is only added for compatibility with WorkSet
     verbose :
         Enables verbose mode.
 
@@ -275,9 +276,9 @@ class ForceSet(TransformerMixin, BaseEstimator):
     force_:
         Constraint force time traces, in kJ/mol.
     names_ :
-        Constraint force file names corresponding to work time traces.
+        Constraint force file names corresponding to force time traces.
     time_ :
-        Time trace corresponding to the work, in ps.
+        Time trace corresponding to the force, in ps.
     position_ :
         Positions time trace, product of time trace and velocity, in nm.
 
@@ -339,17 +340,50 @@ class ForceSet(TransformerMixin, BaseEstimator):
         return self.force_
 
     @beartype
-    def integrate(self):
+    def integrate(self) -> None:
         """Integrate forces and return a WorkSet instance."""
         # (1) Instantiate a WorkSet with velocity, resolution and verbose
         # (2) Save names_, time_, position_ attributes manually
         # (3) Integrate the forces in force_ with _integrate_force
         # (4) Return WorkSet instance.
         # Be careful with the resolution so as not to reduce it twice.
+        self.work_ = _integrate_force(self, self.force_)
 
     @beartype
     def _fill_force(self) -> None:
         """Help load the force files."""
         # Load force files
         # Check if files are corrupt and build names_, position_ and work_
-        self.force_ = None
+        import tqdm
+        self.force_ = np.zeros(
+            (len(self.X), len(self.time_)),
+            dtype=float,
+        )
+        self.names_ = np.array([])
+        self.position_ = self.time_ * self.velocity
+        # read in data and fill work_array
+        for idx, file_name in (pbar := tqdm.tqdm)(
+            enumerate(self.X),
+            total=len(self.X),
+            desc='Loading & integrating force files',
+        ):
+            if self.verbose:
+                pbar.write(f'Reading file {file_name}')
+            file_data = np.loadtxt(
+                file_name,
+                comments=('@', '#'),
+                usecols=[1],
+            )
+            # test if file is not corrupted, else add it
+            if file_data.shape == self.time_.shape:
+                self.force_[idx, :] = file_data
+                short_name = basename(file_name)
+                self.names_ = np.append(self.names_, short_name)
+            else:
+                pbar.write(f'skip file {file_name}')
+                pbar.write(
+                    f'shape is {file_data.shape} and not {self.time_.shape}'
+                )
+        # removing rows with only zero, reduce positions resolution
+        self.force_ = self.force_[~np.all(self.force_ == 0, axis=1)]
+
