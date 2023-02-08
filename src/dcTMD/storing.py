@@ -30,8 +30,8 @@ from dcTMD._typing import (
 
 @beartype
 def save(
-    filename: Str,
     object,
+    filename: Str,
 ) -> None:
     r"""
     Save a data handler or an estimator.
