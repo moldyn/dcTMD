@@ -487,7 +487,8 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         ) * self.force_set.velocity
 
         # Reduce resolution
-        self.W_mean_ = W_mean[::self.force_set.resolution]
+        self.force_set.position_ = self.force_set.position_[::self.force_set.resolution]
+        self.W_mean_ = self.W_mean_[::self.force_set.resolution]
         self.W_diss_ = W_diss[::self.force_set.resolution]
         self.dG_ = self.W_mean_ - self.W_diss_
         self.friction_ = self.friction_[::self.force_set.resolution]
@@ -500,8 +501,6 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         x_indices: Float1DArray,
     ) -> Float1DArray:
         """
-        Calculate memory kernel at positions X "forward" in time.
-
         Calculate memory kernel at positions X "forward" in time
         from fluctuation-dissipation.
         see e.g. R. Zwanzig, “Nonequilibrium statistical mechanics”,
