@@ -365,7 +365,7 @@ class ForceSet(TransformerMixin, BaseEstimator):
         for idx, file_name in (pbar := tqdm.tqdm)(
             enumerate(self.X),
             total=len(self.X),
-            desc='Loading & integrating force files',
+            desc='Loading force files',
         ):
             if self.verbose:
                 pbar.write(f'Reading file {file_name}')
