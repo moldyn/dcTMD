@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ['dcTMD', 'io', 'utils']
+__all__ = ['dcTMD', 'storing', 'io', 'utils']
 
 
 from dcTMD import dcTMD
