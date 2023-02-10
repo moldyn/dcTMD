@@ -36,5 +36,5 @@ def write_output(
     )
     np.savez(
         f'{out}_{n_traj}_dG.npz',
-        kwargs,
+        **kwargs,
     )
