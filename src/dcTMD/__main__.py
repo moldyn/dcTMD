@@ -19,15 +19,6 @@ MODES = ('work', 'force')
 
 @click.command(no_args_is_help=True)
 @click.option(
-    '-dG',
-    '--calc_dG',
-    'calc_dG',
-    is_flag=True,
-    type=bool,
-    default=False,
-    help='Set flag to calculate dG',
-)
-@click.option(
     '-friction',
     '--calc_friction',
     'calc_friction',
@@ -73,7 +64,6 @@ names',
 @click.option(
     '-T',
     '--temperature',
-    'T',
     type=float,
     required=True,
     help='Simulation temperature in K.',
@@ -81,7 +71,6 @@ names',
 @click.option(
     '-vel',
     '--velocity',
-    'vel',
     type=float,
     required=True,
     help='Pulling velocity in nm/ps.',
@@ -106,7 +95,7 @@ names',
     '--N_resamples',
     type=float,
     required=False,
-    help='Number of resamples used in optional bootstrapping.',
+    help='Number of resamples used in optional bootstrapping. This is only available in mode work',
 )
 @click.option(
     '-v',
@@ -125,14 +114,12 @@ names',
     help='Plots free energy and smoothed friction.',
 )
 def main(
-    calc_dG,
-    calc_friction,
     mode,
     pullf_files,
     pullf_glob_pattern,
     outname,
-    temp,
-    vel,
+    temperature,
+    velocity,
     res,
     sigma,
     N_resamples,
@@ -158,15 +145,10 @@ def main(
     """
     # Click aftercare
     if verbose:
-        click.echo(f'Input:\n calc_dG: {calc_dG};\n calc_friction: \
-{calc_friction};\n mode: {mode}\n file: {pullf_files}\n glob: \
-{pullf_glob_pattern}\n outname: {outname}\n temperature: {temp}\n \
-velocity: {vel}\n resolution: {res}\n sigma: {sigma}\n verbose: \
+        click.echo(f'Input:\n mode: {mode}\n file: {pullf_files}\n glob: \
+{pullf_glob_pattern}\n outname: {outname}\n temperature: {temperature}\n \
+velocity: {velocity}\n resolution: {res}\n sigma: {sigma}\n verbose: \
 {verbose}\n, plot: {plot}\n, N_resamples: {N_resamples}\n')
-
-    if not calc_dG and not calc_friction:
-        print("No '-dG' or '-friction' flag found, please specify what to do.")
-        exit()
 
     if not (pullf_files or pullf_glob_pattern):
         print("Please provide constraint force files via '-f' or '-g'.")
@@ -174,83 +156,33 @@ velocity: {vel}\n resolution: {res}\n sigma: {sigma}\n verbose: \
 
     # Set up mode
     if mode == 'work':
-        calc_dG = dcTMD.work.calc_dG
-        calc_dG_and_friction = dcTMD.work.calc_dG_and_friction
-        pullf_to_dataset = dcTMD.work.pullf_to_work_array
+        dataset = dcTMD.storing.WorkSet(velocity=velocity, 
+                                              resolution=res,
+                                              )
+        estimator = dcTMD.dcTMD.ForceEstimator(temperature)
         outname += '_from_work'
     if mode == 'force':
-        calc_dG = dcTMD.force.calc_dG
-        calc_dG_and_friction = dcTMD.force.calc_dG_and_friction
-        pullf_to_dataset = dcTMD.force.pullf_to_force_array
+        dataset_class = dcTMD.storing.ForceSet(velocity=velocity, 
+                                              resolution=res,
+                                              )
+        estimator = dcTMD.dcTMD.WorkEstimator(temperature)
         outname += '_from_forceacf'
 
     # Loading constraint force files
-    files = dcTMD.io._load_pullf(pullf_glob_pattern, pullf_files)
+    filenames = dcTMD.io._load_pullf(pullf_glob_pattern, pullf_files)
 
     # Generate work/force set
-    dataset, time, filenames = pullf_to_dataset(files, vel, verbose, res)
+    dataset.fit(filenames)
 
-    pos = time * vel
-    N_traj, _ = np.shape(dataset)
-    timestep = time[1] - time[0]
+    # Calculate Wmean, Wdiss, dG and friction factor
+    estimator.fit(dataset)
+    
+    # calculate errors
+    if N_resamples:
+        estimator.estimate_free_energy_errors(N_resamples)
 
-    if mode == 'work':
-        if calc_friction:
-            print('calculate free energy and friction')
-            Wmean, Wdiss, dG, Gamma, Gamma_smooth, *args = \
-                calc_dG_and_friction(
-                    dataset,
-                    temp,
-                    vel,
-                    timestep,
-                    sigma,
-                    N_resamples,
-                )
-            outname += f'_sig{sigma}nm'
-        else:
-            print('calculate free energy')
-            Wmean, Wdiss, dG, *args = calc_dG(
-                dataset,
-                temp,
-                N_resamples,
-            )
-
-    if mode == 'force':
-        if calc_friction:
-            print('calculate free energy and friction')
-            Wmean, Wdiss, dG, Gamma, Gamma_smooth, *args = \
-                calc_dG_and_friction(dataset, temp, time, vel, sigma, res)
-
-            outname += f'_sig{sigma}nm'
-            print(f'saving output {outname}')
-        else:
-            print('calculate free energy')
-            Wmean, Wdiss, dG, *args = calc_dG(dataset, temp, time, vel, res)
-            # striding
-        pos = pos[::res]
-
-    if calc_friction:
-        dcTMD.io.write_output(
-            outname,
-            N_traj,
-            pos=pos,
-            Wmean=Wmean,
-            Wdiss=Wdiss,
-            dG=dG,
-            Gamma=Gamma,
-            Gamma_smooth=Gamma_smooth,
-            errors=args,
-        )
-    else:
-        dcTMD.io.write_output(
-            outname,
-            N_traj,
-            pos=pos,
-            Wmean=Wmean,
-            Wdiss=Wdiss,
-            dG=dG,
-            errors=args,
-        )
+    # save data as .npz and .dat file
+    dcTMD.io.write_output(dataset, estimator)
 
 
 if __name__ == '__main__':

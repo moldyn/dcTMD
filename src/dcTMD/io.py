@@ -14,27 +14,45 @@ from dcTMD._typing import (
 @beartype
 def write_output(
     out: Str,
-    n_traj: Int,
-    **kwargs,
+    dataset,
+    estimator,
+    filetype=['.dat', '.npz']
 ) -> None:
     """Take all calculated quantities and save them."""
-    print('writing dG...')
-    results = [(key, item) for key, item in kwargs.items() if key != 'errors']
-    results = np.asarray(results, dtype=object)
-    header = results.T[0]
-    arrays = np.vstack(results.T[1])
-    if kwargs['errors']:
-        header = np.append(
-            header, [f's_{name}' for name in header if name != 'x'],
+    n_traj = len(dataset.names_)
+    if estimator.free_energy_error_:
+        results_dict = {
+            "x": dataset.position_,
+            "Wmean":estimator.W_mean_,
+            "Wdiss":estimator.W_diss_,
+            "dG":estimator.dG_,
+            "Gamma":estimator.friction_,
+            "s_W_mean":estimator.s_W_mean_,
+            "s_W_diss":estimator.s_W_diss_, 
+            "s_dG":estimator.s_dG_,
+        }
+    else:
+        results_dict = {
+            "x": dataset.position_,
+            "Wmean":estimator.W_mean_,
+            "Wdiss":estimator.W_diss_,
+            "dG":estimator.dG_,
+            "Gamma":estimator.friction_,
+        }
+
+    if '.dat' in filetype:
+        results = [(key, item) for key, item in results_dict.items() if key != 'errors']
+        results = np.asarray(results, dtype=object)
+        header = results.T[0]
+        arrays = np.vstack(results.T[1])
+        np.savetxt(
+            f'{out}_{n_traj}_dG.dat',
+            arrays.T,
+            fmt='%20.8f',  # noqa: WPS323
+            header='    '.join(header),
         )
-        arrays = np.vstack([arrays, kwargs['errors']])
-    np.savetxt(
-        f'{out}_{n_traj}_dG.dat',
-        arrays.T,
-        fmt='%20.8f',  # noqa: WPS323
-        header='    '.join(header),
-    )
-    np.savez(
-        f'{out}_{n_traj}_dG.npz',
-        **kwargs,
-    )
+    if '.npz' in filetype:
+        np.savez(
+            f'{out}_{n_traj}_dG.npz',
+            **results_dict,
+        )

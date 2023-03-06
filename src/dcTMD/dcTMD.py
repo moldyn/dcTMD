@@ -227,7 +227,6 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         self.s_W_mean_ = s_quantity[0, 0]
         self.s_W_diss_ = s_quantity[0, 1]
         self.s_dG_ = s_quantity[0, 2]
-        print(quantity_resampled.shape)
         self.W_mean_resampled_ = quantity_resampled[:, 0]
         self.W_diss_resampled_ = quantity_resampled[:, 1]
         self.dG_resampled_ = quantity_resampled[:, 2]
@@ -417,7 +416,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
     ) -> Tuple[Float1DArray, Float1DArray, Float1DArray, Float1DArray]:
         """
         Estimate free energy and friction.
-
+        ToDo: check Kapitel to add comments from code
         Returns
         -------
         W_mean :self.force_set.force_
@@ -492,7 +491,8 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         self.W_diss_ = W_diss[::self.force_set.resolution]
         self.dG_ = self.W_mean_ - self.W_diss_
         self.friction_ = self.friction_[::self.force_set.resolution]
-        self.delta_force_array_ = delta_force
+        # ToDo: do we need this?
+        #self.delta_force_array_ = delta_force
 
         return self.W_mean_, self.W_diss_, self.dG_, self.friction_
 

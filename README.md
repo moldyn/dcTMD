@@ -22,7 +22,7 @@
 > This package is still in beta stage. Please open an issue if you encounter
 > any bug/error.
 
-This package aids in the analysis of dissipation-corrected targeted molecular dynamics (dcTMD) simulations. The method enforces rare unbinding events of ligands from proteins via a constraint pulling bias. Subsequently, free energy profiles and friction factors are estimated along the unbinding coordinate. For a methological overview, see our [article](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835)
+This package aids in the analysis of dissipation-corrected targeted molecular dynamics (dcTMD) simulations. The method enforces rare unbinding events of ligands from proteins via a constraint pulling bias. Subsequently, free energy profiles and friction factors are estimated along the unbinding coordinate. For a methodological overview, see our [article](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835)
 
 > S. Wolf, and G. Stock,
 > *Targeted molecular dynamics calculations of free energy profiles using a nonequilibrium friction correction.*,
@@ -43,8 +43,8 @@ We kindly ask you to cite these articles in case you use this software package f
 - Multitude of [publications](https://www.moldyn.uni-freiburg.de/publications.html) with dcTMD
 
 ## Implemented Key Functionalities
-- Estimation of free energy profiles and friction factors along the unbinding coordinate of ligands as decribed by [Wolf and Stock 2018](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835).
-- Analysis of separate unbinding pathways as decribed by [Wolf et al. 2022](https://arxiv.org/abs/2212.07154).
+- Estimation of free energy profiles and friction factors along the unbinding coordinate of ligands as described by [Wolf and Stock 2018](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835).
+- Analysis of separate unbinding pathways as described by [Wolf et al. 2022](https://arxiv.org/abs/2212.07154).
 
 ## Installation
 The package will be available on pipy and conda. Until then, install it via:
