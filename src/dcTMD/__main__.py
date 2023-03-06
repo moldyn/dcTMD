@@ -113,6 +113,14 @@ names',
     show_default=True,
     help='Plots free energy and smoothed friction.',
 )
+@click.option(
+    '-sd'
+    '--save_dataset',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Save the Work/ForceSet class to file.',
+)
 def main(
     mode,
     pullf_files,
@@ -125,6 +133,7 @@ def main(
     N_resamples,
     verbose,
     plot,
+    save_dataset,
 ) -> None:
     r"""
     \b
@@ -148,7 +157,8 @@ def main(
         click.echo(f'Input:\n mode: {mode}\n file: {pullf_files}\n glob: \
 {pullf_glob_pattern}\n outname: {outname}\n temperature: {temperature}\n \
 velocity: {velocity}\n resolution: {res}\n sigma: {sigma}\n verbose: \
-{verbose}\n, plot: {plot}\n, N_resamples: {N_resamples}\n')
+{verbose}\n, plot: {plot}\n, N_resamples: {N_resamples}\n, \
+save dataset: {save_dataset}\n')
 
     if not (pullf_files or pullf_glob_pattern):
         print("Please provide constraint force files via '-f' or '-g'.")
@@ -173,7 +183,9 @@ velocity: {velocity}\n resolution: {res}\n sigma: {sigma}\n verbose: \
 
     # Generate work/force set
     dataset.fit(filenames)
-
+    if save_dataset:
+        out = outname + f"_{len(dataset.names_)}" 
+        dcTMD.storing.save(dataset, out)
     # Calculate Wmean, Wdiss, dG and friction factor
     estimator.fit(dataset)
     
