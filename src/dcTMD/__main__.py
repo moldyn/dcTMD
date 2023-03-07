@@ -19,15 +19,6 @@ MODES = ('work', 'force')
 
 @click.command(no_args_is_help=True)
 @click.option(
-    '-friction',
-    '--calc_friction',
-    'calc_friction',
-    is_flag=True,
-    type=bool,
-    default=False,
-    help='Set flag to calculate friction',
-)
-@click.option(
     '-m',
     '--mode',
     type=click.Choice(MODES, case_sensitive=True),
@@ -41,18 +32,9 @@ MODES = ('work', 'force')
     '-f',
     '--file',
     'pullf_files',
-    help='Input: File containing list of all constraint force file names',
-    cls=Mutex,
-    not_required_if=['pullf_glob_pattern'],
-)
-@click.option(
-    '-g',
-    '--glob',
-    'pullf_glob_pattern',
-    help='Input: Glob pattern generating a list of all constraint force file \
-names',
-    cls=Mutex,
-    not_required_if=['pullf_files'],
+    required=True,
+    help='Input: File containing list of all constraint force file names' +
+    'or glob pattern e.g.'*.xvg' to generate a list of all constraint force files using glob.glob()',
 )
 @click.option(
     '-o',
@@ -124,7 +106,6 @@ names',
 def main(
     mode,
     pullf_files,
-    pullf_glob_pattern,
     outname,
     temperature,
     velocity,
@@ -154,11 +135,11 @@ def main(
     """
     # Click aftercare
     if verbose:
-        click.echo(f'Input:\n mode: {mode}\n file: {pullf_files}\n glob: \
-{pullf_glob_pattern}\n outname: {outname}\n temperature: {temperature}\n \
-velocity: {velocity}\n resolution: {res}\n sigma: {sigma}\n verbose: \
-{verbose}\n, plot: {plot}\n, N_resamples: {N_resamples}\n, \
-save dataset: {save_dataset}\n')
+        click.echo(f'Input:\n mode: {mode}\n file: {pullf_files}\n \
+        outname: {outname}\n temperature: {temperature}\n \
+        velocity: {velocity}\n resolution: {res}\n sigma: {sigma}\n verbose: \
+        {verbose}\n, plot: {plot}\n, N_resamples: {N_resamples}\n, \
+        save dataset: {save_dataset}\n')
 
     if not (pullf_files or pullf_glob_pattern):
         print("Please provide constraint force files via '-f' or '-g'.")
@@ -179,7 +160,7 @@ save dataset: {save_dataset}\n')
         outname += '_from_forceacf'
 
     # Loading constraint force files
-    filenames = dcTMD.io._load_pullf(pullf_glob_pattern, pullf_files)
+    filenames = dcTMD.io.load_pullf(pullf_files)
 
     # Generate work/force set
     dataset.fit(filenames)

@@ -12,6 +12,23 @@ from dcTMD._typing import (
 
 
 @beartype
+def load_pullf(
+    pullf_files: Str
+) -> : (List[str], Float1DArray)
+    try:
+        filenames = np.loadtxt(pullf_files, dtype='str')
+    except:
+        import glob
+        filenames = glob.glob(pullf_glob_pattern)
+
+    if len(filenames)==0:
+        print("No constraint force files found.")
+        exit()
+
+    return filenames
+
+
+@beartype
 def write_output(
     out: Str,
     dataset,
