@@ -331,6 +331,7 @@ class ForceSet(TransformerMixin, BaseEstimator):
         _get_time_from_testfile(self)
         # fill arrays with data
         self._fill_force()
+        self.integrate()
         return self
 
     @beartype
@@ -346,7 +347,9 @@ class ForceSet(TransformerMixin, BaseEstimator):
         # (3) Integrate the forces in force_ with _integrate_force
         # (4) Return WorkSet instance.
         # Be careful with the resolution so as not to reduce it twice.
-        self.work_ = _integrate_force(self, self.force_)
+        print('integrating forceset --> workset')
+        self.work_ = _integrate_force(self, self.force_)[::self.resolution]
+        print(self.work_.shape)
 
     @beartype
     def _fill_force(self) -> None:
