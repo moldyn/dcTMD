@@ -141,7 +141,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             Mean work, in kJ/mol.
         W_diss : 1D np.array
             Dissipative work, in kJ/mol.
-        dG : 1D np.array
+        dG_ : 1D np.array
             Free energy estimate, in kJ/mol.
         """
         # Besides calculating dcTMD quantitites for the class, this function
@@ -354,7 +354,6 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         Free energy estimate, in kJ/mol.
     friction_ :
         Friction factor in kJ/mol/(nm^2/ps).
-    delta_force
 
     Examples :
     >>> from dcTMD.dcTMD import ForceEstimator
@@ -416,16 +415,18 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
     ) -> Tuple[Float1DArray, Float1DArray, Float1DArray, Float1DArray]:
         """
         Estimate free energy and friction.
-        ToDo: check Kapitel to add comments from code
+        From 
+
         Returns
         -------
-        W_mean :self.force_set.force_
+        W_mean : 1D np.array
             Mean work, in kJ/mol.
-        W_diss :
+        W_diss : 1D np.array
             Dissipative work, in kJ/mol.
-        dG :
+        dG_ : 1D np.array
             Free energy estimate, in kJ/mol.
-        friction : 
+        friction_ : 1D np.array
+            Friction factor in kJ/mol/(nm^2/ps).
         """
         from scipy.constants import R  # noqa: WPS347
         from scipy.integrate import cumulative_trapezoid
@@ -434,51 +435,30 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         # average and variance over all trajectories in each time step
         # shape: (length_data)
         force_mean = np.mean(self.force_set.force_, axis=0)
-        self.W_mean_ = cumulative_trapezoid(
-            force_mean,
-            self.force_set.position_,
-            initial=0,
-        )
-        # calculate $\delta f_c(t) = f_c(t) - \left< f_c (t) \right>_N$ for every t
-        # shape: (N, length_data)
-        delta_force = self.force_set.force_ - force_mean
-        
 
-        # ~~~ evaluation
-        """
-        * optimized algorithm for numerical evaluation:
-        * integrate: $\int_0^t dt' \delta f_c(t')$ for all $t'$
-        * multiply by $\delta f_c(t)$ to yield $\int_0^t dt'\delta f_c(t)
-        * \delta f_c(t')$ for $t$ with all $t' \leq t$ each then calculate the
-        * ensemble average $\left< \int_0^t dt' \delta f_c(t) \delta f_c(t')
-        * \right>$
-        """
+        # calculate $\delta f_c(t) = f_c(t) - \left< f_c (t) \right>_N$ for every t
+        self.delta_force_array = self.force_set.force_ - force_mean
+        
+        # integrate over time
         int_delta_force = cumulative_trapezoid(
-            delta_force,
+            self.delta_force_array,
             self.force_set.time_,
             axis=-1,
             initial=0,
         )
-        intcorr = np.multiply(delta_force, int_delta_force)
-        """
-        # similar to :
-        for n in range(N):
-        for i in range(length_data):
-            intcorr[n,i] = delta_force[n,i]*delta_force[n,i]
-        """
-        self.friction_ = np.mean(intcorr, axis=0) / RT
-        """
-        # * autocorrelation function evaluation:
-        # * calculate $\left< \delta f_c(t) \delta f_c(t') \right>$ for the last
-        # * $t$
-        corr_set = np.zeros(np.shape(force_array))
-        print("calculating and processing ACF...\n")
-        for n in range(N):
-            corr_set[n, :] = delta_force[n, :]*delta_force[n, -1]
-        autocorr_set = np.mean(corr_set, axis=0)
-        """
-        # * $W_{diss}$ from integration:
+        intcorr = np.multiply(
+            self.delta_force_array,
+            int_delta_force,
+        )
+        friction_ = np.mean(intcorr, axis=0) / RT
+
+
         print('Calculating dissipative work...')
+        W_mean_ = cumulative_trapezoid(
+            force_mean,
+            self.force_set.position_,
+            initial=0,
+        )
         W_diss = cumulative_trapezoid(
             self.friction_,
             self.force_set.position_,
@@ -487,12 +467,10 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
 
         # Reduce resolution
         self.force_set.position_ = self.force_set.position_[::self.force_set.resolution]
-        self.W_mean_ = self.W_mean_[::self.force_set.resolution]
+        self.W_mean_ = W_mean_[::self.force_set.resolution]
         self.W_diss_ = W_diss[::self.force_set.resolution]
         self.dG_ = self.W_mean_ - self.W_diss_
-        self.friction_ = self.friction_[::self.force_set.resolution]
-        # ToDo: do we need this?
-        #self.delta_force_array_ = delta_force
+        self.friction_ = friction_[::self.force_set.resolution]
 
         return self.W_mean_, self.W_diss_, self.dG_, self.friction_
 

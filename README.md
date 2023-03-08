@@ -77,6 +77,7 @@ Secondary importance:
     - [ ] Normality plot
     - [ ] Confidence intervals
     - [ ] Exponential estimator class
+    - [ ] Add function ForceSet.integrate
 - [ ] Check if smoothing width works as expected
 - [ ] Discuss gaussian kernel borders
 

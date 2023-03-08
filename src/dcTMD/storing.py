@@ -361,7 +361,7 @@ class ForceSet(TransformerMixin, BaseEstimator):
         )
         self.names_ = np.array([])
         self.position_ = self.time_ * self.velocity
-        # read in data and fill work_array
+        # read in data and fill force_array
         for idx, file_name in (pbar := tqdm.tqdm)(
             enumerate(self.X),
             total=len(self.X),
@@ -384,6 +384,6 @@ class ForceSet(TransformerMixin, BaseEstimator):
                 pbar.write(
                     f'shape is {file_data.shape} and not {self.time_.shape}'
                 )
-        # removing rows with only zero, reduce positions resolution
+        # removing rows with only zero
         self.force_ = self.force_[~np.all(self.force_ == 0, axis=1)]
 
