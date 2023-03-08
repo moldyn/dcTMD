@@ -30,8 +30,8 @@ from dcTMD._typing import (
 
 @beartype
 def save(
-    object,
     filename: Str,
+    object,
 ) -> None:
     r"""
     Save a data handler or an estimator.
@@ -106,7 +106,6 @@ def _get_time_from_testfile(handler):
         time_length_reduced = len(handler.time_[::handler.resolution])
         print(f'length of pullf file is {time_length}')
         print(f'reduced length is {time_length_reduced}')
-
 
 
 class WorkSet(TransformerMixin, BaseEstimator):
@@ -386,4 +385,3 @@ class ForceSet(TransformerMixin, BaseEstimator):
                 )
         # removing rows with only zero
         self.force_ = self.force_[~np.all(self.force_ == 0, axis=1)]
-
