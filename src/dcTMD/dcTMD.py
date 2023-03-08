@@ -43,6 +43,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         Dissipative work, in kJ/mol.
     dG_ :
         Free energy estimate, in kJ/mol.
+    friction_:
+        Friction factor in kJ/mol/(nm^2/ps).
     mode_ :
         Parameter of estimate_free_energy_errors(). Decides how the
         bootstrapping errors are calculated.
