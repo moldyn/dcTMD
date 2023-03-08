@@ -22,7 +22,7 @@ HERE = os.path.dirname(__file__)
 TEST_FILE_DIR = os.path.join(HERE, 'testdata')
 
 
-def filenames():
+def filenames(scope="session"):
     files = glob.glob(f'{TEST_FILE_DIR}/t_middle_*_pullf.xvg')
     return sorted(files)
 
