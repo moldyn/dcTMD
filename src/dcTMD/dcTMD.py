@@ -294,8 +294,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         n_resamples :
             Number of drawn resamples for bootstrapping error analysis.
         mode :
-            Chooses between reducing the resampled statistic via 
-                1.  'std' the element-wise calculation of standard deviations, 
+            Chooses between reducing the resampled statistic via
+                1.  'std' the element-wise calculation of standard deviations,
                 2.  confidence intervals if `mode` is a float in [0, 1).
         seed :
             Seed for the random number generator.
@@ -415,7 +415,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
     ) -> Tuple[Float1DArray, Float1DArray, Float1DArray, Float1DArray]:
         """
         Estimate free energy and friction.
-        From 
+        From force auto corrleation
 
         Returns
         -------
@@ -436,9 +436,9 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         # shape: (length_data)
         force_mean = np.mean(self.force_set.force_, axis=0)
 
-        # calculate $\delta f_c(t) = f_c(t) - \left< f_c (t) \right>_N$ for every t
+        # calculate $\delta f_c(t) = f_c(t) - \left< f_c (t) \right>_N$
         self.delta_force_array = self.force_set.force_ - force_mean
-        
+
         # integrate over time
         int_delta_force = cumulative_trapezoid(
             self.delta_force_array,
@@ -452,7 +452,6 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         )
         friction_ = np.mean(intcorr, axis=0) / RT
 
-
         print('Calculating dissipative work...')
         W_mean_ = cumulative_trapezoid(
             force_mean,
@@ -460,13 +459,13 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
             initial=0,
         )
         W_diss = cumulative_trapezoid(
-            self.friction_,
+            friction_,
             self.force_set.position_,
             initial=0,
         ) * self.force_set.velocity
 
         # Reduce resolution
-        self.force_set.position_ = self.force_set.position_[::self.force_set.resolution]
+        self.force_set.position_ = self.force_set.position_[::self.force_set.resolution]  # noqa: E501
         self.W_mean_ = W_mean_[::self.force_set.resolution]
         self.W_diss_ = W_diss[::self.force_set.resolution]
         self.dG_ = self.W_mean_ - self.W_diss_

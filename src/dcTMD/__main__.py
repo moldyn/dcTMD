@@ -142,25 +142,24 @@ def main(
     if mode == 'work':
         dataset = dcTMD.storing.WorkSet(velocity=velocity,
                                         resolution=res,
+                                        verbose=verbose,
                                         )
         estimator = dcTMD.dcTMD.WorkEstimator(temperature)
-        outname += '_from_work'
     if mode == 'force':
         dataset = dcTMD.storing.ForceSet(velocity=velocity,
                                          resolution=res,
+                                         verbose=verbose,
                                          )
         estimator = dcTMD.dcTMD.ForceEstimator(temperature)
-        outname += '_from_forceacf'
 
-    print(dataset, estimator)
     # Loading constraint force files
     filenames = dcTMD.io.load_pullf(pullf_files)
 
     # Generate work/force set
     dataset.fit(filenames)
     if save_dataset:
-        out = outname + f"_{len(dataset.names_)}"
-        dcTMD.storing.save(dataset, out)
+        out = outname + f"_{len(dataset.names_)}_{mode}set"
+        dcTMD.storing.save(out, dataset)
     # Calculate Wmean, Wdiss, dG and friction factor
     estimator.fit(dataset)
 
@@ -171,6 +170,7 @@ def main(
     """
 
     # save data as .npz and .dat file
+    outname += f'_{mode}'
     dcTMD.io.write_output(outname, dataset, estimator)
 
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ['smoothing', 'bootstrapping'], 'dcTMDplots'
+__all__ = ['smoothing', 'bootstrapping', 'dcTMDplots']
 
 from dcTMD.utils import smoothing
 from dcTMD.utils import bootstrapping
