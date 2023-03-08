@@ -6,20 +6,22 @@ import numpy as np
 from beartype import beartype
 
 from dcTMD._typing import (
-    Int,
     Str,
+    Str1DArray,
+    List,
 )
 
 
 @beartype
 def load_pullf(
     pullf_files: Str
-) -> : (List[str], Float1DArray)
+) -> (List[Str], Str1DArray):
+    """Load filenames from file or glob them from globpattern."""
     try:
         filenames = np.loadtxt(pullf_files, dtype='str')
     except:
         import glob
-        filenames = glob.glob(pullf_glob_pattern)
+        filenames = glob.glob(pullf_files)
 
     if len(filenames)==0:
         print("No constraint force files found.")
@@ -37,7 +39,7 @@ def write_output(
 ) -> None:
     """Take all calculated quantities and save them."""
     n_traj = len(dataset.names_)
-    if estimator.free_energy_error_:
+    if hasattr(estimator, "s_dG_"):
         results_dict = {
             "x": dataset.position_,
             "Wmean":estimator.W_mean_,
@@ -63,13 +65,13 @@ def write_output(
         header = results.T[0]
         arrays = np.vstack(results.T[1])
         np.savetxt(
-            f'{out}_{n_traj}_dG.dat',
+            f'{out}_N{n_traj}_dG.dat',
             arrays.T,
             fmt='%20.8f',  # noqa: WPS323
             header='    '.join(header),
         )
     if '.npz' in filetype:
         np.savez(
-            f'{out}_{n_traj}_dG.npz',
+            f'{out}_N{n_traj}_dG.npz',
             **results_dict,
         )
