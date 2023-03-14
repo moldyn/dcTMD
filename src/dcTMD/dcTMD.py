@@ -83,7 +83,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
     @beartype
     def __init__(
         self,
-        temperature: Float,
+        temperature: (Float, Int),
         verbose: bool = False,
     ) -> None:
         """Initialize class."""
