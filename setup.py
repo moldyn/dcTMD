@@ -60,6 +60,7 @@ setup(
         'tqdm',
         'click>=7.0.0',
         'typing_extensions>=3.9.0;python_version<"3.9"',
+        'matplotlib>=3.7'
     ],
     extras_require=get_extra_requirements('extra-requirements.txt'),
     entry_points={
