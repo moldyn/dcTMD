@@ -7,6 +7,7 @@ import numpy as np
 from dcTMD._typing import (
     Float,
     Float1DArray,
+    Str
 )
 
 
@@ -14,6 +15,7 @@ def gaussfilter_friction(
     friction: Float1DArray,
     pos: Float1DArray,
     sigma: Float,
+    mode: Str = "reflect",
 ) -> Float1DArray:
     """
     Smoothes friction with a gaussian kernel and 'nearest' borders.
@@ -32,7 +34,7 @@ def gaussfilter_friction(
     blurred_friction : 1d np.array
         Smoothed friction.
     """
-    from scipy.ndimage import gaussian_filter
+    from scipy.ndimage import gaussian_filter1d
     delta_x = pos[1] - pos[0]
     blur = np.ceil(sigma / delta_x).astype(int)
-    return gaussian_filter(friction, sigma=blur, mode='nearest')
+    return gaussian_filter1d(friction, sigma=blur, mode=mode)
