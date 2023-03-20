@@ -58,9 +58,9 @@ Check out the documentation for an overview over all modules as well as the tuto
 ## Roadmap
 
 Next steps:
-- [ ] Finish ForceSet, ForceEstimator.
-- [ ] Rewrite IO of results (discuss this).
-- [ ] Rewrite CLI and provide only simplest case: Estimation of free energy and friction from list of files plus saving.
+- [x] Finish ForceSet, ForceEstimator.
+- [x] Rewrite IO of results (discuss this).
+- [x] Rewrite CLI and provide only simplest case: Estimation of free energy and friction from list of files plus saving.
 - [ ] Smoothing of friction within Estimators via self.smooth_friction() methods. Better(?) even: Write abstract parent class which provides this smoothing method and inherit it.
 - [ ] Tests for all functionality. So far, only the WorkSet has two tests. Add tests for the ForceSet, for the Estimators WorkEstimator and ForceEstimator as well as all their methods. Also provide tests for the io and for the utils, so smoothing and bootstrapping.
 - [ ] Linting using [wemake](https://github.com/wemake-services/wemake-python-styleguide). Provide short explanation for ignores.
@@ -74,10 +74,10 @@ Secondary importance:
     - [ ] Gaussian error estimation
     - [ ] WorkSet plots: 1d, 2d distributions
     - [ ] Estimator plots: free energy, friction & both
-    - [ ] Normality plot
+    - [x] Normality plot
     - [ ] Confidence intervals
     - [ ] Exponential estimator class
-    - [ ] Add function ForceSet.integrate
+    - [x] Add function ForceSet.integrate
 - [ ] Check if smoothing width works as expected
 - [ ] Discuss gaussian kernel borders
 
