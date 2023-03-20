@@ -90,6 +90,7 @@ def write_output(
         results = np.asarray(results, dtype=object)
         header = results.T[0]
         arrays = np.vstack(results.T[1])
+        print(f'save file {out}_N{n_traj}_dG.dat')
         np.savetxt(
             f'{out}_N{n_traj}_dG.dat',
             arrays.T,
@@ -97,6 +98,7 @@ def write_output(
             header='    '.join(header),
         )
     if '.npz' in filetype:
+        print(f'dave file {out}_N{n_traj}_dG.npz')
         np.savez(
             f'{out}_N{n_traj}_dG.npz',
             **results_dict,

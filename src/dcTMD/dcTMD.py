@@ -110,8 +110,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             Fitted estimator.
         """
         self.work_set = work_set
-        self.position_ = self.work_set.position_
-        self.names_ = self.work_set.names_
+        self.position_ = work_set.position_
+        self.names_ = work_set.names_
         self.estimate_free_energy()
         self.estimate_friction()
         return self
@@ -374,7 +374,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
     @beartype
     def __init__(
         self,
-        temperature: Float,
+        temperature: (Float, Int),
         verbose: bool = False,
     ) -> None:
         """Initialize class."""
@@ -401,8 +401,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
             Fitted estimator.
         """
         self.force_set = force_set
-        self.position_ = self.force_set.position_
-        self.names_ = self.force_set.names_
+        self.names_ = force_set.names_
         self.estimate_free_energy_friction()
         return self
 
@@ -471,7 +470,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         ) * self.force_set.velocity
 
         # Reduce resolution
-        self.force_set.position_ = self.force_set.position_[::self.force_set.resolution]  # noqa: E501
+        self.position_ = self.force_set.position_[::self.force_set.resolution]  # noqa: E501
         self.W_mean_ = W_mean_[::self.force_set.resolution]
         self.W_diss_ = W_diss[::self.force_set.resolution]
         self.dG_ = self.W_mean_ - self.W_diss_
