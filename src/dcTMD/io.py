@@ -16,7 +16,6 @@ from dcTMD._typing import (
 def load_pullf(
     pullf_files: Str
 ) -> (List[Str], Str1DArray):
-    # ToDo: add exception for Union typing
     """Load filenames from file or glob them from globpattern."""
     try:
         filenames = np.loadtxt(pullf_files, dtype='str')
@@ -35,15 +34,40 @@ def load_pullf(
 @beartype
 def write_output(
     out: Str,
-    dataset,
     estimator,
     filetype=['.dat', '.npz']
 ) -> None:
-    """Take all calculated quantities and save them."""
-    n_traj = len(dataset.names_)
+    """
+    Takes all calculated quantities and saves them
+
+    Parameters
+    ----------
+    out :
+        Output name. By default f'{out}_N{n_traj}_dG'
+    estimator :
+        Either a ForceEstimator or WorkEstimator instance.
+    filetype:
+        Output filetype, either '.dat', '.npz' or ['.dat', '.npz'].
+    
+    Examples :
+    >>> from dcTMD.storing import load
+    >>> from dcTMD.io import write_output
+    >>> from dcTMD.dcTMD import WorkEstimator
+    >>> # Save the results from WorkEstimator 
+    >>> # (ForceEstimator works similarly)
+    >>> # calculate dcTMD results from workset
+    >>> work = load('my_work_set')
+    >>> work_estimator = WorkEstimator(temperature=290.15)
+    >>> work_estimator.fit(work)
+    >>> out = 'my_dcTMD_results'
+    >>> # save results as '.npz' file
+    >>> write_output(out, work_estimator, filetype='.npz')
+    """
+
+    n_traj = len(estimator.names_)
     if hasattr(estimator, "s_dG_"):
         results_dict = {
-            "x": dataset.position_,
+            "x": estimator.position_,
             "Wmean": estimator.W_mean_,
             "Wdiss": estimator.W_diss_,
             "dG": estimator.dG_,
@@ -54,7 +78,7 @@ def write_output(
         }
     else:
         results_dict = {
-            "x": dataset.position_,
+            "x": estimator.position_,
             "Wmean": estimator.W_mean_,
             "Wdiss": estimator.W_diss_,
             "dG": estimator.dG_,

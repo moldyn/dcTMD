@@ -110,6 +110,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             Fitted estimator.
         """
         self.work_set = work_set
+        self.position_ = self.work_set.position_
+        self.names_ = self.work_set.names_
         self.estimate_free_energy()
         self.estimate_friction()
         return self
@@ -399,6 +401,8 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
             Fitted estimator.
         """
         self.force_set = force_set
+        self.position_ = self.force_set.position_
+        self.names_ = self.force_set.names_
         self.estimate_free_energy_friction()
         return self
 

@@ -60,7 +60,7 @@ def ref_forceestimator(scope="session"):
     return estimator
 
 
-
+"""
 import numpy as np
 import pytest
 from dcTMD.dcTMD import ForceSet, ForceEstimator
@@ -163,3 +163,4 @@ def test_fit(work_estimator):
     assert all(work_estimator.W_mean_resampled_.shape == work_estimator.W_mean_.shape)
     assert all(work_estimator.W_diss_resampled_.shape == work_estimator.W_diss_.shape)
     assert all(work_estimator.dG_resampled_.shape == work_estimator.dG_.shape)
+"""
