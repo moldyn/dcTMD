@@ -37,6 +37,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
 
     Attributes
     ----------
+    position_ :
+        Positions time trace, product of time trace and velocity, in nm.
     W_mean_ :
         Mean work, in kJ/mol.
     W_diss_ :
@@ -178,7 +180,10 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         n_resamples: Int,
         mode: Union[StrStd, NumInRange0to1],
         seed: Optional[Int] = None,
-    ) -> Tuple[Float1DArray, Float1DArray, Float1DArray]:
+    ) -> Tuple[Union[Float1DArray, Tuple[Float1DArray, Float1DArray]],
+               Union[Float1DArray, Tuple[Float1DArray, Float1DArray]],
+               Union[Float1DArray, Tuple[Float1DArray, Float1DArray]],
+               ]:
         """
         Estimate bootstrapping errors for the free energy estimate.
 
@@ -205,6 +210,14 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             Error estimate of the mean work.
         s_dG_ :
             Error estimate of free energy.
+
+        Examples
+        --------
+        >>> from dcTMD.dcTMD import WorkEstimator
+        >>> work_estimator.estimate_free_energy_errors(1000, mode='std')
+        Bootstrapping progress: 100%|██████████| 1000/1000 [00:00<00:00, 12797.15it/s]
+        >>> work_estimator.s_dG_
+        array([..., ])
         """
         self.free_energy_error_ = {
             'mode': mode,
@@ -228,12 +241,19 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             descriptor=self.free_energy_error_,
         )
         # Save error estimates and bootstrapped quantities
-        self.s_W_mean_ = s_quantity[0, 0]
-        self.s_W_diss_ = s_quantity[0, 1]
-        self.s_dG_ = s_quantity[0, 2]
         self.W_mean_resampled_ = quantity_resampled[:, 0]
         self.W_diss_resampled_ = quantity_resampled[:, 1]
         self.dG_resampled_ = quantity_resampled[:, 2]
+        
+        if self.free_energy_error_['mode'] == 'std':
+            self.s_W_mean_ = s_quantity[0, 0]
+            self.s_W_diss_ = s_quantity[0, 1]
+            self.s_dG_ = s_quantity[0, 2]
+        else:
+            self.s_W_mean_ = s_quantity[0, :, 0]
+            self.s_W_diss_ = s_quantity[0, :, 1]
+            self.s_dG_ = s_quantity[0, :, 2]
+            
 
     @beartype
     def estimate_friction(
@@ -308,6 +328,14 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         -------
         s_friction_ :
             Bootstrap error of the friction factor in kJ/mol/(nm^2/ps).
+
+        Examples
+        --------
+        >>> from dcTMD.dcTMD import WorkEstimator
+        >>> work_estimator.estimate_friction_errors(1000, mode='std')
+        Bootstrapping progress: 100%|██████████| 1000/1000 [00:00<00:00, 10245.63it/s]
+        >>> work_estimator.s_friction_
+        array([..., ])
         """
         self.friction_error_ = {
             'n_resamples': n_resamples,
@@ -333,7 +361,10 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             descriptor=self.friction_error_,
         )
         # Save error estimates and bootstrapped quantities
-        self.s_friction_ = s_quantity[0, 0]
+        if self.free_energy_error_['mode'] == 'std':
+            self.s_friction_ = s_quantity[0, 0]
+        else:
+            self.s_friction_ = s_quantity[0, :, 0]
         self.friction_resampled_ = quantity_resampled[:, 0]
 
 
@@ -350,6 +381,8 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
 
     Attributes
     ----------
+    position_ :
+        Positions time trace, product of time trace and velocity, in nm.
     W_mean_ :
         Mean work, in kJ/mol.
     W_diss_ :
@@ -359,12 +392,13 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
     friction_ :
         Friction factor in kJ/mol/(nm^2/ps).
 
-    Examples :
+    Examples
+    --------
     >>> from dcTMD.dcTMD import ForceEstimator
     >>> from dcTMD.storing import load
     >>> force = load('my_force_set')
-    >>> # Instantiate a ForceEstimator instance and fit it with the ForceSet
-    >>> # instance
+    >>> # Instantiate a ForceEstimator instance and fit it with the
+    >>> # ForceSet instance
     >>> force_estimator = ForceEstimator(temperature=290.15)
     >>> force_estimator.fit(force)
     >>> force_estimator.dG_

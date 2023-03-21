@@ -16,7 +16,22 @@ from dcTMD._typing import (
 def load_pullf(
     pullf_files: Str
 ) -> (List[Str], Str1DArray):
-    """Load filenames from file or glob them from globpattern."""
+    """Loads filenames from file or glob them from globpattern
+    and resturns them as list.
+
+    Parameters
+    ----------
+    pullf_files :
+        file which contains pullf filenames or globpattern
+
+    Examples
+    --------
+    >>> from dcTMD.io import load_pullf
+    >>> # load filenames form file
+    >>> filenames = load_pullf('pullf_files.txt')
+    >>> # load filenames with glob pattern
+    >>> filenames = load_pullf('data/*.pullf.xvg')
+    """
     try:
         filenames = np.loadtxt(pullf_files, dtype='str')
     except FileNotFoundError as fnf_error:
@@ -49,7 +64,8 @@ def write_output(
     filetype:
         Output filetype, either '.dat', '.npz' or ['.dat', '.npz'].
     
-    Examples :
+    Examples
+    --------
     >>> from dcTMD.storing import load
     >>> from dcTMD.io import write_output
     >>> from dcTMD.dcTMD import WorkEstimator
