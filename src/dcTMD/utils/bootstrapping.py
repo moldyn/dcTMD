@@ -3,7 +3,7 @@
 Functions used for bootstrapping.
 
 MIT License
-Copyright (c) 2022, Victor Tänzel
+Copyright (c) 2022, Victor Tänzel, Miriam Jäger
 All rights reserved.
 """
 
@@ -48,9 +48,17 @@ def _bootstrap_reducer(
         def reducer(resampled_quantity):
             return np.std(resampled_quantity, axis=0)
     else:
-        # Implement the confidence intervals here.
         def reducer(resampled_quantity):
-            pass  # noqa: WPS420
+            confidence_level = descriptor['mode']
+            # Calculate the lower and upper bounds of the confidence interval
+            lower_bound = np.percentile(resampled_quantity,
+                                        (1 - confidence_level) / 2 * 100,
+                                        axis=0)
+            upper_bound = np.percentile(resampled_quantity,
+                                        (1 + confidence_level) / 2 * 100,
+                                        axis=0)
+            # Return and the confidence interval as a tuple
+            return lower_bound, upper_bound
     return tuple(reducer(arg) for arg in args)
 
 
