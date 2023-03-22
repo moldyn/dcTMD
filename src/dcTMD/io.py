@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Module handling the input/output functions."""
+"""Submodule handling the input/output operations.
+
+MIT License
+Copyright (c) 2022, Victor Tänzel, Miriam Jäger
+All rights reserved.
+"""
+
 __all__ = ['write_output']
 
 import numpy as np

@@ -14,15 +14,15 @@ nav:
   - Changelog: changelog.md
   - License: license.md
 - Tutorial:
-  - Getting Started: tutorials/tutorial.ipynb
+  - Getting Started: getting_started.md
   - Theory: tutorials/theory.md 
-  - Estimate Work: tutorials/work.ipynb
-  - Estimate Force: tutorials/force.ipynb
-  - CLI: tutorials/tutorial.ipynb
-- Code Reference: reference/
-- How-To Guides:
-  - Estimate Work: tutorials/work.ipynb
-  - Estimate Force: tutorials/force.ipynb
+  - Create trajectories with Gromacs: tutorials/Gromacs.md
+  - dcTMD via Work: tutorials/work.ipynb
+  - dcTMD via Force: tutorials/force.ipynb
+  - CLI: tutorials/CLI.ipynb
+- Code Reference:
+  - Structure: tutorials/structure_dcTMD.md
+  - Reference: reference/
 - Development:
   - Contributing: contributing.md
 - MolDyn Freiburg: https://moldyn.uni-freiburg.de/

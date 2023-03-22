@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-Classes storing constraint force data as work or force time traces.
+"""Classes that store constraint force data as work or force time traces.
+The resulting force or work sets are needed for further analysis.
 
 
 MIT License

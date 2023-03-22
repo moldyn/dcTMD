@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+""" --8<-- "docs/structure_dcTMD.md" """
 
 __all__ = ['dcTMD', 'storing', 'io', 'utils']
 

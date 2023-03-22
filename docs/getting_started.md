@@ -26,48 +26,11 @@ The package will be available on pipy and conda. Until then, install it via:
 python3 -m pip install git+ssh://git@github.com/moldyn/dcTMD.git
 ```
 
+## Sections:
+- [**Theoretical Background:**](tutorials/theory.md): Here, you will learn the basic theory behind dcTMD. Including Jarzinskys equality, the derivation of the free energy and friction estimate as well as the main assumptions made on the way.
 
+- [**Create pulling trajectories with Gromacs:**](tutorials/Gromacs.md): Here, you will learn how you can set up constraint targeted MD simulations using the pull code implemented in Gromacs. 
 
-## Classes and Modules
-The module is structured into the following submodules:
+- **dcTMD Analysis:** In section [dcTMD via Work](tutorials/work.ipynb) and [dcTMD via Force](tutorials/force.ipynb) you will learn how to analyse the constraint pulling trajectories with dcTMD as described in [Theory](tutorials/theory.md).
 
-    io: This submodule provides functions for handling input and output operations in dcTMD package. Specifically, the two functions: load_pullf and write_output.
-
-    storing: This modules creates force or work sets from .pullf files which are needed for further analysis.
-    This submodule provides two classes, WorkSet and ForceSet, that store constraint force data as work or force time traces, respectively.
-
-    dcTMD: 
-
-    utils: bootstrapping, plotting and smoothing
-
-### Methods:
-
-    __init__(self, temperature: (Float, Int), verbose: bool = False): Constructor for the class, which takes the temperature of the simulation and a verbose flag as input parameters.
-    fit(self, work_set): Method to estimate the free energy and friction for a given work set. It takes a work set as input and returns a fitted estimator.
-    transform(self, X, y=None): Method to return the free energy and friction estimates as a tuple.
-    estimate_free_energy(self, work_set=None): Method to estimate the free energy for a given work set. It takes an optional work set as input and returns the mean work, dissipative work, and free energy estimate as a tuple.
-    estimate_free_energy_errors(self, n_resamples: Int, mode: Union[StrStd, NumInRange0to1], seed=None): Method to estimate the errors in the free energy estimates using bootstrapping. It takes the number of resamples, the mode of calculation, and the random seed as input parameters and returns the resampled mean work, resampled dissipative work, and resampled free energy estimate as a tuple.
-
-Attributes:
-
-    temperature: The temperature of the simulation.
-    verbose: The verbose flag, which determines whether to print verbose output.
-    W_mean_: The mean work, in kJ/mol.
-    W_diss_: The dissipative work, in kJ/mol.
-    dG_: The free energy estimate, in kJ/mol.
-    friction_: The friction factor in kJ/mol/(nm^2/ps).
-    mode_: The parameter used to estimate free energy errors.
-    s_W_mean_: The bootstrapping error of the mean work.
-    s_W_diss_: The bootstrapping error of the dissipative work.
-    s_dG_: The bootstrapping error of the free energy estimate.
-    W_mean_resampled_: The resampled mean work, needed to inspect its distribution.
-    W_diss_resampled_: The resampled dissipative work, needed to inspect its distribution.
-    dG_resampled_: The resampled free energy estimate, needed to inspect its distribution.
-
-This code defines a class ForceEstimator for performing dcTMD (discrete coordinate thermodynamics) analysis on a force set. The class has several methods and attributes, including fit, transform, and estimate_free_energy_friction.
-
-The fit method takes in a force_set object and estimates the free energy and friction. The transform method returns the estimated free energy and friction. The estimate_free_energy_friction method estimates the free energy and friction using force auto-correlation.
-
-The memory_kernel method calculates the memory kernel at positions x_indices "forward" in time from fluctuation-dissipation. It returns a 2D array corr_set with shape (len(x_indices), length_data).
-
-Overall, this class seems to be part of a larger codebase for analyzing molecular dynamics simulations.
+- [**Command Line Interface:**](tutorials/CLI.ipynb) In this section, we will provide a short guide to the command line interface of `dcTMD`, which provides some common analysis and visualization functionality.

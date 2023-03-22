@@ -21,6 +21,7 @@ from dcTMD._typing import (
     StrStd,
     NumInRange0to1,
     Float1DArray,
+    Float2DArray,
 )
 
 
@@ -180,9 +181,9 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         n_resamples: Int,
         mode: Union[StrStd, NumInRange0to1],
         seed: Optional[Int] = None,
-    ) -> Tuple[Union[Float1DArray, Tuple[Float1DArray, Float1DArray]],
-               Union[Float1DArray, Tuple[Float1DArray, Float1DArray]],
-               Union[Float1DArray, Tuple[Float1DArray, Float1DArray]],
+    ) -> Tuple[Union[Float1DArray, Float2DArray],
+               Union[Float1DArray, Float2DArray],
+               Union[Float1DArray, Float2DArray],
                ]:
         """
         Estimate bootstrapping errors for the free energy estimate.
