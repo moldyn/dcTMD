@@ -18,6 +18,7 @@ from dcTMD.utils import bootstrapping
 from dcTMD._typing import (
     Int,
     Float,
+    Str,
     StrStd,
     NumInRange0to1,
     Float1DArray,
@@ -368,6 +369,36 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             self.s_friction_ = s_quantity[0, :, 0]
         self.friction_resampled_ = quantity_resampled[:, 0]
 
+    @beartype
+    def smooth_friction(
+        self,
+        sigma: Float,
+        mode: Str = "reflect",
+    ) -> Float1DArray:
+        """Smooth friction with gaussain kernel.
+
+        Parameters
+        ----------
+        sigma:
+            standard deviation of gaussian kernel in nm
+        mode:
+            options: ‘reflect’, ‘constant’, ‘nearest’, ‘mirror’, ‘wrap’
+            The mode parameter determines how the input array is
+            extended beyond its boundaries. Default is ‘reflect’.
+            Behavior for each option see scipy.ndimage.gaussian_filter1d
+
+        Returns
+        -------
+        friction_smooth_ : 1d np.array
+            Smoothed friction.
+        """
+        from dcTMD.utils.smoothing import gaussfilter_friction
+        self.friction_smooth_ = gaussfilter_friction(self.friction_,
+                                                     self.position_,
+                                                     sigma=0.1,
+                                                     )
+        return self.friction_smooth_
+
 
 class ForceEstimator(TransformerMixin, BaseEstimator):
     """
@@ -512,6 +543,36 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         self.friction_ = friction_[::self.force_set.resolution]
 
         return self.W_mean_, self.W_diss_, self.dG_, self.friction_
+
+    @beartype
+    def smooth_friction(
+        self,
+        sigma: Float,
+        mode: Str = "reflect",
+    ) -> Float1DArray:
+        """Smooth friction with gaussain kernel.
+
+        Parameters
+        ----------
+        sigma:
+            standard deviation of gaussian kernel in nm
+        mode:
+            options: ‘reflect’, ‘constant’, ‘nearest’, ‘mirror’, ‘wrap’
+            The mode parameter determines how the input array is
+            extended beyond its boundaries. Default is ‘reflect’.
+            Behavior for each option see scipy.ndimage.gaussian_filter1d
+
+        Returns
+        -------
+        friction_smooth_ : 1d np.array
+            Smoothed friction.
+        """
+        from dcTMD.utils.smoothing import gaussfilter_friction
+        self.friction_smooth_ = gaussfilter_friction(self.friction_,
+                                                     self.position_,
+                                                     sigma=0.1,
+                                                     )
+        return self.friction_smooth_
 
     def memory_kernel(
         self,

@@ -66,15 +66,9 @@ MODES = ('work', 'force')
     '-s',
     '--sigma',
     type=float,
+    default=None,
     required=False,
     help='Standard deviation of gaussian filter in nm.',
-)
-@click.option(
-    '--resamples',
-    type=int,
-    required=False,
-    help='Number of resamples used in optional bootstrapping. ' +
-    'This is only available in mode work',
 )
 @click.option(
     '-v',
@@ -108,7 +102,6 @@ def main(
     velocity,
     res,
     sigma,
-    resamples,
     verbose,
     plot,
     save_dataset,
@@ -135,8 +128,7 @@ def main(
         click.echo(f'Input:\n mode: {mode}\n file: {pullf_files}\n \
         outname: {outname}\n temperature: {temperature}\n \
         velocity: {velocity}\n resolution: {res}\n sigma: {sigma}\n verbose: \
-        {verbose}\n, plot: {plot}\n, N_resamples: {resamples}\n\
-        save dataset: {save_dataset}\n')
+        {verbose}\n, plot: {plot}\n, save dataset: {save_dataset}\n')
 
     # Set up mode
     if mode == 'work':
@@ -163,15 +155,13 @@ def main(
     # Calculate Wmean, Wdiss, dG and friction factor
     estimator.fit(dataset)
 
-    """
-    # calculate errors
-    if resamples:
-        estimator.estimate_free_energy_errors(N_resamples)
-    """
+    # Smooth friction
+    if sigma:
+        estimator.smooth_friction(sigma=0.1, mode='reflect')
 
     # save data as .npz and .dat file
     outname += f'_{mode}'
-    dcTMD.io.write_output(outname, dataset, estimator)
+    dcTMD.io.write_output(outname, estimator)
 
 
 if __name__ == '__main__':

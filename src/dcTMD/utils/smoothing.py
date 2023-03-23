@@ -28,6 +28,11 @@ def gaussfilter_friction(
         Positions corresponding to entries in friction array in nm.
     sigma : float
         Standard deviation of gaussian kernel in nm.
+    mode:
+        options: ‘reflect’, ‘constant’, ‘nearest’, ‘mirror’, ‘wrap’
+        The mode parameter determines how the input array is
+        extended beyond its boundaries. Default is ‘reflect’.
+        Behavior for each option see scipy.ndimage.gaussian_filter1d
 
     Returns
     -------

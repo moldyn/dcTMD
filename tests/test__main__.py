@@ -23,7 +23,6 @@ def test_main():
             '--velocity', '0.01',
             '--res', '1',
             '--sigma', '0.1',
-            '--resamples', '10',
             '--verbose',
             '--plot',
             '--save_dataset'

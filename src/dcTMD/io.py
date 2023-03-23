@@ -87,41 +87,41 @@ def write_output(
     """
 
     n_traj = len(estimator.names_)
+    out = f'{out}_N{n_traj}'
+
+    results_dict = {
+        "x": estimator.position_,
+        "Wmean": estimator.W_mean_,
+        "Wdiss": estimator.W_diss_,
+        "dG": estimator.dG_,
+        "Gamma": estimator.friction_,
+    }
     if hasattr(estimator, "s_dG_"):
-        results_dict = {
-            "x": estimator.position_,
-            "Wmean": estimator.W_mean_,
-            "Wdiss": estimator.W_diss_,
-            "dG": estimator.dG_,
-            "Gamma": estimator.friction_,
+        results_dict.update({
             "s_W_mean": estimator.s_W_mean_,
             "s_W_diss": estimator.s_W_diss_,
             "s_dG": estimator.s_dG_,
-        }
-    else:
-        results_dict = {
-            "x": estimator.position_,
-            "Wmean": estimator.W_mean_,
-            "Wdiss": estimator.W_diss_,
-            "dG": estimator.dG_,
-            "Gamma": estimator.friction_,
-        }
+        })
+    if hasattr(estimator, "friction_smooth_"):
+        results_dict["Gamma_smooth"] = estimator.friction_smooth_
+    if hasattr(estimator, "s_friction_"):
+        results_dict["s_Gamma"] = estimator.s_friction_
 
     if '.dat' in filetype:
         results = [(key, item) for key, item in results_dict.items()]
         results = np.asarray(results, dtype=object)
         header = results.T[0]
         arrays = np.vstack(results.T[1])
-        print(f'save file {out}_N{n_traj}_dG.dat')
+        print(f'save file {out}_dG.dat')
         np.savetxt(
-            f'{out}_N{n_traj}_dG.dat',
+            f'{out}_dG.dat',
             arrays.T,
             fmt='%20.8f',  # noqa: WPS323
             header='    '.join(header),
         )
     if '.npz' in filetype:
-        print(f'dave file {out}_N{n_traj}_dG.npz')
+        print(f'save file {out}_dG.npz')
         np.savez(
-            f'{out}_N{n_traj}_dG.npz',
+            f'{out}_dG.npz',
             **results_dict,
         )
