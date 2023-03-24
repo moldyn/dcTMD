@@ -84,32 +84,32 @@ def load(
 
 @beartype
 def _integrate_force(
-    forceorworkset_handler,
+    forceorworkset,
     force_data,
 ):
     """Integrate a force time trace and return the work time trace."""
     work_data = cumulative_trapezoid(
         force_data,
-        forceorworkset_handler.position_,
+        forceorworkset.position_,
         initial=0,
     )
-    return work_data[::forceorworkset_handler.resolution]
+    return work_data[::forceorworkset.resolution]
 
 
 @beartype
-def _get_time_from_testfile(forceorworkset_handler):
-    """Read test force file to determine the time trace for a data handler."""
-    forceorworkset_handler.time_ = np.loadtxt(
-        forceorworkset_handler.X[0],
+def _get_time_from_testfile(forceorworkset):
+    """Read test force file to determine the time trace for a data forceorworkset."""
+    forceorworkset.time_ = np.loadtxt(
+        forceorworkset.X[0],
         comments=('@', '#'),
         usecols=[0],
     )
-    if forceorworkset_handler.verbose:
-        print(f'Using {forceorworkset_handler.X[0]} to initialize arrays.')
-        time_length = len(forceorworkset_handler.time_)
+    if forceorworkset.verbose:
+        print(f'Using {forceorworkset.X[0]} to initialize arrays.')
+        time_length = len(forceorworkset.time_)
         time_length_reduced = len(
-            forceorworkset_handler.time
-            [::forceorworkset_handler.resolution])
+            forceorworkset.time_
+            [::forceorworkset.resolution])
         print(f'length of pullf file is {time_length}')
         print(f'reduced length is {time_length_reduced}')
 
