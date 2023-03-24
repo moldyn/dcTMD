@@ -8,10 +8,10 @@
         <img src="https://img.shields.io/badge/mkdocs-Documentation-brightgreen" /></a>
     <a href="https://github.com/moldyn/dcTMD/blob/main/LICENSE" alt="License">
         <img src="https://img.shields.io/github/license/moldyn/dcTMD" /></a>
-    <a href="https://github.com/moldyn/MoSAIC/actions/workflows/codeql.yml" alt="CodeQL">
-        <img src="https://github.com/moldyn/MoSAIC/actions/workflows/codeql.yml/badge.svg?branch=main" /></a>
-    <a href="https://github.com/moldyn/MoSAIC/actions/workflows/pytest.yml" alt="GitHub Workflow Status">
-        <img src="https://img.shields.io/github/actions/workflow/status/moldyn/MoSAIC/pytest.yml?branch=main"></a>
+    <a href="https://github.com/moldyn/dcTMD/actions/workflows/codeql.yml" alt="CodeQL">
+        <img src="https://github.com/moldyn/dcTMD/actions/workflows/codeql.yml/badge.svg?branch=main" /></a>
+    <a href="https://github.com/moldyn/dcTMD/actions/workflows/pytest.yml" alt="GitHub Workflow Status">
+        <img src="https://img.shields.io/github/actions/workflow/status/moldyn/dcTMD/pytest.yml?branch=main"></a>
   </p>
 
   <p>
