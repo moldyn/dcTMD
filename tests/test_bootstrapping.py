@@ -3,7 +3,7 @@
 
 import pytest
 import numpy as np
-from dcTMD.utils.bootstrapping import bootstrapping
+from dcTMD.utils import bootstrapping
 from dcTMD.dcTMD import WorkEstimator
 from dcTMD.storing import load
 from os.path import dirname, join

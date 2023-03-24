@@ -11,7 +11,7 @@ import numpy as np
 from os.path import dirname, join
 from dcTMD.dcTMD import WorkEstimator
 from dcTMD.storing import load
-from dcTMD.utils.smoothing import gaussfilter_friction
+from dcTMD.utils import gaussfilter_friction
 
 
 VELOCITY = 0.001

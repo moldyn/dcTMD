@@ -11,7 +11,7 @@ from beartype import beartype
 from beartype.typing import Union, Tuple, Optional
 from sklearn.base import BaseEstimator, TransformerMixin
 
-from dcTMD.utils import bootstrapping
+from dcTMD import utils
 from dcTMD._typing import (
     Int,
     Float,
@@ -233,7 +233,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         # Prepare and run bootstrapper
         def func(my_work_set):
             return self.estimate_free_energy(my_work_set)
-        s_quantity, quantity_resampled = bootstrapping.bootstrapping(
+        s_quantity, quantity_resampled = utils.bootstrapping(
             self,
             func=func,
             descriptor=self.free_energy_error_,
@@ -352,7 +352,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             return self.estimate_friction(
                 self.estimate_free_energy(my_work_set)[1],
             )
-        s_quantity, quantity_resampled = bootstrapping.bootstrapping(
+        s_quantity, quantity_resampled = utils.bootstrapping(
             self,
             func=func,
             descriptor=self.friction_error_,
@@ -387,7 +387,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         friction_smooth_ : 1d np.array
             Smoothed friction.
         """
-        from dcTMD.utils.smoothing import gaussfilter_friction
+        from dcTMD.utils import gaussfilter_friction
         self.friction_smooth_ = gaussfilter_friction(self.friction_,
                                                      self.position_,
                                                      sigma=0.1,
@@ -562,11 +562,10 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         friction_smooth_ : 1d np.array
             Smoothed friction.
         """
-        from dcTMD.utils.smoothing import gaussfilter_friction
+        from dcTMD.utils import gaussfilter_friction
         self.friction_smooth_ = gaussfilter_friction(self.friction_,
                                                      self.position_,
-                                                     sigma=0.1,
-                                                     )
+                                                     sigma=0.1)
         return self.friction_smooth_
 
     def memory_kernel(
