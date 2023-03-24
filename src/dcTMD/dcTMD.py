@@ -173,13 +173,13 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         return W_mean, W_diss, dG
 
     @beartype
-    def estimate_free_energy_errors(
+    def estimate_free_energy_errors(  # noqa: WPS320
         self,
         n_resamples: Int,
         mode: Union[StrStd, NumInRange0to1],
         seed: Optional[Int] = None,
     ) -> Tuple[Union[Float1DArray, Float2DArray],
-               Union[Float1DArray, Float2DArray],
+               Union[Float1DArray, Float2DArray],  # noqa: WPS318
                Union[Float1DArray, Float2DArray],
                ]:
         """
@@ -368,9 +368,9 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
     def smooth_friction(
         self,
         sigma: Float,
-        mode: Str = "reflect",
+        mode: Str = 'reflect',
     ) -> Float1DArray:
-        """Smooth friction with gaussain kernel.
+        """Smooth friction with gaussian kernel.
 
         Parameters
         ----------
@@ -387,11 +387,11 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         friction_smooth_ : 1d np.array
             Smoothed friction.
         """
-        from dcTMD.utils import gaussfilter_friction
-        self.friction_smooth_ = gaussfilter_friction(self.friction_,
-                                                     self.position_,
-                                                     sigma=0.1,
-                                                     )
+        self.friction_smooth_ = utils.gaussfilter_friction(
+            self.friction_,
+            self.position_,
+            sigma=0.1,
+        )
         return self.friction_smooth_
 
 
@@ -480,8 +480,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         self,
     ) -> Tuple[Float1DArray, Float1DArray, Float1DArray, Float1DArray]:
         """
-        Estimate free energy and friction.
-        From force auto corrleation
+        Estimate free energy and friction from force auto corrleation.
 
         Returns
         -------
@@ -499,7 +498,6 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         RT = R * self.temperature / 1e3
 
         # average and variance over all trajectories in each time step
-        # shape: (length_data)
         force_mean = np.mean(self.force_set.force_, axis=0)
 
         # calculate $\delta f_c(t) = f_c(t) - \left< f_c (t) \right>_N$
@@ -543,9 +541,10 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
     def smooth_friction(
         self,
         sigma: Float,
-        mode: Str = "reflect",
+        mode: Str = 'reflect',
     ) -> Float1DArray:
-        """Smooth friction with gaussain kernel.
+        """
+        Smooth friction with gaussian kernel.
 
         Parameters
         ----------
@@ -562,10 +561,11 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         friction_smooth_ : 1d np.array
             Smoothed friction.
         """
-        from dcTMD.utils import gaussfilter_friction
-        self.friction_smooth_ = gaussfilter_friction(self.friction_,
-                                                     self.position_,
-                                                     sigma=0.1)
+        self.friction_smooth_ = utils.gaussfilter_friction(
+            self.friction_,
+            self.position_,
+            sigma=0.1,
+        )
         return self.friction_smooth_
 
     def memory_kernel(
@@ -573,10 +573,10 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         x_indices: Float1DArray,
     ) -> Float1DArray:
         """
-        Calculate memory kernel at positions X "forward" in time
-        from fluctuation-dissipation.
-        see e.g. R. Zwanzig, “Nonequilibrium statistical mechanics”,
-        Oxford University Press (2001).
+        Calculate memory kernel at positions X "forward" in time.
+
+        From fluctuation-dissipation. See e.g. R. Zwanzig,
+        “Nonequilibrium statistical mechanics”, Oxford University Press (2001).
 
         Parameters
         ----------
@@ -587,14 +587,14 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         -------
         corr_set : np.ndarray
             shape: (len(X), length_data)
-        NaN are set to zero
+            NaN are set to zero
         """
         _, length_data = self.delta_force_.shape
         corr_set = np.zeros((len(x_indices), length_data))
 
         for ind, tt in enumerate(range(length_data)):
             entries = self.delta_force_[:, tt:-2] * \
-                self.delta_force_[:, tt + 1:-1]
+                self.delta_force_[:, tt + 1:-1]  # noqa: N400
             corr_set[ind, tt:-2] = np.mean(
                 entries,
                 axis=0,
