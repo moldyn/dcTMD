@@ -1,11 +1,8 @@
-#!/usr/bin/env python3
-"""
-CLI of dcTMD.
-
-MIT License
-Copyright (c) 2021, Victor Tänzel, Miriam Jaeger, Steffen Wolf.
-All rights reserved.
-"""
+# -*- coding: utf-8 -*-
+# MIT License
+# Copyright (c) 2021-2023, Victor Tänzel, Miriam Jaeger, Steffen Wolf.
+# All rights reserved.
+"""CLI of dcTMD."""
 
 import click
 import dcTMD
@@ -125,23 +122,24 @@ def main(
     # Click aftercare
     # ToDo: discuss if we want to include error estimation
     if verbose:
-        click.echo(f'Input:\n mode: {mode}\n file: {pullf_files}\n \
-        outname: {outname}\n temperature: {temperature}\n \
-        velocity: {velocity}\n resolution: {res}\n sigma: {sigma}\n verbose: \
-        {verbose}\n, plot: {plot}\n, save dataset: {save_dataset}\n')
+        click.echo(
+            f'Input:\n mode: {mode}\n file: {pullf_files}\n '
+            f'outname: {outname}\n temperature: {temperature}\n '
+            f'velocity: {velocity}\n resolution: {res}\n '
+            f'sigma: {sigma}\n verbose: {verbose}\n '
+            f'plot: {plot}\n, save dataset: {save_dataset}\n'
+        )
 
     # Set up mode
     if mode == 'work':
         dataset = dcTMD.storing.WorkSet(velocity=velocity,
                                         resolution=res,
-                                        verbose=verbose,
-                                        )
+                                        verbose=verbose)
         estimator = dcTMD.dcTMD.WorkEstimator(temperature)
-    if mode == 'force':
+    else:  # 'force'
         dataset = dcTMD.storing.ForceSet(velocity=velocity,
                                          resolution=res,
-                                         verbose=verbose,
-                                         )
+                                         verbose=verbose)
         estimator = dcTMD.dcTMD.ForceEstimator(temperature)
 
     # Loading constraint force files
@@ -165,4 +163,4 @@ def main(
 
 
 if __name__ == '__main__':
-    main()
+    main()  # pragma: no cover

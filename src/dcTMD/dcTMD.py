@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
-"""
-Classes calculating the dcTMD quantities.
-
-MIT License
-Copyright (c) 2022, Victor Tänzel, Miriam Jäger
-All rights reserved.
-"""
+# MIT License
+# Copyright (c) 2022, Victor Tänzel, Miriam Jäger
+# All rights reserved.
+"""Classes calculating the dcTMD quantities."""
 
 __all__ = ['WorkEstimator', 'ForceEstimator']
 
@@ -27,8 +24,7 @@ from dcTMD._typing import (
 
 
 class WorkEstimator(TransformerMixin, BaseEstimator):
-    """
-    Class for performing dcTMD analysis on a work set.
+    """Class for performing dcTMD analysis on a work set.
 
     Parameters
     ----------
@@ -217,7 +213,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         --------
         >>> from dcTMD.dcTMD import WorkEstimator
         >>> work_estimator.estimate_free_energy_errors(1000, mode='std')
-        Bootstrapping progress: 100%|██████████| 1000/1000 [00:00<00:00, 12797.15it/s]
+        Bootstrapping progress: 100%|██████████| 1000/1000 [00:00<00:00, 12797.15it/s]  # noqa
         >>> work_estimator.s_dG_
         array([..., ])
         """
@@ -246,7 +242,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         self.W_mean_resampled_ = quantity_resampled[:, 0]
         self.W_diss_resampled_ = quantity_resampled[:, 1]
         self.dG_resampled_ = quantity_resampled[:, 2]
-        
+
         if self.free_energy_error_['mode'] == 'std':
             self.s_W_mean_ = s_quantity[0, 0]
             self.s_W_diss_ = s_quantity[0, 1]
@@ -255,7 +251,6 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             self.s_W_mean_ = s_quantity[0, :, 0]
             self.s_W_diss_ = s_quantity[0, :, 1]
             self.s_dG_ = s_quantity[0, :, 2]
-            
 
     @beartype
     def estimate_friction(
@@ -335,7 +330,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         --------
         >>> from dcTMD.dcTMD import WorkEstimator
         >>> work_estimator.estimate_friction_errors(1000, mode='std')
-        Bootstrapping progress: 100%|██████████| 1000/1000 [00:00<00:00, 10245.63it/s]
+        Bootstrapping progress: 100%|██████████| 1000/1000 [00:00<00:00, 10245.63it/s]  # noqa
         >>> work_estimator.s_friction_
         array([..., ])
         """
@@ -536,7 +531,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         ) * self.force_set.velocity
 
         # Reduce resolution
-        self.position_ = self.force_set.position_[::self.force_set.resolution]  # noqa: E501
+        self.position_ = self.force_set.position_[::self.force_set.resolution]
         self.W_mean_ = W_mean_[::self.force_set.resolution]
         self.W_diss_ = W_diss[::self.force_set.resolution]
         self.dG_ = self.W_mean_ - self.W_diss_
