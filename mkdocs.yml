@@ -5,7 +5,7 @@ repo_url: "https://github.com/moldyn/dcTMD"
 edit_uri: "blob/main/docs/"
 repo_name: "moldyn/dcTMD"
 site_dir: "site"
-copyright: Copyright &copy; 2022 Biomolecular Dynamics
+copyright: Copyright &copy; 2021-2023 Biomolecular Dynamics
 watch: [src/dcTMD]
 
 nav:
@@ -20,11 +20,10 @@ nav:
   - dcTMD via Work: tutorials/work.ipynb
   - dcTMD via Force: tutorials/force.ipynb
   - CLI: tutorials/CLI.ipynb
-- Code Reference:
-  - Structure: tutorials/structure_dcTMD.md
-  - Reference: reference/
+- Code Reference: reference/
 - Development:
   - Contributing: contributing.md
+  - Maintenance: maintenance.md
 - MolDyn Freiburg: https://moldyn.uni-freiburg.de/
 
 theme:
@@ -62,6 +61,7 @@ markdown_extensions:
   - attr_list
   - def_list
   - footnotes
+  - mkdocs-click
   - md_in_html
   - nl2br
   - toc:
@@ -94,6 +94,7 @@ markdown_extensions:
   - pymdownx.tilde
 
 plugins:
+- section-index
 - search
 - gen-files:
     scripts:
@@ -102,8 +103,9 @@ plugins:
     nav_file: SUMMARY.md
 - mkdocs-jupyter:
     include: ["*.ipynb"]
-    execute: False
+    execute: false
     allow_errors: false
+    ignore_h1_titles: true
 - mkdocstrings:
     handlers:
       python:
