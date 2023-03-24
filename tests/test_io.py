@@ -1,14 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-Tests for the io module.
-
-MIT License
-Copyright (c) 2021-2022, Victor Tänzel
-All rights reserved.
-"""
+"""Tests for the io module."""
 
 import numpy as np
-import os
 from os.path import basename, dirname, join
 import pytest
 from dcTMD import storing, dcTMD
@@ -46,8 +39,7 @@ def ref_forceestimator(scope="session"):
 def filenames_list():
     return [f'{TEST_FILE_DIR}/t_middle_01_pullf.xvg',
             f'{TEST_FILE_DIR}/t_middle_03_pullf.xvg',
-            f'{TEST_FILE_DIR}/t_middle_04_pullf.xvg',
-            ]
+            f'{TEST_FILE_DIR}/t_middle_04_pullf.xvg']
 
 
 def test_load_pullf(filenames_list):
@@ -58,7 +50,7 @@ def test_load_pullf(filenames_list):
     assert basename(filenames[0]) == basename(filenames_list[0])
     assert basename(filenames[1]) == basename(filenames_list[1])
     assert basename(filenames[2]) == basename(filenames_list[2])
-    
+
     # Test case for globbing filenames
     files = load_pullf(f'{TEST_FILE_DIR}/t_middle_*_pullf.xvg')
     filenames = sorted(files)
@@ -66,7 +58,7 @@ def test_load_pullf(filenames_list):
     assert filenames[0] in filenames
     assert filenames[1] in filenames
     assert filenames[2] in filenames
-        
+
 
 def assert_npzfile_equality(npzfile, estimator):
     """Compare saved .npz files and Work/ForceEstimator"""
@@ -116,10 +108,7 @@ def assert_datfile_equality(datfile, estimator):
     )
 
 
-def test_write_output_dat_workestimator(
-        ref_workestimator,
-        tmp_path,
-    ):
+def test_write_output_dat_workestimator(ref_workestimator, tmp_path):
     out = tmp_path / "test"
     estimator = ref_workestimator
     write_output(str(out), estimator, filetype=['.dat'])
@@ -127,14 +116,11 @@ def test_write_output_dat_workestimator(
     test_file = tmp_path / f"test_N{n_traj}_dG.dat"
     assert (test_file).is_file()
     datfile = np.loadtxt(test_file)
-    print(datfile.shape)    
+    print(datfile.shape)
     assert_datfile_equality(datfile, estimator)
 
 
-def test_write_output_dat_forceestimator(
-        ref_forceestimator,
-        tmp_path,
-    ):
+def test_write_output_dat_forceestimator(ref_forceestimator, tmp_path):
     out = tmp_path / "test"
     estimator = ref_forceestimator
     write_output(str(out), estimator, filetype=['.dat'])
@@ -144,10 +130,7 @@ def test_write_output_dat_forceestimator(
     assert (test_file).is_file()
 
 
-def test_write_output_npz_workestimator(
-        ref_workestimator,
-        tmp_path,
-    ):
+def test_write_output_npz_workestimator(ref_workestimator, tmp_path):
     out = tmp_path / "test"
     estimator = ref_workestimator
     write_output(str(out), estimator, filetype=['.npz'])
@@ -158,10 +141,7 @@ def test_write_output_npz_workestimator(
     assert_npzfile_equality(npzfile, estimator)
 
 
-def test_write_output_npz_forceestimator(
-        ref_forceestimator,
-        tmp_path,
-    ):
+def test_write_output_npz_forceestimator(ref_forceestimator, tmp_path):
     out = tmp_path / "test"
     estimator = ref_forceestimator
     write_output(str(out), estimator, filetype=['.npz'])
@@ -170,4 +150,3 @@ def test_write_output_npz_forceestimator(
     assert (test_file).is_file()
     npzfile = np.load(test_file)
     assert_npzfile_equality(npzfile, estimator)
-

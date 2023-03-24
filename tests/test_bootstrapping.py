@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Tests for the utils smoothing module."""
+
 import pytest
 import numpy as np
 from dcTMD.utils.bootstrapping import bootstrapping
@@ -27,7 +30,7 @@ def test_bootstrapping(ref_workestimator):
     def func(work_set):
         return ref_workestimator.estimate_free_energy(work_set)
 
-    ### test 'std' mode
+    # test 'std' mode
     descriptor = {
         'mode': 'std',
         'n_resamples': 100,
@@ -41,12 +44,12 @@ def test_bootstrapping(ref_workestimator):
     assert quantity_resampled.shape == (descriptor['n_resamples'],
                                         3,
                                         len(ref_workestimator.position_))
-    
+
     # Check if the output is of the expected type
     assert isinstance(s_quantity, np.ndarray)
     assert isinstance(quantity_resampled, np.ndarray)
 
-    ### test confidence interval mode
+    # test confidence interval mode
     descriptor = {
         'mode': 0.5,
         'n_resamples': 100,
