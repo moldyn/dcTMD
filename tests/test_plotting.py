@@ -9,13 +9,19 @@ All rights reserved.
 
 import pytest
 import numpy as np
-from numpy.testing import assert_allclose
 import matplotlib.pyplot as plt
 from os.path import dirname, join
 from dcTMD.dcTMD import WorkEstimator
 from dcTMD.storing import load
-from dcTMD.utils.plotting import fig_sizeA4width, fig_sizehalfA4width, plot_dcTMD_results, plot_dG_Wdiss, \
-    plot_Gamma, plot_dG, plot_worklines, plot_histo_normaldist, plot_worknormalitychecks
+from dcTMD.utils.plotting import (
+    plot_dcTMD_results,
+    plot_dG_Wdiss,
+    plot_Gamma,
+    plot_dG,
+    plot_worklines,
+    plot_histo_normaldist,
+    plot_worknormalitychecks,
+)
 
 
 VELOCITY = 0.001
@@ -104,4 +110,3 @@ def test_plot_worknormalitychecks():
     assert axs[0].get_ylabel() == r'work $W$ [kJ/mol]'
     assert axs[1].get_xlabel() == r'$P$'
     assert axs[1].get_ylabel() == r'$W$ [kJ/mol]'
-
