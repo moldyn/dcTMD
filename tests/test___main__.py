@@ -5,9 +5,6 @@ Copyright (c) 2021-2022, Miriam Jäger
 All rights reserved.
 """
 from click.testing import CliRunner
-import tempfile
-import os
-import shutil
 from dcTMD.__main__ import main
 
 
@@ -30,7 +27,3 @@ def test_main(tmpdir):
     runner = CliRunner()
     result = runner.invoke(main, args)
     assert result.exit_code == 0
-
-    # Check that output files were created
-    #assert os.path.exists(f'{output}.npz')
-    #assert os.path.exists(f'{output}.dat')
