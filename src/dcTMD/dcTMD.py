@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
-"""
-Classes calculating the dcTMD quantities.
-
-MIT License
-Copyright (c) 2022, Victor Tänzel, Miriam Jäger
-All rights reserved.
-"""
+# MIT License
+# Copyright (c) 2022, Victor Tänzel, Miriam Jäger
+# All rights reserved.
+"""Classes calculating the dcTMD quantities."""
 
 __all__ = ['WorkEstimator', 'ForceEstimator']
 
@@ -14,19 +11,20 @@ from beartype import beartype
 from beartype.typing import Union, Tuple, Optional
 from sklearn.base import BaseEstimator, TransformerMixin
 
-from dcTMD.utils import bootstrapping
+from dcTMD import utils
 from dcTMD._typing import (
     Int,
     Float,
+    Str,
     StrStd,
     NumInRange0to1,
     Float1DArray,
+    Float2DArray,
 )
 
 
 class WorkEstimator(TransformerMixin, BaseEstimator):
-    """
-    Class for performing dcTMD analysis on a work set.
+    """Class for performing dcTMD analysis on a work set.
 
     Parameters
     ----------
@@ -37,12 +35,16 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
 
     Attributes
     ----------
+    position_ :
+        Positions time trace, product of time trace and velocity, in nm.
     W_mean_ :
         Mean work, in kJ/mol.
     W_diss_ :
         Dissipative work, in kJ/mol.
     dG_ :
         Free energy estimate, in kJ/mol.
+    friction_:
+        Friction factor in kJ/mol/(nm^2/ps).
     mode_ :
         Parameter of estimate_free_energy_errors(). Decides how the
         bootstrapping errors are calculated.
@@ -81,7 +83,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
     @beartype
     def __init__(
         self,
-        temperature: Float,
+        temperature: (Float, Int),
         verbose: bool = False,
     ) -> None:
         """Initialize class."""
@@ -108,6 +110,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             Fitted estimator.
         """
         self.work_set = work_set
+        self.position_ = work_set.position_
+        self.names_ = work_set.names_
         self.estimate_free_energy()
         self.estimate_friction()
         return self
@@ -141,7 +145,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             Mean work, in kJ/mol.
         W_diss : 1D np.array
             Dissipative work, in kJ/mol.
-        dG : 1D np.array
+        dG_ : 1D np.array
             Free energy estimate, in kJ/mol.
         """
         # Besides calculating dcTMD quantitites for the class, this function
@@ -174,7 +178,10 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         n_resamples: Int,
         mode: Union[StrStd, NumInRange0to1],
         seed: Optional[Int] = None,
-    ) -> Tuple[Float1DArray, Float1DArray, Float1DArray]:
+    ) -> Tuple[Union[Float1DArray, Float2DArray],
+               Union[Float1DArray, Float2DArray],
+               Union[Float1DArray, Float2DArray],
+               ]:
         """
         Estimate bootstrapping errors for the free energy estimate.
 
@@ -201,6 +208,14 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             Error estimate of the mean work.
         s_dG_ :
             Error estimate of free energy.
+
+        Examples
+        --------
+        >>> from dcTMD.dcTMD import WorkEstimator
+        >>> work_estimator.estimate_free_energy_errors(1000, mode='std')
+        Bootstrapping progress: 100%|██████████| 1000/1000 [00:00<00:00, 12797.15it/s]  # noqa
+        >>> work_estimator.s_dG_
+        array([..., ])
         """
         self.free_energy_error_ = {
             'mode': mode,
@@ -218,19 +233,24 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         # Prepare and run bootstrapper
         def func(my_work_set):
             return self.estimate_free_energy(my_work_set)
-        s_quantity, quantity_resampled = bootstrapping.bootstrapping(
+        s_quantity, quantity_resampled = utils.bootstrapping(
             self,
             func=func,
             descriptor=self.free_energy_error_,
         )
         # Save error estimates and bootstrapped quantities
-        self.s_W_mean_ = s_quantity[0, 0]
-        self.s_W_diss_ = s_quantity[0, 1]
-        self.s_dG_ = s_quantity[0, 2]
-        print(quantity_resampled.shape)
         self.W_mean_resampled_ = quantity_resampled[:, 0]
         self.W_diss_resampled_ = quantity_resampled[:, 1]
         self.dG_resampled_ = quantity_resampled[:, 2]
+
+        if self.free_energy_error_['mode'] == 'std':
+            self.s_W_mean_ = s_quantity[0, 0]
+            self.s_W_diss_ = s_quantity[0, 1]
+            self.s_dG_ = s_quantity[0, 2]
+        else:
+            self.s_W_mean_ = s_quantity[0, :, 0]
+            self.s_W_diss_ = s_quantity[0, :, 1]
+            self.s_dG_ = s_quantity[0, :, 2]
 
     @beartype
     def estimate_friction(
@@ -295,8 +315,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         n_resamples :
             Number of drawn resamples for bootstrapping error analysis.
         mode :
-            Chooses between reducing the resampled statistic via 
-                1.  'std' the element-wise calculation of standard deviations, 
+            Chooses between reducing the resampled statistic via
+                1.  'std' the element-wise calculation of standard deviations,
                 2.  confidence intervals if `mode` is a float in [0, 1).
         seed :
             Seed for the random number generator.
@@ -305,6 +325,14 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         -------
         s_friction_ :
             Bootstrap error of the friction factor in kJ/mol/(nm^2/ps).
+
+        Examples
+        --------
+        >>> from dcTMD.dcTMD import WorkEstimator
+        >>> work_estimator.estimate_friction_errors(1000, mode='std')
+        Bootstrapping progress: 100%|██████████| 1000/1000 [00:00<00:00, 10245.63it/s]  # noqa
+        >>> work_estimator.s_friction_
+        array([..., ])
         """
         self.friction_error_ = {
             'n_resamples': n_resamples,
@@ -324,14 +352,47 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             return self.estimate_friction(
                 self.estimate_free_energy(my_work_set)[1],
             )
-        s_quantity, quantity_resampled = bootstrapping.bootstrapping(
+        s_quantity, quantity_resampled = utils.bootstrapping(
             self,
             func=func,
             descriptor=self.friction_error_,
         )
         # Save error estimates and bootstrapped quantities
-        self.s_friction_ = s_quantity[0, 0]
+        if self.free_energy_error_['mode'] == 'std':
+            self.s_friction_ = s_quantity[0, 0]
+        else:
+            self.s_friction_ = s_quantity[0, :, 0]
         self.friction_resampled_ = quantity_resampled[:, 0]
+
+    @beartype
+    def smooth_friction(
+        self,
+        sigma: Float,
+        mode: Str = "reflect",
+    ) -> Float1DArray:
+        """Smooth friction with gaussain kernel.
+
+        Parameters
+        ----------
+        sigma:
+            standard deviation of gaussian kernel in nm
+        mode:
+            options: ‘reflect’, ‘constant’, ‘nearest’, ‘mirror’, ‘wrap’
+            The mode parameter determines how the input array is
+            extended beyond its boundaries. Default is ‘reflect’.
+            Behavior for each option see scipy.ndimage.gaussian_filter1d
+
+        Returns
+        -------
+        friction_smooth_ : 1d np.array
+            Smoothed friction.
+        """
+        from dcTMD.utils import gaussfilter_friction
+        self.friction_smooth_ = gaussfilter_friction(self.friction_,
+                                                     self.position_,
+                                                     sigma=0.1,
+                                                     )
+        return self.friction_smooth_
 
 
 class ForceEstimator(TransformerMixin, BaseEstimator):
@@ -347,6 +408,8 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
 
     Attributes
     ----------
+    position_ :
+        Positions time trace, product of time trace and velocity, in nm.
     W_mean_ :
         Mean work, in kJ/mol.
     W_diss_ :
@@ -355,14 +418,14 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         Free energy estimate, in kJ/mol.
     friction_ :
         Friction factor in kJ/mol/(nm^2/ps).
-    delta_force
 
-    Examples :
+    Examples
+    --------
     >>> from dcTMD.dcTMD import ForceEstimator
     >>> from dcTMD.storing import load
     >>> force = load('my_force_set')
-    >>> # Instantiate a ForceEstimator instance and fit it with the ForceSet
-    >>> # instance
+    >>> # Instantiate a ForceEstimator instance and fit it with the
+    >>> # ForceSet instance
     >>> force_estimator = ForceEstimator(temperature=290.15)
     >>> force_estimator.fit(force)
     >>> force_estimator.dG_
@@ -372,7 +435,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
     @beartype
     def __init__(
         self,
-        temperature: Float,
+        temperature: (Float, Int),
         verbose: bool = False,
     ) -> None:
         """Initialize class."""
@@ -399,6 +462,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
             Fitted estimator.
         """
         self.force_set = force_set
+        self.names_ = force_set.names_
         self.estimate_free_energy_friction()
         return self
 
@@ -417,95 +481,98 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
     ) -> Tuple[Float1DArray, Float1DArray, Float1DArray, Float1DArray]:
         """
         Estimate free energy and friction.
+        From force auto corrleation
 
         Returns
         -------
-        W_mean :
+        W_mean : 1D np.array
             Mean work, in kJ/mol.
-        W_diss :
+        W_diss : 1D np.array
             Dissipative work, in kJ/mol.
-        dG :
+        dG_ : 1D np.array
             Free energy estimate, in kJ/mol.
-        friction : 
+        friction_ : 1D np.array
+            Friction factor in kJ/mol/(nm^2/ps).
         """
         from scipy.constants import R  # noqa: WPS347
         from scipy.integrate import cumulative_trapezoid
         RT = R * self.temperature / 1e3
 
-        """
-        * force average: calculate < f_c (t) >_N.
-        **Important:** this is an ensemble average over the trajectory ensemble N,
-        not the time average over t
-        """
         # average and variance over all trajectories in each time step
         # shape: (length_data)
         force_mean = np.mean(self.force_set.force_, axis=0)
-        W_mean = cumulative_trapezoid(
-            force_mean,
-            self.force_set.position_,
-            initial=0,
-        )
-        # calculate $\delta f_c(t) = f_c(t) - \left< f_c (t) \right>_N$ for all t
-        delta_force = self.force_set.force_ - force_mean
-        # shape: (N, length_data)
 
-        # ~~~ evaluation
-        """
-        * optimized algorithm for numerical evaluation:
-        * integrate: $\int_0^t dt' \delta f_c(t')$ for all $t'$
-        * multiply by $\delta f_c(t)$ to yield $\int_0^t dt'\delta f_c(t)
-        * \delta f_c(t')$ for $t$ with all $t' \leq t$ each then calculate the
-        * ensemble average $\left< \int_0^t dt' \delta f_c(t) \delta f_c(t')
-        * \right>$
-        """
+        # calculate $\delta f_c(t) = f_c(t) - \left< f_c (t) \right>_N$
+        self.delta_force_array = self.force_set.force_ - force_mean
+
+        # integrate over time
         int_delta_force = cumulative_trapezoid(
-            delta_force,
+            self.delta_force_array,
             self.force_set.time_,
             axis=-1,
             initial=0,
         )
-        intcorr = np.multiply(delta_force, int_delta_force)
-        """
-        # similar to :
-        for n in range(N):
-        for i in range(length_data):
-            intcorr[n,i] = delta_force[n,i]*delta_force[n,i]
-        """
-        gamma = np.mean(intcorr, axis=0) / RT
-        """
-        # * autocorrelation function evaluation:
-        # * calculate $\left< \delta f_c(t) \delta f_c(t') \right>$ for the last
-        # * $t$
-        corr_set = np.zeros(np.shape(force_array))
-        print("calculating and processing ACF...\n")
-        for n in range(N):
-            corr_set[n, :] = delta_force[n, :]*delta_force[n, -1]
-        autocorr_set = np.mean(corr_set, axis=0)
-        """
-        # * $W_{diss}$ from integration:
+        intcorr = np.multiply(
+            self.delta_force_array,
+            int_delta_force,
+        )
+        friction_ = np.mean(intcorr, axis=0) / RT
+
         print('Calculating dissipative work...')
+        W_mean_ = cumulative_trapezoid(
+            force_mean,
+            self.force_set.position_,
+            initial=0,
+        )
         W_diss = cumulative_trapezoid(
-            gamma,
+            friction_,
             self.force_set.position_,
             initial=0,
         ) * self.force_set.velocity
 
         # Reduce resolution
-        self.W_mean_ = W_mean[::self.force_set.resolution]
+        self.position_ = self.force_set.position_[::self.force_set.resolution]
+        self.W_mean_ = W_mean_[::self.force_set.resolution]
         self.W_diss_ = W_diss[::self.force_set.resolution]
-        self.dG_ = W_mean - W_diss
-        self.friction_ = gamma[::self.force_set.resolution]
-        self.delta_force_array_ = delta_force
+        self.dG_ = self.W_mean_ - self.W_diss_
+        self.friction_ = friction_[::self.force_set.resolution]
 
         return self.W_mean_, self.W_diss_, self.dG_, self.friction_
+
+    @beartype
+    def smooth_friction(
+        self,
+        sigma: Float,
+        mode: Str = "reflect",
+    ) -> Float1DArray:
+        """Smooth friction with gaussain kernel.
+
+        Parameters
+        ----------
+        sigma:
+            standard deviation of gaussian kernel in nm
+        mode:
+            options: ‘reflect’, ‘constant’, ‘nearest’, ‘mirror’, ‘wrap’
+            The mode parameter determines how the input array is
+            extended beyond its boundaries. Default is ‘reflect’.
+            Behavior for each option see scipy.ndimage.gaussian_filter1d
+
+        Returns
+        -------
+        friction_smooth_ : 1d np.array
+            Smoothed friction.
+        """
+        from dcTMD.utils import gaussfilter_friction
+        self.friction_smooth_ = gaussfilter_friction(self.friction_,
+                                                     self.position_,
+                                                     sigma=0.1)
+        return self.friction_smooth_
 
     def memory_kernel(
         self,
         x_indices: Float1DArray,
     ) -> Float1DArray:
         """
-        Calculate memory kernel at positions X "forward" in time.
-
         Calculate memory kernel at positions X "forward" in time
         from fluctuation-dissipation.
         see e.g. R. Zwanzig, “Nonequilibrium statistical mechanics”,

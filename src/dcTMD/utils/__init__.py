@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
+"""Utils submodule."""
 
-__all__ = ['smoothing', 'bootstrapping']
+__all__ = ['gaussfilter_friction', 'bootstrapping', 'plotting']
 
-from dcTMD.utils import smoothing
-from dcTMD.utils import bootstrapping
-
-__version__ = '0.2.1'
+from ._smoothing import gaussfilter_friction
+from ._bootstrapping import bootstrapping
+from dcTMD.utils import plotting

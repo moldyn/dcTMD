@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Tests for the work module.
+Tests for the storing module.
 
 MIT License
 Copyright (c) 2021-2022, Victor Tänzel
@@ -16,13 +16,14 @@ import numpy as np
 VELOCITY = 0.001
 RESOLUTION = 1
 VERBOSE = True
+TEMPERATURE = 300
 INDICES = np.array([1, 3, 5])
 HERE = os.path.dirname(__file__)
+TEST_FILE_DIR = os.path.join(HERE, 'testdata')
 
 
-def filenames():
-    path = os.path.join(HERE, 'testdata')
-    files = glob.glob(f'{path}/t_middle_*_pullf.xvg')
+def filenames(scope="session"):
+    files = glob.glob(f'{TEST_FILE_DIR}/t_middle_*_pullf.xvg')
     return sorted(files)
 
 
@@ -48,7 +49,7 @@ def assert_sets_equality(set1, set2):
 
 
 @pytest.fixture
-def ref_workset():
+def ref_workset(scope="session"):
     workset = dcTMD.storing.WorkSet(
         velocity=VELOCITY,
         resolution=RESOLUTION,
@@ -59,7 +60,7 @@ def ref_workset():
 
 
 @pytest.fixture
-def red_workset():
+def red_workset(scope="session"):
     workset = dcTMD.storing.WorkSet(
         velocity=VELOCITY,
         resolution=RESOLUTION,
@@ -70,23 +71,52 @@ def red_workset():
     return red_workset
 
 
+@pytest.fixture
+def ref_forceset(scope="session"):
+    forceset = dcTMD.storing.ForceSet(
+        velocity=VELOCITY,
+        resolution=RESOLUTION,
+        verbose=VERBOSE,
+    )
+    forceset.fit(filenames())
+    return forceset
+
+
+def test_save_load_forceset(ref_forceset, tmpdir):
+    """Test save/load."""
+    filename = str(tmpdir.mkdir('sub').join('load_set_test'))
+    dcTMD.storing.save(filename, ref_forceset)
+    dataset = dcTMD.storing.load(filename=filename)
+    # compare set to reference
+    assert_sets_equality(dataset, ref_forceset)
+
+
+def test_save_load_workset(ref_workset, tmpdir):
+    """Test save/load."""
+    filename = str(tmpdir.mkdir('sub').join('load_set_test'))
+    dcTMD.storing.save(filename, ref_workset)
+    dataset = dcTMD.storing.load(filename=filename)
+    # compare set to reference
+    assert_sets_equality(dataset, ref_workset)
+
+
 @pytest.mark.parametrize(
-    'filename', ['testdata/workset'],
+    'filename', ['workset'],
 )
-def test_load(filename, ref_workset):
+def test_WorkSet(filename, ref_workset):
     workset = dcTMD.storing.load(
-        filename=f'{HERE}/{filename}'
+        filename=f'{TEST_FILE_DIR}/{filename}'
     )
     # compare workset to reference
     assert_sets_equality(workset, ref_workset)
 
 
 @pytest.mark.parametrize(
-    'filename', ['testdata/red_workset'],
+    'filename', ['forceset'],
 )
-def test_WorkSet(filename, red_workset):
+def test_ForceSet(filename, ref_forceset):
     workset = dcTMD.storing.load(
-        filename=f'{HERE}/{filename}'
+        filename=f'{TEST_FILE_DIR}/{filename}'
     )
     # compare workset to reference
-    assert_sets_equality(workset, red_workset)
+    assert_sets_equality(workset, ref_forceset)

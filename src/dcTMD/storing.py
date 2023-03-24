@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-Classes storing constraint force data as work or force time traces.
+# MIT License
+# Copyright (c) 2022, Victor Tänzel, Miriam Jäger
+# All rights reserved.
+"""Classes that store constraint force data as work or force time traces.
 
-
-MIT License
-Copyright (c) 2022, Victor Tänzel, Miriam Jäger
-All rights reserved.
+The resulting force or work sets are needed for further analysis.
 """
 
 __all__ = ['WorkSet', 'ForceSet', 'save', 'load']
@@ -106,7 +105,6 @@ def _get_time_from_testfile(handler):
         time_length_reduced = len(handler.time_[::handler.resolution])
         print(f'length of pullf file is {time_length}')
         print(f'reduced length is {time_length_reduced}')
-
 
 
 class WorkSet(TransformerMixin, BaseEstimator):
@@ -266,7 +264,8 @@ class ForceSet(TransformerMixin, BaseEstimator):
     velocity :
         Pulling velocity in nm/ps.
     resolution :
-        Striding to reduce work time trace.
+        Striding to reduce work time trace. This parameter
+        is only added for compatibility with WorkSet
     verbose :
         Enables verbose mode.
 
@@ -275,9 +274,9 @@ class ForceSet(TransformerMixin, BaseEstimator):
     force_:
         Constraint force time traces, in kJ/mol.
     names_ :
-        Constraint force file names corresponding to work time traces.
+        Constraint force file names corresponding to force time traces.
     time_ :
-        Time trace corresponding to the work, in ps.
+        Time trace corresponding to the force, in ps.
     position_ :
         Positions time trace, product of time trace and velocity, in nm.
 
@@ -331,6 +330,7 @@ class ForceSet(TransformerMixin, BaseEstimator):
         _get_time_from_testfile(self)
         # fill arrays with data
         self._fill_force()
+        self.integrate()
         return self
 
     @beartype
@@ -339,17 +339,51 @@ class ForceSet(TransformerMixin, BaseEstimator):
         return self.force_
 
     @beartype
-    def integrate(self):
+    def integrate(self) -> None:
         """Integrate forces and return a WorkSet instance."""
         # (1) Instantiate a WorkSet with velocity, resolution and verbose
         # (2) Save names_, time_, position_ attributes manually
         # (3) Integrate the forces in force_ with _integrate_force
         # (4) Return WorkSet instance.
         # Be careful with the resolution so as not to reduce it twice.
+        print('integrating forceset --> workset')
+        self.work_ = _integrate_force(self, self.force_)[::self.resolution]
+        print(self.work_.shape)
 
     @beartype
     def _fill_force(self) -> None:
         """Help load the force files."""
         # Load force files
         # Check if files are corrupt and build names_, position_ and work_
-        self.force_ = None
+        import tqdm
+        self.force_ = np.zeros(
+            (len(self.X), len(self.time_)),
+            dtype=float,
+        )
+        self.names_ = np.array([])
+        self.position_ = self.time_ * self.velocity
+        # read in data and fill force_array
+        for idx, file_name in (pbar := tqdm.tqdm)(
+            enumerate(self.X),
+            total=len(self.X),
+            desc='Loading force files',
+        ):
+            if self.verbose:
+                pbar.write(f'Reading file {file_name}')
+            file_data = np.loadtxt(
+                file_name,
+                comments=('@', '#'),
+                usecols=[1],
+            )
+            # test if file is not corrupted, else add it
+            if file_data.shape == self.time_.shape:
+                self.force_[idx, :] = file_data
+                short_name = basename(file_name)
+                self.names_ = np.append(self.names_, short_name)
+            else:
+                pbar.write(f'skip file {file_name}')
+                pbar.write(
+                    f'shape is {file_data.shape} and not {self.time_.shape}'
+                )
+        # removing rows with only zero
+        self.force_ = self.force_[~np.all(self.force_ == 0, axis=1)]
