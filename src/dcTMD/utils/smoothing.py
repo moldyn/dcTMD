@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+# MIT License
+# Copyright (c) 2021-2023, Miriam Jaeger
+# All rights reserved.
 """Smooth the friction."""
 __all__ = ['gaussfilter_friction']
 

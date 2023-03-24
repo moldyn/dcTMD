@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
-"""
-Functions used for bootstrapping.
-
-MIT License
-Copyright (c) 2022, Victor Tänzel, Miriam Jäger
-All rights reserved.
-"""
+# MIT License
+# Copyright (c) 2022, Victor Tänzel, Miriam Jäger
+# All rights reserved.
+"""Functions used for bootstrapping."""
 
 __all__ = ['bootstrapping']
 
