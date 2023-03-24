@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Submodule handling the input/output operations.
-
-MIT License
-Copyright (c) 2022, Victor Tänzel, Miriam Jäger
-All rights reserved.
-"""
+# MIT License
+# Copyright (c) 2021-2023, Victor Tänzel, Miriam Jäger
+# All rights reserved.
+"""Submodule handling the input/output operations."""
 
 __all__ = ['write_output']
 
@@ -22,13 +20,14 @@ from dcTMD._typing import (
 def load_pullf(
     pullf_files: Str
 ) -> (List[Str], Str1DArray):
-    """Loads filenames from file or glob them from globpattern
-    and resturns them as list.
+    """Load filenames and resturns them as list.
+
+    Filenames can be taken from file or glob them from globpattern.
 
     Parameters
     ----------
     pullf_files :
-        file which contains pullf filenames or globpattern
+        file which contains `pullf` filenames or globpattern
 
     Examples
     --------
@@ -58,8 +57,7 @@ def write_output(
     estimator,
     filetype=['.dat', '.npz']
 ) -> None:
-    """
-    Takes all calculated quantities and saves them
+    """Takes all calculated quantities and saves them.
 
     Parameters
     ----------
@@ -69,13 +67,13 @@ def write_output(
         Either a ForceEstimator or WorkEstimator instance.
     filetype:
         Output filetype, either '.dat', '.npz' or ['.dat', '.npz'].
-    
+
     Examples
     --------
     >>> from dcTMD.storing import load
     >>> from dcTMD.io import write_output
     >>> from dcTMD.dcTMD import WorkEstimator
-    >>> # Save the results from WorkEstimator 
+    >>> # Save the results from WorkEstimator
     >>> # (ForceEstimator works similarly)
     >>> # calculate dcTMD results from workset
     >>> work = load('my_work_set')

@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
-"""
-Simple plot functions for dcTMD results.
-
-MIT License
-Copyright (c) 2021-2022, Miriam Jäger
-All rights reserved.
-"""
+# MIT License
+# Copyright (c) 2021-2023, Miriam Jäger
+# All rights reserved.
+"""Simple plot functions for dcTMD results."""
 
 
 import matplotlib.pyplot as plt
@@ -114,8 +111,8 @@ def plot_histo_normaldist(data, ax, color='blue', label=None):
             )
     mu, std = norm.fit(data)
     # Plot the PDF.
-    y = np.linspace(np.min(data)-10,
-                    np.max(data)+10,
+    y = np.linspace(np.min(data) - 10,
+                    np.max(data) + 10,
                     100
                     )
     p = norm.pdf(y, mu, std)
@@ -127,8 +124,9 @@ def plot_histo_normaldist(data, ax, color='blue', label=None):
 
 def plot_worknormalitychecks(x, workset, index, colors=None):
     """Plots the work values of trajectories individually.
-    And adds histograms and normality plots for the indices     
-    given in index."""
+
+    And adds histograms and normality plots for the indices given in index.
+    """
     fig, axs = plt.subplots(ncols=3,
                             nrows=1,
                             figsize=fig_sizeA4width()
@@ -151,7 +149,7 @@ def plot_worknormalitychecks(x, workset, index, colors=None):
                        )
 
         probplot(data, plot=axs[2], fit=True)
-        axs[2].get_lines()[j*2].set_color(colors[j])
+        axs[2].get_lines()[j * 2].set_color(colors[j])
         axs[2].set_title('Normality Plot')
 
     axs[0].legend()
