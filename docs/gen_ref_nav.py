@@ -21,6 +21,18 @@ for path in sorted(Path('src').glob('**/*.py')):
         parts = parts[:-1]
         doc_path = doc_path.with_name('index.md')
         full_doc_path = full_doc_path.with_name('index.md')
+    elif parts[-1] == '__main__':
+        doc_path = doc_path.with_name('cli.md')
+        full_doc_path = full_doc_path.with_name('cli.md')
+        parts = 'cli'
+        with mkdocs_gen_files.open(full_doc_path, 'w') as fd:
+            mkdocs_click = (
+                '::: mkdocs-click\n'
+                '    :module: src.dcTMD.__main__\n'
+                '    :command: main\n'
+                '    :prog_name: dcTMD\n'
+                '    :list_subcommands: True\n'
+            )
     elif parts[-1].startswith('_'):
         continue
 
@@ -28,8 +40,12 @@ for path in sorted(Path('src').glob('**/*.py')):
 
     module_string = '.'.join(parts)
     with mkdocs_gen_files.open(full_doc_path, 'w') as fd:
-        fd.writelines('::: {m}'.format(m=module_string))
+        fd.writelines(
+            '::: {m}'.format(m=module_string)
+            if parts != 'cli' else
+            mkdocs_click
+        )
     mkdocs_gen_files.set_edit_path(full_doc_path, Path('../') / path)
 
-with mkdocs_gen_files.open('reference/index.md', 'w') as nav_file:
+with mkdocs_gen_files.open('reference/SUMMARY.md', 'w') as nav_file:
     nav_file.writelines(nav.build_literate_nav())
