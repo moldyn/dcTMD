@@ -2,7 +2,9 @@
 """Tests for the clustering module."""
 
 import numpy as np
-import os
+from os.path import dirname, join
+import pytest
+from dcTMD import storing, dcTMD
 
 
 VELOCITY = 0.001
@@ -10,7 +12,31 @@ RESOLUTION = 1
 VERBOSE = True
 TEMPERATURE = 300
 INDICES = np.array([1, 3, 5])
-HERE = os.path.dirname(__file__)
+SIGMA = 0.1
+MODE = 'reflect'
+HERE = dirname(__file__)
+TEST_FILE_DIR = join(HERE, 'testdata')
+
+
+@pytest.fixture
+def ref_workestimator(scope="session"):
+    workset_name = f'{TEST_FILE_DIR}/workset'
+    workset = storing.load(filename=workset_name)
+    print(workset)
+    estimator = dcTMD.WorkEstimator(temperature=TEMPERATURE)
+    estimator.fit(workset)
+    estimator.smooth_friction(SIGMA, MODE)
+    return estimator
+
+
+@pytest.fixture
+def ref_forceestimator(scope="session"):
+    forceset_name = f'{TEST_FILE_DIR}/forceset'
+    forceset = storing.load(filename=forceset_name)
+    estimator = dcTMD.ForceEstimator(temperature=TEMPERATURE)
+    estimator.fit(forceset)
+    estimator.smooth_friction(SIGMA, MODE)
+    return estimator
 
 
 def assert_estimator_equality(estimator1, estimator2):
@@ -33,4 +59,22 @@ def assert_estimator_equality(estimator1, estimator2):
     np.testing.assert_almost_equal(
         estimator1.friction_,
         estimator2.friction_,
+        decimal=6,
     )
+    np.testing.assert_almost_equal(
+        estimator1.friction_smooth_,
+        estimator2.friction_smooth_,
+        decimal=6,
+    )
+
+
+def test_WorkEstimator(ref_workestimator):
+    workestimator_name = f'{TEST_FILE_DIR}/workestimator.joblib'
+    estimator = storing.load(filename=workestimator_name)
+    assert_estimator_equality(estimator, ref_workestimator)
+
+
+def test_ForceEstimator(ref_forceestimator):
+    forceestimator_name = f'{TEST_FILE_DIR}/forceestimator.joblib'
+    estimator = storing.load(filename=forceestimator_name)
+    assert_estimator_equality(estimator, ref_forceestimator)
