@@ -21,6 +21,7 @@ nav:
   - dcTMD via Force: tutorials/force.ipynb
   - CLI: tutorials/CLI.ipynb
 - Code Reference: reference/
+- FAQ: faq.md
 - Development:
   - Contributing: contributing.md
   - Maintenance: maintenance.md
