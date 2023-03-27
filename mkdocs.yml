@@ -29,9 +29,9 @@ nav:
 
 theme:
   name: material
-  favicon: icon.png
-  logo_slate_mode: logo_dark.svg
-  logo_default_mode: logo_light.svg
+  favicon: dctmd_icon.png
+  logo_slate_mode: dctmd_icon.svg
+  logo_default_mode: dctmd_icon.svg
   custom_dir: docs/overrides
   features:
   - content.code.annotate
