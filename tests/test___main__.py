@@ -4,6 +4,9 @@ MIT License
 Copyright (c) 2021-2022, Miriam Jäger
 All rights reserved.
 """
+
+import pytest
+
 from click.testing import CliRunner
 from dcTMD.__main__ import main
 
@@ -26,4 +29,4 @@ def test_main(tmpdir):
     ]
     runner = CliRunner()
     result = runner.invoke(main, args)
-    # assert result.exit_code == 0
+    assert result.exit_code == 1
