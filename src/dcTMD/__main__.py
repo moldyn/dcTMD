@@ -89,7 +89,7 @@ MODES = ('work', 'force')
     is_flag=True,
     default=False,
     show_default=True,
-    help='Save the Work/ForceSet class to file.',
+    help='Save the Work/ForceSet instance to file.',
 )
 def main(
     mode,

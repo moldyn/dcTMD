@@ -5,20 +5,22 @@
 """Smooth the friction."""
 __all__ = ['gaussfilter_friction']
 
+
 import numpy as np
 
+from beartype import beartype
 from dcTMD._typing import (
     Float,
     Float1DArray,
     Str
 )
 
-
+@beartype
 def gaussfilter_friction(
     friction: Float1DArray,
     pos: Float1DArray,
     sigma: Float,
-    mode: Str = "reflect",
+    mode: Str = 'nearest',
 ) -> Float1DArray:
     """
     Smoothes friction with a gaussian kernel and 'nearest' borders.
