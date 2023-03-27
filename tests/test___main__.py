@@ -5,8 +5,6 @@ Copyright (c) 2021-2022, Miriam Jäger
 All rights reserved.
 """
 
-import pytest
-
 from click.testing import CliRunner
 from dcTMD.__main__ import main
 
