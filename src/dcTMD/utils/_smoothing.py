@@ -15,6 +15,7 @@ from dcTMD._typing import (
     Str
 )
 
+
 @beartype
 def gaussfilter_friction(
     friction: Float1DArray,
