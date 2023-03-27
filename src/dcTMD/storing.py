@@ -10,7 +10,9 @@ The resulting force or work sets are needed for further analysis.
 __all__ = ['WorkSet', 'ForceSet', 'save', 'load']
 
 import joblib
+
 import numpy as np
+
 from os.path import basename
 from beartype import beartype
 from beartype.typing import Optional, Any
@@ -30,16 +32,16 @@ from dcTMD._typing import (
 @beartype
 def save(
     filename: Str,
-    object,
+    classobject,
 ) -> None:
-    r"""
-    Save a data handler or an estimator.
+    """
+    Save a class object: a data handler or an estimator.
 
     Parameters
     ----------
     filename :
-        File name to which `handler` is saved.
-    object :
+        File name to which classobject is saved.
+    classobject :
         Instance of the data handler, i.e. a WorkSet or ForceSet instance, or
         of an estimator, i.e. a WorkEstimator or ForceEstimator instance.
 
@@ -48,17 +50,17 @@ def save(
     >>> # Save Estimators and data handlers. Here: WorkSet.
     >>> # Save a WorkSet instance named work_set and load it again:
     >>> from dcTMD.storing import save, load
-    >>> save(work_set, 'my_workset.joblib')
+    >>> save(work_set, 'my_workset.joblib')  # noqa: F821
     >>> my_workset = load('my_workset.joblib')
     """
-    joblib.dump(object, filename)
+    joblib.dump(classobject, filename)
 
 
 @beartype
 def load(
     filename: Str,
 ) -> Any:
-    r"""
+    """
     Load a data handler or an estimator.
 
     Parameters
@@ -66,12 +68,17 @@ def load(
     filename :
         Name of the file containing the data handler.
 
+    Returns
+    -------
+    handler:
+        Loaded class object.
+
     Examples
     --------
     >>> # Loads estimators and data handlers. Here: WorkSet.
     >>> # Save a WorkSet instance named work_set and load it again:
     >>> from dcTMD.storing import save, load
-    >>> save(work_set, 'my_workset.joblib')
+    >>> save(work_set, 'my_workset.joblib')  # noqa: F821
     >>> my_workset = load('my_workset.joblib')
     """
     return joblib.load(filename)
@@ -79,30 +86,31 @@ def load(
 
 @beartype
 def _integrate_force(
-    handler,
+    forceorworkset,
     force_data,
 ):
     """Integrate a force time trace and return the work time trace."""
     work_data = cumulative_trapezoid(
         force_data,
-        handler.position_,
+        forceorworkset.position_,
         initial=0,
     )
-    return work_data[::handler.resolution]
+    return work_data[::forceorworkset.resolution]
 
 
 @beartype
-def _get_time_from_testfile(handler):
-    """Read test force file to determine the time trace for a data handler."""
-    handler.time_ = np.loadtxt(
-        handler.X[0],
+def _get_time_from_testfile(forceorworkset):
+    """Read test force file to determine the time trace."""
+    forceorworkset.time_ = np.loadtxt(
+        forceorworkset.X[0],
         comments=('@', '#'),
         usecols=[0],
     )
-    if handler.verbose:
-        print(f'Using {handler.X[0]} to initialize arrays.')
-        time_length = len(handler.time_)
-        time_length_reduced = len(handler.time_[::handler.resolution])
+    if forceorworkset.verbose:
+        print(f'Using {forceorworkset.X[0]} to initialize arrays.')
+        time_length = len(forceorworkset.time_)
+        lenth_reduced = forceorworkset.time_[::forceorworkset.resolution]
+        time_length_reduced = len(lenth_reduced)
         print(f'length of pullf file is {time_length}')
         print(f'reduced length is {time_length_reduced}')
 
@@ -137,7 +145,7 @@ class WorkSet(TransformerMixin, BaseEstimator):
     >>> import numpy as np
     >>> from dcTMD.storing import WorkSet
     >>> work_set = WorkSet(velocity=0.001, resolution=1)
-    >>> work_set.fit(filenames)
+    >>> work_set.fit(filenames)  # noqa: F821
     Loading & integrating force files: 100%|████| X/X [XX:XX<00:00,  X.XX/it]
     WorkSet(velocity=0.001)
     >>> work_set.work_.shape
@@ -150,6 +158,7 @@ class WorkSet(TransformerMixin, BaseEstimator):
     >>> reduced_set.work_.shape
     (3, len(time_))
     """
+
     @beartype
     def __init__(
         self,
@@ -165,11 +174,11 @@ class WorkSet(TransformerMixin, BaseEstimator):
     @beartype
     def fit(
         self,
-        X: ArrayLikeStr,
-        y: Optional[np.ndarray] = None,
+        X: ArrayLikeStr,  # noqa: WPS111 N803
+        y: Optional[np.ndarray] = None,  # noqa: WPS111
     ):
         """
-        Loads constraint force files and calculates work time traces.
+        Load constraint force files and calculate work time traces.
 
         Parameters
         ----------
@@ -183,7 +192,7 @@ class WorkSet(TransformerMixin, BaseEstimator):
         self:
             Fitted estimator.
         """
-        self.X = X
+        self.X = X  # noqa: WPS111 N803
         # read a test file for the time trace
         _get_time_from_testfile(self)
         # fill arrays with data
@@ -191,7 +200,7 @@ class WorkSet(TransformerMixin, BaseEstimator):
         return self
 
     @beartype
-    def transform(self, X, y=None) -> Float2DArray:
+    def transform(self, X, y=None) -> Float2DArray:  # noqa: WPS111 N803
         """Return work set."""
         return self.work_
 
@@ -228,7 +237,8 @@ class WorkSet(TransformerMixin, BaseEstimator):
         self.names_ = np.array([])
         self.position_ = self.time_ * self.velocity
         # read in data and fill work_array
-        for idx, file_name in (pbar := tqdm.tqdm)(
+        pbar = tqdm.tqdm
+        for idx, file_name in pbar(
             enumerate(self.X),
             total=len(self.X),
             desc='Loading & integrating force files',
@@ -283,7 +293,7 @@ class ForceSet(TransformerMixin, BaseEstimator):
     Examples
     --------
     >>> # Load some file names listed in 'filenames'
-    >>> import numpy as np
+    >>> import numpy as np  # noqa: F401
     >>> from dcTMD.storing import ForceSet
     >>> force_set = ForceSet(velocity=0.001, resolution=1)
     >>> force_set.fit(filenames)
@@ -292,6 +302,7 @@ class ForceSet(TransformerMixin, BaseEstimator):
     >>> force_set.work_.shape
     (N_trajectories_, len(time_))
     """
+
     @beartype
     def __init__(
         self,
@@ -307,11 +318,11 @@ class ForceSet(TransformerMixin, BaseEstimator):
     @beartype
     def fit(
         self,
-        X: ArrayLikeStr,
-        y: Optional[np.ndarray] = None,
+        X: ArrayLikeStr,  # noqa: WPS111 N803
+        y: Optional[np.ndarray] = None,  # noqa: WPS111
     ):
         """
-        Loads constraint force files.
+        Load constraint force files.
 
         Parameters
         ----------
@@ -325,7 +336,7 @@ class ForceSet(TransformerMixin, BaseEstimator):
         self:
             Fitted estimator.
         """
-        self.X = X
+        self.X = X  # noqa: WPS111 N803
         # read a test file for the time trace
         _get_time_from_testfile(self)
         # fill arrays with data
@@ -334,7 +345,7 @@ class ForceSet(TransformerMixin, BaseEstimator):
         return self
 
     @beartype
-    def transform(self, X, y=None) -> Float2DArray:
+    def transform(self, X, y=None) -> Float2DArray:  # noqa: WPS111 N803
         """Return force set."""
         return self.force_
 
@@ -363,7 +374,8 @@ class ForceSet(TransformerMixin, BaseEstimator):
         self.names_ = np.array([])
         self.position_ = self.time_ * self.velocity
         # read in data and fill force_array
-        for idx, file_name in (pbar := tqdm.tqdm)(
+        pbar = tqdm.tqdm
+        for idx, file_name in pbar(
             enumerate(self.X),
             total=len(self.X),
             desc='Loading force files',
