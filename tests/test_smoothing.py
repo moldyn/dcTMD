@@ -39,6 +39,9 @@ def ref_friction(scope="session"):
 
 def test_gaussfilter_friction(ref_workestimator, ref_friction):
     smooth_friction = gaussfilter_friction(
-        ref_workestimator.friction_, ref_workestimator.position_, 0.1,
+        ref_workestimator.friction_,
+        ref_workestimator.position_,
+        0.1,
+        mode='reflect',
     )
     np.testing.assert_array_almost_equal(smooth_friction, ref_friction)
