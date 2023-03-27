@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://raw.githubusercontent.com/moldyn/dcTMD/main/docs/dctmd_logo.svg" />
+    <img  style="width: 400px;" src="https://raw.githubusercontent.com/moldyn/dcTMD/main/docs/dctmd_logo.svg" />
   <p>
     <a href="https://github.com/wemake-services/wemake-python-styleguide" alt="wemake-python-styleguide">
         <img src="https://img.shields.io/badge/style-wemake-000000.svg" /></a>
