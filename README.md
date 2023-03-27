@@ -13,6 +13,8 @@
         <img src="https://github.com/moldyn/dcTMD/actions/workflows/codeql.yml/badge.svg?branch=main" /></a>
     <a href="https://github.com/moldyn/dcTMD/actions/workflows/pytest.yml" alt="GitHub Workflow Status">
         <img src="https://img.shields.io/github/actions/workflow/status/moldyn/dcTMD/pytest.yml?branch=main"></a>
+    <a href="https://codecov.io/gh/moldyn/dcTMD" > 
+        <img src="https://codecov.io/gh/moldyn/dcTMD/branch/main/graph/badge.svg?token=XMLP2VUU33"/></a>
   </p>
 
   <p>
