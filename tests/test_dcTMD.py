@@ -69,12 +69,12 @@ def assert_estimator_equality(estimator1, estimator2):
 
 
 def test_WorkEstimator(ref_workestimator):
-    workestimator_name = f'{TEST_FILE_DIR}/workestimator.joblib'
+    workestimator_name = f'{TEST_FILE_DIR}/workestimator'
     estimator = storing.load(filename=workestimator_name)
     assert_estimator_equality(estimator, ref_workestimator)
 
 
 def test_ForceEstimator(ref_forceestimator):
-    forceestimator_name = f'{TEST_FILE_DIR}/forceestimator.joblib'
+    forceestimator_name = f'{TEST_FILE_DIR}/forceestimator'
     estimator = storing.load(filename=forceestimator_name)
     assert_estimator_equality(estimator, ref_forceestimator)
