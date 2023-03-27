@@ -10,7 +10,9 @@ The resulting force or work sets are needed for further analysis.
 __all__ = ['WorkSet', 'ForceSet', 'save', 'load']
 
 import joblib
+
 import numpy as np
+
 from os.path import basename
 from beartype import beartype
 from beartype.typing import Optional, Any
@@ -98,7 +100,7 @@ def _integrate_force(
 
 @beartype
 def _get_time_from_testfile(forceorworkset):
-    """Read test force file to determine the time trace for a data forceorworkset."""
+    """Read test force file to determine the time trace."""
     forceorworkset.time_ = np.loadtxt(
         forceorworkset.X[0],
         comments=('@', '#'),
@@ -107,9 +109,8 @@ def _get_time_from_testfile(forceorworkset):
     if forceorworkset.verbose:
         print(f'Using {forceorworkset.X[0]} to initialize arrays.')
         time_length = len(forceorworkset.time_)
-        time_length_reduced = len(
-            forceorworkset.time_
-            [::forceorworkset.resolution])
+        lenth_reduced = forceorworkset.time_[::forceorworkset.resolution]
+        time_length_reduced = len(lenth_reduced)
         print(f'length of pullf file is {time_length}')
         print(f'reduced length is {time_length_reduced}')
 
@@ -236,7 +237,8 @@ class WorkSet(TransformerMixin, BaseEstimator):
         self.names_ = np.array([])
         self.position_ = self.time_ * self.velocity
         # read in data and fill work_array
-        for idx, file_name in (pbar := tqdm.tqdm)(  # noqa: WPS332
+        pbar = tqdm.tqdm
+        for idx, file_name in pbar(
             enumerate(self.X),
             total=len(self.X),
             desc='Loading & integrating force files',
@@ -294,7 +296,7 @@ class ForceSet(TransformerMixin, BaseEstimator):
     >>> import numpy as np  # noqa: F401
     >>> from dcTMD.storing import ForceSet
     >>> force_set = ForceSet(velocity=0.001, resolution=1)
-    >>> force_set.fit(filenames)  
+    >>> force_set.fit(filenames)
     Loading force files: 100%|████| X/X [XX:XX<00:00,  X.XX/it]
     ForceSet(velocity=0.001)
     >>> force_set.work_.shape
@@ -372,7 +374,8 @@ class ForceSet(TransformerMixin, BaseEstimator):
         self.names_ = np.array([])
         self.position_ = self.time_ * self.velocity
         # read in data and fill force_array
-        for idx, file_name in (pbar := tqdm.tqdm)(
+        pbar = tqdm.tqdm
+        for idx, file_name in pbar(
             enumerate(self.X),
             total=len(self.X),
             desc='Loading force files',
@@ -395,4 +398,4 @@ class ForceSet(TransformerMixin, BaseEstimator):
                     f'shape is {file_data.shape} and not {self.time_.shape}'
                 )
         # removing rows with only zero
-        self.force_ = self.force_[~np.all(self.force_ == 0, axis=1)]  # noqa: WPS221
+        self.force_ = self.force_[~np.all(self.force_ == 0, axis=1)]
