@@ -36,15 +36,16 @@
 
 This package aids in the analysis of dissipation-corrected targeted molecular dynamics (dcTMD) simulations. The method enforces rare unbinding events of ligands from proteins via a constraint pulling bias. Subsequently, free energy profiles and friction factors are estimated along the unbinding coordinate. For a methodological overview, see our [article](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835).
 
-> S. Wolf, and G. Stock,
-> *Targeted molecular dynamics calculations of free energy profiles using a nonequilibrium friction correction.*,
-> Journal of chemical theory and computation (2018)
+> S. Wolf, and G. Stock,  
+> *Targeted molecular dynamics calculations of free energy profiles using a nonequilibrium friction correction.*,  
+> **J. Chem. Theory Comput.** 2018 14 (12), 6175-6182,  
+> doi: (10.1021/acs.jctc.8b00835)[https://pubs.acs.org/doi/10.1021/acs.jctc.8b00835]
 
 This package will be published soon:
 
-> V. Tänzel, M. Jäger, D. Nagel, and S. Wolf,
-> *Dissipation Corrected Targeted Molecular Dynamics*,
-> in preparation (2023)
+> V. Tänzel, M. Jäger, D. Nagel, and S. Wolf,  
+> *Dissipation Corrected Targeted Molecular Dynamics*,  
+> in preparation 2023
 
 We kindly ask you to cite these articles in case you use this software package for published works.
 
