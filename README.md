@@ -15,6 +15,8 @@
         <img src="https://pepy.tech/badge/dcTMD" /></a>
     <a href="https://github.com/moldyn/dcTMD/blob/main/LICENSE" alt="License">
         <img src="https://img.shields.io/github/license/moldyn/dcTMD" /></a>
+    <a href="https://img.shields.io/pypi/pyversions/dcTMD" alt="PyPI - Python Version">
+        <img src="https://img.shields.io/pypi/pyversions/dcTMD" /></a>
     <a href="https://github.com/moldyn/dcTMD/actions/workflows/codeql.yml" alt="CodeQL">
         <img src="https://github.com/moldyn/dcTMD/actions/workflows/codeql.yml/badge.svg?branch=main" /></a>
     <a href="https://github.com/moldyn/dcTMD/actions/workflows/pytest.yml" alt="GitHub Workflow Status">
