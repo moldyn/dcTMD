@@ -37,12 +37,14 @@ setup(
     version='0.3.0rc1',
     description='Analyse targeted molecular dynamics data with dcTMD',
     long_description=README,
+    long_description_content_type='text/markdown',
     keywords=[
         'enhanced sampling',
         'friction',
         'MD analysis',
     ],
     author='taenzel, dieJaegerIn, braniii, floWneffetS',
+    url='https://github.com/moldyn/dcTMD',
     license='MIT License',
     classifiers=[
         'License :: OSI Approved :: MIT License',
