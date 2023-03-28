@@ -7,13 +7,19 @@
         <img src="https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg" /></a>
     <a href="https://moldyn.github.io/dcTMD" alt="Docs">
         <img src="https://img.shields.io/badge/mkdocs-Documentation-brightgreen" /></a>
+    <a href="https://pypi.org/project/dcTMD" alt="PyPI">
+        <img alt="PyPI" src="https://img.shields.io/pypi/v/dcTMD" /></a>
+    <a href="https://anaconda.org/conda-forge/dcTMD" alt="conda version">
+        <img src="https://img.shields.io/conda/vn/conda-forge/dcTMD" /></a>
+    <a href="https://pepy.tech/project/dcTMD" alt="Downloads">
+        <img src="https://pepy.tech/badge/dcTMD" /></a>
     <a href="https://github.com/moldyn/dcTMD/blob/main/LICENSE" alt="License">
         <img src="https://img.shields.io/github/license/moldyn/dcTMD" /></a>
     <a href="https://github.com/moldyn/dcTMD/actions/workflows/codeql.yml" alt="CodeQL">
         <img src="https://github.com/moldyn/dcTMD/actions/workflows/codeql.yml/badge.svg?branch=main" /></a>
     <a href="https://github.com/moldyn/dcTMD/actions/workflows/pytest.yml" alt="GitHub Workflow Status">
         <img src="https://img.shields.io/github/actions/workflow/status/moldyn/dcTMD/pytest.yml?branch=main"></a>
-    <a href="https://codecov.io/gh/moldyn/dcTMD" > 
+    <a href="https://codecov.io/gh/moldyn/dcTMD" >
         <img src="https://codecov.io/gh/moldyn/dcTMD/branch/main/graph/badge.svg?token=XMLP2VUU33"/></a>
   </p>
 
@@ -30,14 +36,14 @@
 
 This package aids in the analysis of dissipation-corrected targeted molecular dynamics (dcTMD) simulations. The method enforces rare unbinding events of ligands from proteins via a constraint pulling bias. Subsequently, free energy profiles and friction factors are estimated along the unbinding coordinate. For a methodological overview, see our [article](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835).
 
-> S. Wolf, and G. Stock,  
-> *Targeted molecular dynamics calculations of free energy profiles using a nonequilibrium friction correction.*,  
+> S. Wolf, and G. Stock,
+> *Targeted molecular dynamics calculations of free energy profiles using a nonequilibrium friction correction.*,
 > Journal of chemical theory and computation (2018)
 
 This package will be published soon:
 
-> V. Tänzel, and M. Jäger, and S. Wolf,  
-> *Dissipation Corrected Targeted Molecular Dynamics*,  
+> V. Tänzel, M. Jäger, D. Nagel, and S. Wolf,
+> *Dissipation Corrected Targeted Molecular Dynamics*,
 > in preparation (2023)
 
 We kindly ask you to cite these articles in case you use this software package for published works.
@@ -63,7 +69,7 @@ Check out the documentation for an overview over all modules as well as the tuto
 
 ## Roadmap
 
-- [ ] New Features: 
+- [ ] New Features:
     - [ ] Gaussian error estimation
     - [ ] 2d distribution WorkSet plots
     - [x] Estimator plots: free energy, friction & both
