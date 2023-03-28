@@ -6,4 +6,4 @@ __all__ = ['dcTMD', 'storing', 'io', 'utils']
 
 from dcTMD import dcTMD, io, storing, utils
 
-__version__ = '0.3.0rc1'
+__version__ = '0.3.0'
