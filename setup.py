@@ -34,7 +34,7 @@ README = (HERE / 'README.md').read_text()
 
 setup(
     name='dcTMD',
-    version='0.2.1',
+    version='0.3.0rc1',
     description='Analyse targeted molecular dynamics data with dcTMD',
     long_description=README,
     keywords=[
