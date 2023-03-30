@@ -5,7 +5,10 @@
 """CLI of dcTMD."""
 
 import click
-import dcTMD
+from dcTMD.storing import WorkSet, ForceSet
+from dcTMD.dcTMD import WorkEstimator, ForceEstimator
+from dcTMD.io import load_pullf, write_output
+from dcTMD.storing import save
 
 MODES = ('work', 'force')
 
@@ -19,7 +22,7 @@ MODES = ('work', 'force')
     show_default=True,
     required=True,
     help='Use either work or force autocovariance function to calculate' +
-    'dcTMD quantities.',
+         'dcTMD quantities.',
 )
 @click.option(
     '-f',
@@ -91,7 +94,7 @@ MODES = ('work', 'force')
     show_default=True,
     help='Save the Work/ForceSet instance to file.',
 )
-def main(
+def main(  # noqa: WPS211, WPS216
     mode,
     pullf_files,
     outname,
@@ -103,53 +106,62 @@ def main(
     plot,
     save_dataset,
 ) -> None:
-    r"""
+    """Calculate free energy and friction for given constraint force files.
+
     -------------------------
     |         dcTMD         |
     -------------------------
-    Calculate free energy and friction for given constraint force files.
-
+    
     Analysis tools for dissipation-corrected targeted molecular dynamics, which
     is an enhanced sampling method to enforce rare events in biomolecular
     systems. When publishing results gained with this python package, please
     cite the following publications:
     (1) Tänzel, Victor and Jäger, Miriam and Wolf, Steffen in preparation.
-    (2) Wolf, Steffen, and Gerhard Stock. "Targeted molecular dynamics
+    (2) Wolf, Steffen, and Gerhard Stock. 'Targeted molecular dynamics
     calculations of free energy profiles using a nonequilibrium friction
-    correction." Journal of chemical theory and computation 14.12 (2018): 6175-
+    correction.' Journal of chemical theory and computation 14.12 (2018): 6175-
     6182.
     """
     # Click aftercare
-    # ToDo: discuss if we want to include error estimation
     if verbose:
         click.echo(
-            f'Input:\n mode: {mode}\n file: {pullf_files}\n '
-            f'outname: {outname}\n temperature: {temperature}\n '
-            f'velocity: {velocity}\n resolution: {res}\n '
-            f'sigma: {sigma}\n verbose: {verbose}\n '
-            f'plot: {plot}\n, save dataset: {save_dataset}\n'
+            'Input:\n '
+            f'mode: {mode}\n '
+            f'file: {pullf_files}\n '
+            f'outname: {outname}\n '
+            f'temperature: {temperature}\n '
+            f'velocity: {velocity}\n '
+            f'resolution: {res}\n '
+            f'sigma: {sigma}\n '
+            f'verbose: {verbose}\n '
+            f'plot: {plot}\n '
+            f'save dataset: {save_dataset}\n'
         )
 
     # Set up mode
     if mode == 'work':
-        dataset = dcTMD.storing.WorkSet(velocity=velocity,
-                                        resolution=res,
-                                        verbose=verbose)
-        estimator = dcTMD.dcTMD.WorkEstimator(temperature)
-    else:  # 'force'
-        dataset = dcTMD.storing.ForceSet(velocity=velocity,
-                                         resolution=res,
-                                         verbose=verbose)
-        estimator = dcTMD.dcTMD.ForceEstimator(temperature)
+        dataset = WorkSet(
+            velocity=velocity,
+            resolution=res,
+            verbose=verbose,
+        )
+        estimator = WorkEstimator(temperature)
+    elif mode == 'force':
+        dataset = ForceSet(
+            velocity=velocity,
+            resolution=res,
+            verbose=verbose,
+        )
+        estimator = ForceEstimator(temperature)
 
     # Loading constraint force files
-    filenames = dcTMD.io.load_pullf(pullf_files)
+    filenames = load_pullf(pullf_files)
 
     # Generate work/force set
     dataset.fit(filenames)
     if save_dataset:
-        out = outname + f"_{len(dataset.names_)}_{mode}set"
-        dcTMD.storing.save(out, dataset)
+        out = f'{outname}_{mode}set'
+        save(out, dataset)
     # Calculate Wmean, Wdiss, dG and friction factor
     estimator.fit(dataset)
 
@@ -158,8 +170,8 @@ def main(
         estimator.smooth_friction(sigma=0.1, mode='reflect')
 
     # save data as .npz and .dat file
-    outname += f'_{mode}'
-    dcTMD.io.write_output(outname, estimator)
+    outname = f'{outname}_{mode}'
+    write_output(outname, estimator)
 
 
 if __name__ == '__main__':

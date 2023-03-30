@@ -12,7 +12,7 @@ from beartype import beartype
 from dcTMD._typing import (
     Float,
     Float1DArray,
-    Str
+    Str,
 )
 
 
@@ -42,7 +42,7 @@ def gaussfilter_friction(
 
     Returns
     -------
-    blurred_friction : 1d np.array
+    1d np.array
         Smoothed friction.
     """
     from scipy.ndimage import gaussian_filter1d

@@ -237,12 +237,12 @@ class WorkSet(TransformerMixin, BaseEstimator):
         self.names_ = np.array([])
         self.position_ = self.time_ * self.velocity
         # read in data and fill work_array
-        pbar = tqdm.tqdm
-        for idx, file_name in pbar(
+        pbar = tqdm.tqdm(
             enumerate(self.X),
             total=len(self.X),
             desc='Loading & integrating force files',
-        ):
+        )
+        for idx, file_name in pbar:
             if self.verbose:
                 pbar.write(f'Reading file {file_name}')
             file_data = np.loadtxt(
@@ -251,17 +251,19 @@ class WorkSet(TransformerMixin, BaseEstimator):
                 usecols=[1],
             )
             # test if file is not corrupted, else add it
-            if file_data.shape == self.time_.shape:
+            expected_shape = self.time_.shape
+            if file_data.shape == expected_shape:
                 self.work_[idx, :] = _integrate_force(self, file_data)
                 short_name = basename(file_name)
                 self.names_ = np.append(self.names_, short_name)
             else:
                 pbar.write(f'skip file {file_name}')
                 pbar.write(
-                    f'shape is {file_data.shape} and not {self.time_.shape}'
+                    f'shape is {file_data.shape} expected {expected_shape}',
                 )
         # removing rows with only zero, reduce positions resolution
-        self.work_ = self.work_[~np.all(self.work_ == 0, axis=1)]
+        empty_rows = np.all(self.work_ == 0, axis=1)
+        self.work_ = self.work_[~empty_rows]
         self.position_ = self.position_[::self.resolution]
 
 
@@ -295,6 +297,7 @@ class ForceSet(TransformerMixin, BaseEstimator):
     >>> # Load some file names listed in 'filenames'
     >>> import numpy as np  # noqa: F401
     >>> from dcTMD.storing import ForceSet
+    >>> filenames = np.loadtxt('my_filenames.txt')
     >>> force_set = ForceSet(velocity=0.001, resolution=1)
     >>> force_set.fit(filenames)
     Loading force files: 100%|████| X/X [XX:XX<00:00,  X.XX/it]
@@ -351,15 +354,8 @@ class ForceSet(TransformerMixin, BaseEstimator):
 
     @beartype
     def integrate(self) -> None:
-        """Integrate forces and return a WorkSet instance."""
-        # (1) Instantiate a WorkSet with velocity, resolution and verbose
-        # (2) Save names_, time_, position_ attributes manually
-        # (3) Integrate the forces in force_ with _integrate_force
-        # (4) Return WorkSet instance.
-        # Be careful with the resolution so as not to reduce it twice.
-        print('integrating forceset --> workset')
+        """Integrate forces."""
         self.work_ = _integrate_force(self, self.force_)[::self.resolution]
-        print(self.work_.shape)
 
     @beartype
     def _fill_force(self) -> None:
@@ -374,12 +370,12 @@ class ForceSet(TransformerMixin, BaseEstimator):
         self.names_ = np.array([])
         self.position_ = self.time_ * self.velocity
         # read in data and fill force_array
-        pbar = tqdm.tqdm
-        for idx, file_name in pbar(
+        pbar = tqdm.tqdm(
             enumerate(self.X),
             total=len(self.X),
             desc='Loading force files',
-        ):
+        )
+        for idx, file_name in pbar:
             if self.verbose:
                 pbar.write(f'Reading file {file_name}')
             file_data = np.loadtxt(
@@ -388,14 +384,16 @@ class ForceSet(TransformerMixin, BaseEstimator):
                 usecols=[1],
             )
             # test if file is not corrupted, else add it
-            if file_data.shape == self.time_.shape:
+            expected_shape = self.time_.shape
+            if file_data.shape == expected_shape:
                 self.force_[idx, :] = file_data
                 short_name = basename(file_name)
                 self.names_ = np.append(self.names_, short_name)
             else:
                 pbar.write(f'skip file {file_name}')
                 pbar.write(
-                    f'shape is {file_data.shape} and not {self.time_.shape}'
+                    f'shape is {file_data.shape} expected {expected_shape}',
                 )
         # removing rows with only zero
-        self.force_ = self.force_[~np.all(self.force_ == 0, axis=1)]
+        empty_rows = np.all(self.force_ == 0, axis=1)
+        self.force_ = self.force_[~empty_rows]

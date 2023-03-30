@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # MIT License
-# Copyright (c) 2021-2023, Victor Tänzel, Miriam Jäger
+# Copyright (c) 2021-2023, Miriam Jäger
 # All rights reserved.
 """Submodule handling the input/output operations."""
 
