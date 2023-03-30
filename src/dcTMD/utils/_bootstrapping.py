@@ -42,7 +42,7 @@ def _bootstrap_reducer(
         Tuple of reduced statistics.
     """
     if descriptor['mode'] == 'std':
-        def reducer(resampled_quantity):  #noqa: WPS440
+        def reducer(resampled_quantity):  # noqa: WPS440
             return np.std(resampled_quantity, axis=0)
     else:
         def reducer(resampled_quantity):
