@@ -111,7 +111,6 @@ def main(  # noqa: WPS211, WPS216
     -------------------------
     |         dcTMD         |
     -------------------------
-    
     Analysis tools for dissipation-corrected targeted molecular dynamics, which
     is an enhanced sampling method to enforce rare events in biomolecular
     systems. When publishing results gained with this python package, please
