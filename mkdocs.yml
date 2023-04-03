@@ -15,7 +15,7 @@ nav:
   - License: license.md
 - Tutorial:
   - Getting Started: getting_started.md
-  - Theory: tutorials/theory.md 
+  - Theory: tutorials/theoryMD.md 
   - Create trajectories with Gromacs: tutorials/Gromacs.md
   - dcTMD via Work: tutorials/work.ipynb
   - dcTMD via Force: tutorials/force.ipynb
