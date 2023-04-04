@@ -4,11 +4,12 @@
 In order to study the dynamics of biomolecular processes by computer simulation, biased simulation methods have been developed that can accelerate the sampling of otherwise rare events. One such method is Targeted Molecular Dynamics (TMD) developed by [Schlitter et al. 1994](https://doi.org/10.1016/0263-7855(94)80072-3).
 In the specific implementation of TMD of this software package, a constraint is applied on the distance $s$ between two subsets of atoms, moving them with constant velocity $v$ from an initial state $s_0$ along the pulling coordinate towards a target conformation. This constraint,
 
-$$	\Phi(s,t) =  s -(s_0 + v t)  = 0 \, , $$
+$$ \Phi(s,t) =  s -(s_0 + v t)  = 0 \, , $$
 
 modifies the equation of motion of the $K$ atoms $\boldsymbol{r}=(\boldsymbol{r}_1,\dots,\boldsymbol{r}_K)$ bound by the potential $U(\boldsymbol{r})$ by an additional constraint force term
 
-$$  m_i \ddot{\boldsymbol{r}}_i = - \frac{\partial U}{\partial \boldsymbol{r}} + f \frac{\partial \Phi}{\partial \boldsymbol{r}} \; , $$
+$$  m_i \ddot{\mathbf{r}}_i = - \frac{\partial U}{\partial \boldsymbol{r}} + f \frac{\partial \Phi}{\partial \boldsymbol{r}} \; , $$
+
 that is, the constraint force $f$ on $s$ is given by the Lagrange multiplier which in practice is calculated via the SHAKE algorithm ([Ryckaert et al. 1977](https://doi.org/10.1016/0021-9991(77)90098-5)). The constraint forces are then used to compute the work
 
 $$ W(s)=\int_{s_0}^{s} \!\! \mathrm{d} s'  \; f(s') $$
