@@ -8,7 +8,7 @@ $$ \Phi(s,t) =  s -(s_0 + v t)  = 0 \, , $$
 
 modifies the equation of motion of the $K$ atoms $\boldsymbol{r}=(\boldsymbol{r}_1,\dots,\boldsymbol{r}_K)$ bound by the potential $U(\boldsymbol{r})$ by an additional constraint force term
 
-$$  m_i \ddot{\bm{r}}_i = - \frac{\partial U}{\partial \boldsymbol{r}} + f \frac{\partial \Phi}{\partial \boldsymbol{r}} \; , $$
+$$  m_i \ddot{\symbf{r}}_i = - \frac{\partial U}{\partial \boldsymbol{r}} + f \frac{\partial \Phi}{\partial \boldsymbol{r}} \; , $$
 
 that is, the constraint force $f$ on $s$ is given by the Lagrange multiplier which in practice is calculated via the SHAKE algorithm ([Ryckaert et al. 1977](https://doi.org/10.1016/0021-9991(77)90098-5)). The constraint forces are then used to compute the work
 
