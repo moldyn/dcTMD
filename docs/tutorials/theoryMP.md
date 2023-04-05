@@ -8,7 +8,7 @@ $$ \Phi(s,t) =  s -(s_0 + v t)  = 0 \, , $$
 
 modifies the equation of motion of the $K$ atoms $\mathbf{r}=(\mathbf{r}_1,\dots,\mathbf{r}_K)$ bound by the potential $U(\mathbf{r})$ by an additional constraint force term
 
-$$  m_i \ddot{\symbf{r}}_i = - \frac{\partial U}{\partial \mathbf{r}} + f \frac{\partial \Phi}{\partial \mathbf{r}} \; , $$
+$$  m_i \ddot{\mathbf{r}}_i = - \frac{\partial U}{\partial \mathbf{r}} + f \frac{\partial \Phi}{\partial \mathbf{r}} \; , $$
 
 that is, the constraint force $f$ on $s$ is given by the Lagrange multiplier which in practice is calculated via the SHAKE algorithm ([Ryckaert et al. 1977](https://doi.org/10.1016/0021-9991(77)90098-5)). The constraint forces are then used to compute the work
 
@@ -93,11 +93,16 @@ $$
 \end{align}
 $$
 
-assuming  a Gaussian work distribution.
+assuming a Gaussian work distribution.
 
+## What next?
 
+[create pulling trajectories with GROMACS](Gromacs.md){ .md-button }
 
+[calculating dcTMD quantities via work](work.ipynb){ .md-button }
 
+[calculating dcTMD quantities via force](force.ipynb){ .md-button }
+<!---
 # Classes calculating the dcTMD quantities
 
 
@@ -111,4 +116,4 @@ One way to analyze nonequilibrium force time traces from constraint pulling simu
 Another option to directly analyze the constraint force time traces, calculate $\Delta G$ on-the-fly by via Eq. (4) and the friction ${\it{\Gamma}}$ via Eq. (6).  This approach is implemented in the ForceEstimator class
 
 We advise the use of the WorkEstimator class, which is computationally less demanding, since it does not require the full resolution of the force time traces.
-
+-->
