@@ -6,13 +6,13 @@ In the specific implementation of TMD of this software package, a constraint is 
 
 $$ \Phi(s,t) =  s -(s_0 + v t)  = 0 \, , $$
 
-modifies the equation of motion of the $K$ atoms $\boldsymbol{r}=(\boldsymbol{r}_1,\dots,\boldsymbol{r}_K)$ bound by the potential $U(\boldsymbol{r})$ by an additional constraint force term
+modifies the equation of motion of the $K$ atoms $\mathbf{r}=(\mathbf{r}_1,\dots,\mathbf{r}_K)$ bound by the potential $U(\mathbf{r})$ by an additional constraint force term
 
-$$  m_i \ddot{\symbf{r}}_i = - \frac{\partial U}{\partial \boldsymbol{r}} + f \frac{\partial \Phi}{\partial \boldsymbol{r}} \; , $$
+$$  m_i \ddot{\symbf{r}}_i = - \frac{\partial U}{\partial \mathbf{r}} + f \frac{\partial \Phi}{\partial \mathbf{r}} \; , $$
 
 that is, the constraint force $f$ on $s$ is given by the Lagrange multiplier which in practice is calculated via the SHAKE algorithm ([Ryckaert et al. 1977](https://doi.org/10.1016/0021-9991(77)90098-5)). The constraint forces are then used to compute the work
 
-$$ W(s)=\int_{s_0}^{s} \!\! \mathrm{d} s'  \; f(s') $$
+$$ W(s)=\int_{s_0}^{s}  \mathrm{d} s'  \; f(s') $$
 
 done to move the atom, or subset of atoms, along the pulling coordinate. Note that in the follwing we use the notations $f(s) \equiv f(t(s))$ interchangeable. 
 
@@ -28,11 +28,11 @@ $$
 \end{align}
 $$
 
-$\left< A  \right>$ denotes an ensemble average of some function of the atoms positions $\boldsymbol{r}$ and momenta $\boldsymbol{p}$ over independent pulling trajectories starting from an initial Boltzmann distribution at fixed $s$, i.e.,
+$\left< A  \right>$ denotes an ensemble average of some function of the atoms positions $\mathbf{r}$ and momenta $\mathbf{p}$ over independent pulling trajectories starting from an initial Boltzmann distribution at fixed $s$, i.e.,
 
 $$
 \begin{align*}
-	\left< A  \right> &= \frac{1}{\int \!\! \mathrm{d} \boldsymbol{r}_0  \mathrm{d} \boldsymbol{p}_0 \,  \mathrm{e}^{-\beta H(\boldsymbol{r}_0,\boldsymbol{p}_0,0)}} \int \!\! \mathrm{d} \boldsymbol{r}_0  \mathrm{d} \boldsymbol{p}_0 \, A(\boldsymbol{r}_0,\boldsymbol{p}_0,t) \; \mathrm{e}^{-\beta H(\boldsymbol{r}_0,\boldsymbol{p}_0,0)}\\
+	\left< A  \right> &= \frac{1}{\int  \mathrm{d} \mathbf{r}_0  \mathrm{d} \mathbf{p}_0 \,  \mathrm{e}^{-\beta H(\mathbf{r}_0,\mathbf{p}_0,0)}} \int  \mathrm{d} \mathbf{r}_0  \mathrm{d} \mathbf{p}_0 \, A(\mathbf{r}_0,\mathbf{p}_0,t) \; \mathrm{e}^{-\beta H(\mathbf{r}_0,\mathbf{p}_0,0)}\\
 	&\approx \frac{1}{\mathtt{N}} \sum_{\mathtt{i}=1}^{\mathtt{N}} A_\mathtt{i} \; ,
 \end{align*} 
 $$
@@ -71,7 +71,7 @@ When considering an ensemble of TMD trajectories instead of a single one, the st
 
 $$
 \begin{align}
-	\Delta G(s) &= \int_{s_0}^{s} \!\! \text{d}s' \left<f(s')\right> - v \int_{s_0}^{s} \!\! \text{d}s' \; {\it{\Gamma}}(s')  
+	\Delta G(s) &= \int_{s_0}^{s}  \text{d}s' \left<f(s')\right> - v \int_{s_0}^{s}  \text{d}s' \; {\it{\Gamma}}(s')  
 \end{align}
 $$
 
@@ -79,8 +79,8 @@ where the first term corresponds to the average external work done on the system
 
 $$
 \begin{align*}
-	\left<W_\text{diss}\right> &= \frac{\beta}{2} \left<\left(\int_{s_0}^{s} \!\!\mathrm{d}s^\prime \delta f(s') \right)^2\right>\\
-	&= \beta \int_{s_0}^{s} \!\! \text{d}s^\prime \int_{s_0}^{s^\prime} \!\! \text{d}s^{\prime\prime} \left<\delta f(s^{\prime\prime}) \delta f (s^{\prime})\right> \; ,\\
+	\left<W_\text{diss}\right> &= \frac{\beta}{2} \left<\left(\int_{s_0}^{s} \mathrm{d}s^\prime \delta f(s') \right)^2\right>\\
+	&= \beta \int_{s_0}^{s}  \text{d}s^\prime \int_{s_0}^{s^\prime}  \text{d}s^{\prime\prime} \left<\delta f(s^{\prime\prime}) \delta f (s^{\prime})\right> \; ,\\
 \end{align*}
 $$
 
