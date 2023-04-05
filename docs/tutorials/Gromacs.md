@@ -1,6 +1,6 @@
 ### Input files
 
-Download the [tutorial\_files.tar.gz](link) and unpack via
+Download the [tutorial\_files.tar.gz](https://github.com/moldyn/dcTMD/blob/484da088ad8e5e91886d4d057b7c452e7b7d9aab/docs/tutorials/tutorial_files.tar.gz) and unpack via
 
 ```console
 tar -xzvf ./tutorial_files.tar
