@@ -22,7 +22,6 @@ TEST_FILE_DIR = join(HERE, 'testdata')
 def ref_workestimator(scope="session"):
     workset_name = f'{TEST_FILE_DIR}/workset'
     workset = storing.load(filename=workset_name)
-    print(workset)
     estimator = dcTMD.WorkEstimator(temperature=TEMPERATURE)
     estimator.fit(workset)
     estimator.smooth_friction(SIGMA, MODE)
