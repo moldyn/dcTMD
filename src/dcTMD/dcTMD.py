@@ -7,6 +7,7 @@
 __all__ = ['WorkEstimator', 'ForceEstimator']
 
 import numpy as np
+from abc import ABC, abstractmethod
 from beartype import beartype
 from beartype.typing import Union, Tuple, Optional
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -23,7 +24,42 @@ from dcTMD._typing import (
 )
 
 
-class WorkEstimator(TransformerMixin, BaseEstimator):
+class SmoothEstimator():
+    """Abstract class providing the smoothing method.
+    """
+    @beartype
+    def smooth_friction(
+        self,
+        sigma: Float,
+        mode: Str = 'reflect',
+    ) -> Float1DArray:
+        """Smooth friction with gaussian kernel.
+
+        Parameters
+        ----------
+        sigma:
+            standard deviation of gaussian kernel in nm
+        mode:
+            options: ‘reflect’, ‘constant’, ‘nearest’, ‘mirror’, ‘wrap’
+            The mode parameter determines how the input array is
+            extended beyond its boundaries. Default is ‘reflect’.
+            Behavior for each option see scipy.ndimage.gaussian_filter1d
+
+        Returns
+        -------
+        friction_smooth_ : 1d np.array
+            Smoothed friction.
+        """
+        self.friction_smooth_ = utils.gaussfilter_friction(
+            self.friction_,
+            self.position_,
+            sigma=sigma,
+            mode=mode,
+        )
+        return self.friction_smooth_
+
+
+class WorkEstimator(TransformerMixin, BaseEstimator, SmoothEstimator):
     """Class for performing dcTMD analysis on a work set.
 
     Parameters
@@ -83,7 +119,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
     @beartype
     def __init__(
         self,
-        temperature: (Float, Int),
+        temperature: Union[Float, Int],
         verbose: bool = False,
     ) -> None:
         """Initialize class."""
@@ -364,38 +400,38 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             self.s_friction_ = s_quantity[0, :, 0]
         self.friction_resampled_ = quantity_resampled[:, 0]
 
-    @beartype
-    def smooth_friction(
-        self,
-        sigma: Float,
-        mode: Str = 'reflect',
-    ) -> Float1DArray:
-        """Smooth friction with gaussian kernel.
+    # @beartype
+    # def smooth_friction(
+    #     self,
+    #     sigma: Float,
+    #     mode: Str = 'reflect',
+    # ) -> Float1DArray:
+    #     """Smooth friction with gaussian kernel.
 
-        Parameters
-        ----------
-        sigma:
-            standard deviation of gaussian kernel in nm
-        mode:
-            options: ‘reflect’, ‘constant’, ‘nearest’, ‘mirror’, ‘wrap’
-            The mode parameter determines how the input array is
-            extended beyond its boundaries. Default is ‘reflect’.
-            Behavior for each option see scipy.ndimage.gaussian_filter1d
+    #     Parameters
+    #     ----------
+    #     sigma:
+    #         standard deviation of gaussian kernel in nm
+    #     mode:
+    #         options: ‘reflect’, ‘constant’, ‘nearest’, ‘mirror’, ‘wrap’
+    #         The mode parameter determines how the input array is
+    #         extended beyond its boundaries. Default is ‘reflect’.
+    #         Behavior for each option see scipy.ndimage.gaussian_filter1d
 
-        Returns
-        -------
-        friction_smooth_ : 1d np.array
-            Smoothed friction.
-        """
-        self.friction_smooth_ = utils.gaussfilter_friction(
-            self.friction_,
-            self.position_,
-            sigma=0.1,
-        )
-        return self.friction_smooth_
+    #     Returns
+    #     -------
+    #     friction_smooth_ : 1d np.array
+    #         Smoothed friction.
+    #     """
+    #     self.friction_smooth_ = utils.gaussfilter_friction(
+    #         self.friction_,
+    #         self.position_,
+    #         sigma=0.1,
+    #     )
+    #     return self.friction_smooth_
 
 
-class ForceEstimator(TransformerMixin, BaseEstimator):
+class ForceEstimator(TransformerMixin, BaseEstimator, SmoothEstimator):
     """
     Class for performing dcTMD analysis on a force set.
 
@@ -435,7 +471,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
     @beartype
     def __init__(
         self,
-        temperature: (Float, Int),
+        temperature: Union[Float, Int],
         verbose: bool = False,
     ) -> None:
         """Initialize class."""
@@ -564,7 +600,8 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         self.friction_smooth_ = utils.gaussfilter_friction(
             self.friction_,
             self.position_,
-            sigma=0.1,
+            sigma=sigma,
+            mode=mode,
         )
         return self.friction_smooth_
 
