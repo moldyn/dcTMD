@@ -21,7 +21,7 @@ MODES = ('work', 'force')
     default=MODES[0],
     show_default=True,
     required=True,
-    help='Use either work or force autocovariance function to calculate' +
+    help='Use either work or force autocovariance function to calculate ' +
          'dcTMD quantities.',
 )
 @click.option(
@@ -29,7 +29,7 @@ MODES = ('work', 'force')
     '--file',
     'pullf_files',
     required=True,
-    help='Input: File containing list of all constraint force file names' +
+    help='Input: File containing list of all constraint force file names ' +
     'or glob pattern e.g."*.xvg" to generate a list of all constraint ' +
     'force files using glob.glob()',
 )
@@ -60,7 +60,7 @@ MODES = ('work', 'force')
     default=1,
     show_default=True,
     required=False,
-    help='Striding to reduce size of returned free energy and friction',
+    help='Striding to reduce size of returned free energy and friction.',
 )
 @click.option(
     '-s',
@@ -108,9 +108,11 @@ def main(  # noqa: WPS211, WPS216
 ) -> None:
     """Calculate free energy and friction for given constraint force files.
 
+    \b
     -------------------------
     |         dcTMD         |
     -------------------------
+
     Analysis tools for dissipation-corrected targeted molecular dynamics, which
     is an enhanced sampling method to enforce rare events in biomolecular
     systems. When publishing results gained with this python package, please
