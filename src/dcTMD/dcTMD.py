@@ -23,7 +23,7 @@ from dcTMD._typing import (
 )
 
 
-class SmoothEstimator():
+class SmoothBasisEstimator():
     """Class with the smoothing method for ‘WorkEstimator‘, ‘ForceEstimator‘.
     """
     @beartype
@@ -58,7 +58,7 @@ class SmoothEstimator():
         return self.friction_smooth_
 
 
-class WorkEstimator(TransformerMixin, BaseEstimator, SmoothEstimator):
+class WorkEstimator(TransformerMixin, BaseEstimator, SmoothBasisEstimator):
     """Class for performing dcTMD analysis on a work set.
 
     Parameters
@@ -400,7 +400,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator, SmoothEstimator):
         self.friction_resampled_ = quantity_resampled[:, 0]
 
 
-class ForceEstimator(TransformerMixin, BaseEstimator, SmoothEstimator):
+class ForceEstimator(TransformerMixin, BaseEstimator, SmoothBasisEstimator):
     """
     Class for performing dcTMD analysis on a force set.
 
