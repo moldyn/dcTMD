@@ -24,7 +24,7 @@ from dcTMD._typing import (
 
 
 class SmoothBasisEstimator():
-    """Class with the smoothing method for ‘WorkEstimator‘, ‘ForceEstimator‘.
+    """Class with the smoothing method for `WorkEstimator`, `ForceEstimator`.
     """
     @beartype
     def smooth_friction(
@@ -39,9 +39,9 @@ class SmoothBasisEstimator():
         sigma:
             standard deviation of gaussian kernel in nm
         mode:
-            options: ‘reflect’, ‘constant’, ‘nearest’, ‘mirror’, ‘wrap’
+            options: `reflect`, `constant`, `nearest`,`mirror`, `wrap`
             The mode parameter determines how the input array is
-            extended beyond its boundaries. Default is ‘reflect’.
+            extended beyond its boundaries. Default is `reflect`.
             Behavior for each option see scipy.ndimage.gaussian_filter1d.
 
         Returns
@@ -85,22 +85,22 @@ class WorkEstimator(TransformerMixin, BaseEstimator, SmoothBasisEstimator):
         bootstrapping errors are calculated.
     s_W_mean_ :
         Bootstrapping error of the mean work. Calculated via
-        estimate_free_energy_errors().
+        `estimate_free_energy_errors()`.
     s_W_diss_ :
         Bootstrapping error of the dissipative work. Calculated via
-        estimate_free_energy_errors().
+        `estimate_free_energy_errors()`.
     s_dG_ :
         Bootstrapping error of the free energy estimate. Calculated via
-        estimate_free_energy_errors().
+        `estimate_free_energy_errors()`.
     W_mean_resampled_ :
         Resampled mean work, needed to inspect its distribution. Calculated
-        via estimate_free_energy_errors().
+        via `estimate_free_energy_errors()`.
     W_diss_resampled_ :
         Resampled dissipative work, needed to inspect its distribution.
-        Calculated via estimate_free_energy_errors().
+        Calculated via `estimate_free_energy_errors()`.
     dG_resampled_ :
         Resampled free energy estimate, needed to inspect its distribution.
-        Calculated via estimate_free_energy_errors().
+        Calculated via `estimate_free_energy_errors()`.
 
     Examples
     --------
@@ -485,7 +485,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator, SmoothBasisEstimator):
         self,
     ) -> Tuple[Float1DArray, Float1DArray, Float1DArray, Float1DArray]:
         """
-        Estimate free energy and friction from force auto corrleation.
+        Estimate free energy and friction from force auto correlation.
 
         Returns
         -------
@@ -521,7 +521,6 @@ class ForceEstimator(TransformerMixin, BaseEstimator, SmoothBasisEstimator):
         )
         friction_ = np.mean(intcorr, axis=0) / RT
 
-        print('Calculating dissipative work...')
         W_mean_ = cumulative_trapezoid(
             force_mean,
             self.force_set.position_,
