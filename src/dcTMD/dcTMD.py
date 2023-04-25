@@ -2,7 +2,8 @@
 # MIT License
 # Copyright (c) 2022, Victor Tänzel, Miriam Jäger
 # All rights reserved.
-"""Classes calculating the dcTMD quantities."""
+"""Classes `WorkEstimator`, `ForceEstimator` calculating the dcTMD quantities.
+"""
 
 __all__ = ['WorkEstimator', 'ForceEstimator']
 
