@@ -7,7 +7,6 @@
 __all__ = ['WorkEstimator', 'ForceEstimator']
 
 import numpy as np
-from abc import ABC, abstractmethod
 from beartype import beartype
 from beartype.typing import Union, Tuple, Optional
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -25,7 +24,7 @@ from dcTMD._typing import (
 
 
 class SmoothEstimator():
-    """Abstract class providing the smoothing method.
+    """Class with the smoothing method for `WorkEstimator`, `ForceEstimator`.
     """
     @beartype
     def smooth_friction(
@@ -573,37 +572,37 @@ class ForceEstimator(TransformerMixin, BaseEstimator, SmoothEstimator):
 
         return self.W_mean_, self.W_diss_, self.dG_, self.friction_
 
-    @beartype
-    def smooth_friction(
-        self,
-        sigma: Float,
-        mode: Str = 'reflect',
-    ) -> Float1DArray:
-        """
-        Smooth friction with gaussian kernel.
+    # @beartype
+    # def smooth_friction(
+    #     self,
+    #     sigma: Float,
+    #     mode: Str = 'reflect',
+    # ) -> Float1DArray:
+    #     """
+    #     Smooth friction with gaussian kernel.
 
-        Parameters
-        ----------
-        sigma:
-            standard deviation of gaussian kernel in nm
-        mode:
-            options: ‘reflect’, ‘constant’, ‘nearest’, ‘mirror’, ‘wrap’
-            The mode parameter determines how the input array is
-            extended beyond its boundaries. Default is ‘reflect’.
-            Behavior for each option see scipy.ndimage.gaussian_filter1d
+    #     Parameters
+    #     ----------
+    #     sigma:
+    #         standard deviation of gaussian kernel in nm
+    #     mode:
+    #         options: ‘reflect’, ‘constant’, ‘nearest’, ‘mirror’, ‘wrap’
+    #         The mode parameter determines how the input array is
+    #         extended beyond its boundaries. Default is ‘reflect’.
+    #         Behavior for each option see scipy.ndimage.gaussian_filter1d
 
-        Returns
-        -------
-        friction_smooth_ : 1d np.array
-            Smoothed friction.
-        """
-        self.friction_smooth_ = utils.gaussfilter_friction(
-            self.friction_,
-            self.position_,
-            sigma=sigma,
-            mode=mode,
-        )
-        return self.friction_smooth_
+    #     Returns
+    #     -------
+    #     friction_smooth_ : 1d np.array
+    #         Smoothed friction.
+    #     """
+    #     self.friction_smooth_ = utils.gaussfilter_friction(
+    #         self.friction_,
+    #         self.position_,
+    #         sigma=sigma,
+    #         mode=mode,
+    #     )
+    #     return self.friction_smooth_
 
     def memory_kernel(
         self,

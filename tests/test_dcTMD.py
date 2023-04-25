@@ -13,7 +13,7 @@ VERBOSE = True
 TEMPERATURE = 300
 INDICES = np.array([1, 3, 5])
 SIGMA = 0.1
-MODE = 'reflect'
+MODE = 'nearest'
 HERE = dirname(__file__)
 TEST_FILE_DIR = join(HERE, 'testdata')
 
@@ -46,24 +46,29 @@ def assert_estimator_equality(estimator1, estimator2):
     np.testing.assert_almost_equal(
         estimator1.W_mean_,
         estimator2.W_mean_,
+        err_msg='Mean work test failed.',
     )
     np.testing.assert_almost_equal(
         estimator1.W_diss_,
         estimator2.W_diss_,
+        err_msg='Dissipative work test failed.',
     )
     np.testing.assert_almost_equal(
         estimator1.dG_,
         estimator2.dG_,
+        err_msg='Free energy test failed.',
     )
     np.testing.assert_almost_equal(
         estimator1.friction_,
         estimator2.friction_,
         decimal=6,
+        err_msg='Friction test failed.',
     )
     np.testing.assert_almost_equal(
         estimator1.friction_smooth_,
         estimator2.friction_smooth_,
         decimal=6,
+        err_msg='Smoothed friction test failed.',
     )
 
 
