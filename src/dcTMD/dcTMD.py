@@ -24,7 +24,7 @@ from dcTMD._typing import (
 
 
 class SmoothEstimator():
-    """Class with the smoothing method for `WorkEstimator`, `ForceEstimator`.
+    """Class with the smoothing method for ‘WorkEstimator‘, ‘ForceEstimator‘.
     """
     @beartype
     def smooth_friction(
