@@ -54,7 +54,7 @@ We kindly ask you to cite these articles in case you use this software package f
 ## Features
 - Intuitive usage via module and CI
 - Sklearn-style API for fast integration into your Python workflow
-- Supports Python 3.8-3.10
+- Supports Python 3.8-3.11
 - Multitude of [publications](https://www.moldyn.uni-freiburg.de/publications.html) with dcTMD
 
 ## Implemented Key Functionalities
