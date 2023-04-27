@@ -151,6 +151,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator, SmoothBasisEstimator):
         self :
             Fitted estimator.
         """
+        self._reset()
         self.work_set = work_set
         self.position_ = work_set.position_
         self.names_ = work_set.names_
