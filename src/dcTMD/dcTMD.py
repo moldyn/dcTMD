@@ -58,6 +58,12 @@ class SmoothBasisEstimator():
         )
         return self.friction_smooth_
 
+    @beartype
+    def _reset(self) -> None:
+        """Reset friction_smooth_ attribute."""
+        if hasattr(self, 'friction_smooth_'):  # noqa: WPS421
+            del self.friction_smooth_  # noqa: WPS420
+
 
 class WorkEstimator(TransformerMixin, BaseEstimator, SmoothBasisEstimator):
     """Class for performing dcTMD analysis on a work set.
