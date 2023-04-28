@@ -39,7 +39,7 @@ def ref_forceestimator(scope="session"):
 
 
 def assert_estimator_equality(estimator1, estimator2):
-    """Compare to WorkEstimator or ForceEstimator instances via asserts."""
+    """Compare two WorkEstimator or ForceEstimator instances via asserts."""
     assert type(estimator1) is type(estimator2)
     assert estimator1.temperature == estimator2.temperature
     assert estimator1.verbose == estimator2.verbose
@@ -82,3 +82,36 @@ def test_ForceEstimator(ref_forceestimator):
     forceestimator_name = f'{TEST_FILE_DIR}/forceestimator'
     estimator = storing.load(filename=forceestimator_name)
     assert_estimator_equality(estimator, ref_forceestimator)
+
+
+def test_estimator_reset():
+    """Test if _reset is called by fit to delete friction_smooth_.
+
+    When refitting a WorkEstimator with a new WorkSet, many attributes are
+    calculated directly by the fit function. However, the smoothed friction
+    is not directly calculated. As it no longer corresponds to the fitted
+    WorkSet, it is deleted. This is what is tested for, here.
+    """
+    # WorkSet
+    workset_name = f'{TEST_FILE_DIR}/workset'
+    workset = storing.load(filename=workset_name)
+    estimator = dcTMD.WorkEstimator(temperature=TEMPERATURE)
+    estimator.fit(workset)
+    estimator.smooth_friction(SIGMA, MODE)
+    # Check if attribute exists
+    assert hasattr(estimator, 'friction_smooth_')  # noqa: WPS421
+    estimator.fit(workset)
+    # Check if attribute no longer exists
+    assert not hasattr(estimator, 'friction_smooth_')  # noqa: WPS421
+
+    # ForceSet
+    forceset_name = f'{TEST_FILE_DIR}/forceset'
+    forceset = storing.load(filename=forceset_name)
+    estimator = dcTMD.ForceEstimator(temperature=TEMPERATURE)
+    estimator.fit(forceset)
+    estimator.smooth_friction(SIGMA, MODE)
+    # Check if attribute exists
+    assert hasattr(estimator, 'friction_smooth_')  # noqa: WPS421
+    estimator.fit(forceset)
+    # Check if attribute no longer exists
+    assert not hasattr(estimator, 'friction_smooth_')  # noqa: WPS421
