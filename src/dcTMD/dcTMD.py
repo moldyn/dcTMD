@@ -8,6 +8,7 @@
 __all__ = ['WorkEstimator', 'ForceEstimator']
 
 import numpy as np
+from abc import ABC
 from beartype import beartype
 from beartype.typing import Union, Tuple, Optional
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -24,7 +25,7 @@ from dcTMD._typing import (
 )
 
 
-class SmoothBasisEstimator():
+class _SmoothBasisEstimator(ABC):
     """Class with the smoothing method for `WorkEstimator`, `ForceEstimator`.
     """
     @beartype
@@ -65,7 +66,7 @@ class SmoothBasisEstimator():
             del self.friction_smooth_  # noqa: WPS420
 
 
-class WorkEstimator(TransformerMixin, BaseEstimator, SmoothBasisEstimator):
+class WorkEstimator(TransformerMixin, BaseEstimator, _SmoothBasisEstimator):
     """Class for performing dcTMD analysis on a work set.
 
     Parameters
@@ -408,7 +409,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator, SmoothBasisEstimator):
         self.friction_resampled_ = quantity_resampled[:, 0]
 
 
-class ForceEstimator(TransformerMixin, BaseEstimator, SmoothBasisEstimator):
+class ForceEstimator(TransformerMixin, BaseEstimator, _SmoothBasisEstimator):
     """
     Class for performing dcTMD analysis on a force set.
 
