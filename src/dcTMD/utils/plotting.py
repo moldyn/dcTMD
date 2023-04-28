@@ -38,7 +38,7 @@ def fig_sizehalfA4width():
 
 
 def plot_dcTMD_results(x, workestimator, friction):
-    """Plot dcTMD results in two subplots."""
+    """Plot dcTMD results overview in two subplots."""
     fig, axs = plt.subplots(ncols=1,
                             nrows=2,
                             sharex=True,
@@ -56,7 +56,7 @@ def plot_dcTMD_results(x, workestimator, friction):
 
 
 def plot_dG_Wdiss(x, workestimator, ax):
-    """Plot free energy, dissipative work and mean work vs x."""
+    """Plot free energy, dissipative work and mean work against position."""
     ax.plot(x, workestimator.dG_, label=r'$\Delta G$')
     ax.plot(x, workestimator.W_mean_, label=r'W$_{\mathrm{mean}}$')
     ax.plot(x, workestimator.W_diss_, label=r'W$_{\mathrm{diss}}$')
@@ -67,7 +67,7 @@ def plot_dG_Wdiss(x, workestimator, ax):
 
 
 def plot_Gamma(x, friction, ax, label=None):
-    """Plot friction vs x."""
+    """Plot friction factor against position."""
     ax.plot(x, friction, label=rf"{label}")
     ax.set(xlabel=r'position $x$ [nm]',
            ylabel=r'$\Gamma$ [kJ/mol/(nm$^2$/ps)]',
@@ -76,7 +76,7 @@ def plot_Gamma(x, friction, ax, label=None):
 
 
 def plot_dG(x, dG, ax, label=None):
-    """Plot dG vs x."""
+    """Plot free energy against position."""
     ax.plot(x, dG, label=rf"{label}")
     ax.set(xlabel=r'position $x$ [nm]',
            ylabel=r'$\Delta G$ [kJ/mol]',
@@ -85,7 +85,7 @@ def plot_dG(x, dG, ax, label=None):
 
 
 def plot_worklines(x, workset, ax):
-    """Plot work values of trajectories individually."""
+    """Plot work of trajectories individually."""
     for w in workset:
         ax.plot(x, w, color='#777', alpha=.5, lw=.5)
 
@@ -125,7 +125,7 @@ def plot_histo_normaldist(data, ax, color='blue', label=None):
 def plot_worknormalitychecks(x, workset, index, colors=None):
     """Plots the work values of trajectories individually.
 
-    And adds histograms and normality plots for the indices given in index.
+    Also adds histograms and normality plots for the indices given in `index`.
     """
     fig, axs = plt.subplots(ncols=3,
                             nrows=1,
@@ -140,7 +140,7 @@ def plot_worknormalitychecks(x, workset, index, colors=None):
 
     for j, idx in enumerate(index):
         data = workset[:, idx].flatten()
-        axs[1].set_title('Histrogram at x')
+        axs[1].set_title(r'Histogram at $x$')
         plot_histo_normaldist(data, axs[1], colors[j])
         axs[0].axvline(x[idx],
                        color=colors[j],
@@ -150,7 +150,7 @@ def plot_worknormalitychecks(x, workset, index, colors=None):
 
         probplot(data, plot=axs[2], fit=True)
         axs[2].get_lines()[j * 2].set_color(colors[j])
-        axs[2].set_title('Normality Plot')
+        axs[2].set_title('Normality plot')
 
     axs[0].legend()
     plt.tight_layout()
