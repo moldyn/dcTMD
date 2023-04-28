@@ -3,6 +3,8 @@
 # Copyright (c) 2022, Victor Tänzel, Miriam Jäger
 # All rights reserved.
 """Classes `WorkEstimator`, `ForceEstimator` calculating the dcTMD quantities.
+
+This submodule contains two classes, WorkEstimator and ForceEstimator, which are used for the dcTMD analysis of constraint force time traces. Both class can be used to calculate the mean work, dissipative work, free energy and friction estimate of a set of constraint force time traces. 
 """
 
 __all__ = ['WorkEstimator', 'ForceEstimator']
