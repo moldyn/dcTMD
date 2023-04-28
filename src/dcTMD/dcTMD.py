@@ -474,6 +474,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator, SmoothBasisEstimator):
         self :
             Fitted estimator.
         """
+        self._reset()
         self.force_set = force_set
         self.names_ = force_set.names_
         self.estimate_free_energy_friction()
