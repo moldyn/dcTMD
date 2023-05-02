@@ -84,7 +84,12 @@ def test_ForceEstimator(ref_forceestimator):
     assert_estimator_equality(estimator, ref_forceestimator)
 
 
-def test_estimator_reset():
+@pytest.mark.parametrize(
+    "set, Estimator",
+    [('workset', dcTMD.WorkEstimator),
+     ('forceset', dcTMD.ForceEstimator)],
+)
+def test_estimator_reset(set, Estimator):
     """Test if _reset is called by fit to delete friction_smooth_.
 
     When refitting a WorkEstimator with a new WorkSet, many attributes are
@@ -92,26 +97,37 @@ def test_estimator_reset():
     is not directly calculated. As it no longer corresponds to the fitted
     WorkSet, it is deleted. This is what is tested for, here.
     """
-    # WorkSet
-    workset_name = f'{TEST_FILE_DIR}/workset'
-    workset = storing.load(filename=workset_name)
-    estimator = dcTMD.WorkEstimator(temperature=TEMPERATURE)
-    estimator.fit(workset)
+    set_name = f'{TEST_FILE_DIR}/{set}'
+    set = storing.load(filename=set_name)
+    estimator = Estimator(temperature=TEMPERATURE)
+    estimator.fit(set)
     estimator.smooth_friction(SIGMA, MODE)
     # Check if attribute exists
     assert hasattr(estimator, 'friction_smooth_')  # noqa: WPS421
-    estimator.fit(workset)
+    estimator.fit(set)
     # Check if attribute no longer exists
     assert not hasattr(estimator, 'friction_smooth_')  # noqa: WPS421
 
-    # ForceSet
-    forceset_name = f'{TEST_FILE_DIR}/forceset'
-    forceset = storing.load(filename=forceset_name)
-    estimator = dcTMD.ForceEstimator(temperature=TEMPERATURE)
-    estimator.fit(forceset)
-    estimator.smooth_friction(SIGMA, MODE)
-    # Check if attribute exists
-    assert hasattr(estimator, 'friction_smooth_')  # noqa: WPS421
-    estimator.fit(forceset)
-    # Check if attribute no longer exists
-    assert not hasattr(estimator, 'friction_smooth_')  # noqa: WPS421
+    # # WorkSet
+    # workset_name = f'{TEST_FILE_DIR}/workset'
+    # workset = storing.load(filename=workset_name)
+    # estimator = dcTMD.WorkEstimator(temperature=TEMPERATURE)
+    # estimator.fit(workset)
+    # estimator.smooth_friction(SIGMA, MODE)
+    # # Check if attribute exists
+    # assert hasattr(estimator, 'friction_smooth_')  # noqa: WPS421
+    # estimator.fit(workset)
+    # # Check if attribute no longer exists
+    # assert not hasattr(estimator, 'friction_smooth_')  # noqa: WPS421
+
+    # # ForceSet
+    # forceset_name = f'{TEST_FILE_DIR}/forceset'
+    # forceset = storing.load(filename=forceset_name)
+    # estimator = dcTMD.ForceEstimator(temperature=TEMPERATURE)
+    # estimator.fit(forceset)
+    # estimator.smooth_friction(SIGMA, MODE)
+    # # Check if attribute exists
+    # assert hasattr(estimator, 'friction_smooth_')  # noqa: WPS421
+    # estimator.fit(forceset)
+    # # Check if attribute no longer exists
+    # assert not hasattr(estimator, 'friction_smooth_')  # noqa: WPS421
