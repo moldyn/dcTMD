@@ -134,8 +134,7 @@ def plot_worknormalitychecks(x, workset, index, colors=None):
     plot_worklines(x, workset, axs[0])
 
     if not colors:
-        import matplotlib as mpl
-        cmap = mpl.colormaps['Dark2']
+        cmap = plt.get_cmap('Dark2')
         colors = cmap.colors
 
     for j, idx in enumerate(index):
