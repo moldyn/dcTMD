@@ -94,26 +94,33 @@ class WorkEstimator(TransformerMixin, BaseEstimator, _SmoothBasisEstimator):
     friction_:
         Friction factor in kJ/mol/(nm^2/ps).
     mode_ :
-        Parameter of [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.WorkEstimator.estimate_free_energy_errors]. Decides how the
-        bootstrapping errors are calculated.
+        Parameter of [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.\
+WorkEstimator.estimate_free_energy_errors]. Decides how the bootstrapping
+        errors are calculated.
     s_W_mean_ :
-        Bootstrapping error of the mean work. Calculated via
-        [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.WorkEstimator.estimate_free_energy_errors].
+        Bootstrapping error of the mean work. Calculated via [WorkEstimator.\
+estimate_free_energy_errors][dcTMD.dcTMD.WorkEstimator.\
+estimate_free_energy_errors].
     s_W_diss_ :
         Bootstrapping error of the dissipative work. Calculated via
-        [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.WorkEstimator.estimate_free_energy_errors].
+        [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.WorkEstimator.\
+estimate_free_energy_errors].
     s_dG_ :
         Bootstrapping error of the free energy estimate. Calculated via
-        [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.WorkEstimator.estimate_free_energy_errors].
+        [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.WorkEstimator.\
+estimate_free_energy_errors].
     W_mean_resampled_ :
         Resampled mean work, needed to inspect its distribution. Calculated
-        via [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.WorkEstimator.estimate_free_energy_errors].
+        via [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.\
+WorkEstimator.estimate_free_energy_errors].
     W_diss_resampled_ :
         Resampled dissipative work, needed to inspect its distribution.
-        Calculated via [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.WorkEstimator.estimate_free_energy_errors].
+        Calculated via [WorkEstimator.estimate_free_energy_errors][dcTMD.\
+dcTMD.WorkEstimator.estimate_free_energy_errors].
     dG_resampled_ :
         Resampled free energy estimate, needed to inspect its distribution.
-        Calculated via [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.WorkEstimator.estimate_free_energy_errors].
+        Calculated via [WorkEstimator.estimate_free_energy_errors][dcTMD.\
+dcTMD.WorkEstimator.estimate_free_energy_errors].
 
     Examples
     --------
@@ -236,7 +243,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator, _SmoothBasisEstimator):
 
         Bootstrapping errors are calculated for the free energy estimate and
         the related quantities mean and dissipative work. Return matches the
-        one of [WorkEstimator.estimate_free_energy][dcTMD.dcTMD.WorkEstimator.estimate_free_energy].
+        one of [WorkEstimator.estimate_free_energy][dcTMD.dcTMD.WorkEstimator.\
+estimate_free_energy].
 
         Parameters
         ----------
@@ -309,7 +317,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator, _SmoothBasisEstimator):
         """
         Estimate bootstrapping errors for the friction.
 
-        Besides calculating dcTMD quantitites to the class, this function
+        Besides calculating dcTMD quantities to the class, this function
         is also called from the bootstrapping routine. In the latter case,
         which comes with a passed `W_diss` parameter, attributes should not
         be overwritten.
@@ -357,7 +365,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator, _SmoothBasisEstimator):
 
         Bootstrapping errors are calculated for the free energy estimate and
         the related quantities mean and dissipative work. Return matches the
-        one of [WorkEstimator.estimate_free_energy][dcTMD.dcTMD.WorkEstimator.estimate_free_energy].
+        one of [WorkEstimator.estimate_free_energy][dcTMD.dcTMD.WorkEstimator.\
+estimate_free_energy].
 
         Parameters
         ----------
