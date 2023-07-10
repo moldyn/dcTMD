@@ -16,10 +16,12 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.0.0
 - Add python 3.11 support🎉
 - Add tutorial explaining the theory
 
+### Bugfix 🐛:
+- Fix bug in memory kernel estimation #13
+
 ### Other changes:
 - Fix newlines in docs
 - Add generalized smoothing of estimators
-- Many minor bugfixes and improvements in the docs
 
 
 ## [0.3.0] - 2023-03-28
