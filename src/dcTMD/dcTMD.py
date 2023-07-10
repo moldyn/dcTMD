@@ -2,11 +2,18 @@
 # MIT License
 # Copyright (c) 2022, Victor Tänzel, Miriam Jäger
 # All rights reserved.
-"""Classes calculating the dcTMD quantities."""
+"""Classes `WorkEstimator`, `ForceEstimator` calculating the dcTMD quantities.
+
+This submodule contains two classes, WorkEstimator and ForceEstimator, which
+are used for the dcTMD analysis of constraint force time traces. Both class can
+be used to calculate the mean work, dissipative work, free energy and friction
+estimate of a set of constraint force time traces.
+"""
 
 __all__ = ['WorkEstimator', 'ForceEstimator']
 
 import numpy as np
+from abc import ABC
 from beartype import beartype
 from beartype.typing import Union, Tuple, Optional
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -23,7 +30,48 @@ from dcTMD._typing import (
 )
 
 
-class WorkEstimator(TransformerMixin, BaseEstimator):
+class _SmoothBasisEstimator(ABC):
+    """Class with the smoothing method for `WorkEstimator`, `ForceEstimator`.
+    """
+    @beartype
+    def smooth_friction(
+        self,
+        sigma: Float,
+        mode: Str = 'reflect',
+    ) -> Float1DArray:
+        """Smooth friction with gaussian kernel.
+
+        Parameters
+        ----------
+        sigma:
+            standard deviation of gaussian kernel in nm
+        mode:
+            options: `reflect`, `constant`, `nearest`,`mirror`, `wrap`
+            The mode parameter determines how the input array is
+            extended beyond its boundaries. Default is `reflect`.
+            Behavior for each option see scipy.ndimage.gaussian_filter1d.
+
+        Returns
+        -------
+        friction_smooth_ : 1d np.array
+            Smoothed friction.
+        """
+        self.friction_smooth_ = utils.gaussfilter_friction(
+            self.friction_,
+            self.position_,
+            sigma=sigma,
+            mode=mode,
+        )
+        return self.friction_smooth_
+
+    @beartype
+    def _reset(self) -> None:
+        """Reset friction_smooth_ attribute."""
+        if hasattr(self, 'friction_smooth_'):  # noqa: WPS421
+            del self.friction_smooth_  # noqa: WPS420
+
+
+class WorkEstimator(TransformerMixin, BaseEstimator, _SmoothBasisEstimator):
     """Class for performing dcTMD analysis on a work set.
 
     Parameters
@@ -46,26 +94,33 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
     friction_:
         Friction factor in kJ/mol/(nm^2/ps).
     mode_ :
-        Parameter of estimate_free_energy_errors(). Decides how the
-        bootstrapping errors are calculated.
+        Parameter of [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.\
+WorkEstimator.estimate_free_energy_errors]. Decides how the bootstrapping
+        errors are calculated.
     s_W_mean_ :
-        Bootstrapping error of the mean work. Calculated via
-        estimate_free_energy_errors().
+        Bootstrapping error of the mean work. Calculated via [WorkEstimator.\
+estimate_free_energy_errors][dcTMD.dcTMD.WorkEstimator.\
+estimate_free_energy_errors].
     s_W_diss_ :
         Bootstrapping error of the dissipative work. Calculated via
-        estimate_free_energy_errors().
+        [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.WorkEstimator.\
+estimate_free_energy_errors].
     s_dG_ :
         Bootstrapping error of the free energy estimate. Calculated via
-        estimate_free_energy_errors().
+        [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.WorkEstimator.\
+estimate_free_energy_errors].
     W_mean_resampled_ :
         Resampled mean work, needed to inspect its distribution. Calculated
-        via estimate_free_energy_errors().
+        via [WorkEstimator.estimate_free_energy_errors][dcTMD.dcTMD.\
+WorkEstimator.estimate_free_energy_errors].
     W_diss_resampled_ :
         Resampled dissipative work, needed to inspect its distribution.
-        Calculated via estimate_free_energy_errors().
+        Calculated via [WorkEstimator.estimate_free_energy_errors][dcTMD.\
+dcTMD.WorkEstimator.estimate_free_energy_errors].
     dG_resampled_ :
         Resampled free energy estimate, needed to inspect its distribution.
-        Calculated via estimate_free_energy_errors().
+        Calculated via [WorkEstimator.estimate_free_energy_errors][dcTMD.\
+dcTMD.WorkEstimator.estimate_free_energy_errors].
 
     Examples
     --------
@@ -83,7 +138,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
     @beartype
     def __init__(
         self,
-        temperature: (Float, Int),
+        temperature: Union[Float, Int],
         verbose: bool = False,
     ) -> None:
         """Initialize class."""
@@ -109,6 +164,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         self :
             Fitted estimator.
         """
+        self._reset()
         self.work_set = work_set
         self.position_ = work_set.position_
         self.names_ = work_set.names_
@@ -187,7 +243,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
 
         Bootstrapping errors are calculated for the free energy estimate and
         the related quantities mean and dissipative work. Return matches the
-        one of [dcTMD.dcTMD.WorkEstimator.estimate_free_energy][].
+        one of [WorkEstimator.estimate_free_energy][dcTMD.dcTMD.WorkEstimator.\
+estimate_free_energy].
 
         Parameters
         ----------
@@ -260,7 +317,7 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
         """
         Estimate bootstrapping errors for the friction.
 
-        Besides calculating dcTMD quantitites to the class, this function
+        Besides calculating dcTMD quantities to the class, this function
         is also called from the bootstrapping routine. In the latter case,
         which comes with a passed `W_diss` parameter, attributes should not
         be overwritten.
@@ -308,7 +365,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
 
         Bootstrapping errors are calculated for the free energy estimate and
         the related quantities mean and dissipative work. Return matches the
-        one of estimate_free_energy().
+        one of [WorkEstimator.estimate_free_energy][dcTMD.dcTMD.WorkEstimator.\
+estimate_free_energy].
 
         Parameters
         ----------
@@ -364,38 +422,8 @@ class WorkEstimator(TransformerMixin, BaseEstimator):
             self.s_friction_ = s_quantity[0, :, 0]
         self.friction_resampled_ = quantity_resampled[:, 0]
 
-    @beartype
-    def smooth_friction(
-        self,
-        sigma: Float,
-        mode: Str = 'reflect',
-    ) -> Float1DArray:
-        """Smooth friction with gaussian kernel.
 
-        Parameters
-        ----------
-        sigma:
-            standard deviation of gaussian kernel in nm
-        mode:
-            options: ‘reflect’, ‘constant’, ‘nearest’, ‘mirror’, ‘wrap’
-            The mode parameter determines how the input array is
-            extended beyond its boundaries. Default is ‘reflect’.
-            Behavior for each option see scipy.ndimage.gaussian_filter1d
-
-        Returns
-        -------
-        friction_smooth_ : 1d np.array
-            Smoothed friction.
-        """
-        self.friction_smooth_ = utils.gaussfilter_friction(
-            self.friction_,
-            self.position_,
-            sigma=0.1,
-        )
-        return self.friction_smooth_
-
-
-class ForceEstimator(TransformerMixin, BaseEstimator):
+class ForceEstimator(TransformerMixin, BaseEstimator, _SmoothBasisEstimator):
     """
     Class for performing dcTMD analysis on a force set.
 
@@ -435,7 +463,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
     @beartype
     def __init__(
         self,
-        temperature: (Float, Int),
+        temperature: Union[Float, Int],
         verbose: bool = False,
     ) -> None:
         """Initialize class."""
@@ -461,6 +489,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         self :
             Fitted estimator.
         """
+        self._reset()
         self.force_set = force_set
         self.names_ = force_set.names_
         self.estimate_free_energy_friction()
@@ -480,7 +509,7 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         self,
     ) -> Tuple[Float1DArray, Float1DArray, Float1DArray, Float1DArray]:
         """
-        Estimate free energy and friction from force auto corrleation.
+        Estimate free energy and friction from force auto correlation.
 
         Returns
         -------
@@ -516,7 +545,6 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
         )
         friction_ = np.mean(intcorr, axis=0) / RT
 
-        print('Calculating dissipative work...')
         W_mean_ = cumulative_trapezoid(
             force_mean,
             self.force_set.position_,
@@ -537,37 +565,6 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
 
         return self.W_mean_, self.W_diss_, self.dG_, self.friction_
 
-    @beartype
-    def smooth_friction(
-        self,
-        sigma: Float,
-        mode: Str = 'reflect',
-    ) -> Float1DArray:
-        """
-        Smooth friction with gaussian kernel.
-
-        Parameters
-        ----------
-        sigma:
-            standard deviation of gaussian kernel in nm
-        mode:
-            options: ‘reflect’, ‘constant’, ‘nearest’, ‘mirror’, ‘wrap’
-            The mode parameter determines how the input array is
-            extended beyond its boundaries. Default is ‘reflect’.
-            Behavior for each option see scipy.ndimage.gaussian_filter1d
-
-        Returns
-        -------
-        friction_smooth_ : 1d np.array
-            Smoothed friction.
-        """
-        self.friction_smooth_ = utils.gaussfilter_friction(
-            self.friction_,
-            self.position_,
-            sigma=0.1,
-        )
-        return self.friction_smooth_
-
     def memory_kernel(
         self,
         x_indices: Float1DArray,
@@ -580,12 +577,12 @@ class ForceEstimator(TransformerMixin, BaseEstimator):
 
         Parameters
         ----------
-        x_indices : np.ndarray
+        x_indices :
             Indices at which memory kernel is calculated.
 
         Returns
         -------
-        corr_set : np.ndarray
+        corr_set :
             shape: (len(X), length_data)
             NaN are set to zero
         """
