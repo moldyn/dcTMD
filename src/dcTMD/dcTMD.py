@@ -586,12 +586,12 @@ class ForceEstimator(TransformerMixin, BaseEstimator, _SmoothBasisEstimator):
             shape: (len(X), length_data)
             NaN are set to zero
         """
-        _, length_data = self.delta_force_.shape
+        _, length_data = self.delta_force_array.shape
         corr_set = np.zeros((len(x_indices), length_data))
 
         for ind, tt in enumerate(range(length_data)):
-            entries = self.delta_force_[:, tt:-2] * \
-                self.delta_force_[:, tt + 1:-1]  # noqa: N400
+            entries = self.delta_force_array[:, tt:-2] * \
+                self.delta_force_array[:, tt + 1:-1]  # noqa: N400
             corr_set[ind, tt:-2] = np.mean(
                 entries,
                 axis=0,
