@@ -104,8 +104,8 @@ def plot_Gamma(x, friction, ax, label=None):
 def plot_dG(x, dG, ax, label=None):
     """Plot free energy vs position."""
     if label is None:
-        line, _ = ax.plot(x, dG)
-    line, _ = ax.plot(x, dG, label=label)
+        line, = ax.plot(x, dG)
+    line, = ax.plot(x, dG, label=label)
     ax.set(xlabel=r'position $x$ [nm]',
            ylabel=r'$\Delta G$ [kJ/mol]',
            xlim=[min(x), max(x)],
