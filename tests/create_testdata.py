@@ -13,6 +13,7 @@ temperature = 300
 n_resamples = 100
 seed = 42
 sigma = 0.1
+mode = 'nearest'
 bootstrapmode = 'std'
 
 pullf_files = 'testdata/pullf_filenames.dat'
@@ -33,7 +34,7 @@ save('testdata/forceset', forceset)
 forceestimator = ForceEstimator(temperature)
 forceestimator.fit(forceset)
 # smooth friction
-forceestimator.smooth_friction(sigma)
+forceestimator.smooth_friction(sigma, mode=mode)
 save('testdata/forceestimator', forceestimator)
 
 # create ForceSet instance
@@ -50,7 +51,7 @@ save('testdata/workset', workset)
 workeestimator = WorkEstimator(temperature)
 workeestimator.fit(workset)
 # smooth friction
-workeestimator.smooth_friction(sigma)
+workeestimator.smooth_friction(sigma, mode=mode)
 # error estimation vis bootstrapping
 workeestimator.estimate_free_energy_errors(n_resamples, bootstrapmode, seed)
 save('testdata/workeestimator', workeestimator)

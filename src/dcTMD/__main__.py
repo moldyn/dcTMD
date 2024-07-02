@@ -9,6 +9,8 @@ from dcTMD.storing import WorkSet, ForceSet
 from dcTMD.dcTMD import WorkEstimator, ForceEstimator
 from dcTMD.io import load_pullf, write_output
 from dcTMD.storing import save
+from dcTMD.utils import plotting
+import matplotlib.pyplot as plt
 
 MODES = ('work', 'force')
 
@@ -173,6 +175,12 @@ def main(  # noqa: WPS211, WPS216
     # save data as .npz and .dat file
     outname = f'{outname}_{mode}'
     write_output(outname, estimator)
+
+    if plot:
+        plotting.plot_dcTMD_results(
+            estimator,
+        )
+        plt.savefig(f'{outname}.png')
 
 
 if __name__ == '__main__':
