@@ -12,7 +12,7 @@
     <a href="https://anaconda.org/conda-forge/dcTMD" alt="conda version">
         <img src="https://img.shields.io/conda/vn/conda-forge/dcTMD" /></a>
     <a href="https://pepy.tech/project/dcTMD" alt="Downloads">
-        <img src="https://pepy.tech/badge/dcTMD" /></a>
+        <img src="https://static.pepy.tech/badge/dcTMD" /></a>
     <a href="https://github.com/moldyn/dcTMD/blob/main/LICENSE" alt="License">
         <img src="https://img.shields.io/github/license/moldyn/dcTMD" /></a>
     <a href="https://img.shields.io/pypi/pyversions/dcTMD" alt="PyPI - Python Version">
