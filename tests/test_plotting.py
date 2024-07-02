@@ -11,7 +11,6 @@ import pytest
 import numpy as np
 import matplotlib.pyplot as plt
 from os.path import dirname, join
-from dcTMD.dcTMD import WorkEstimator
 from dcTMD.storing import load
 from dcTMD.utils.plotting import (
     plot_dcTMD_results,
@@ -89,7 +88,7 @@ def test_plot_dG():
 
 def test_plot_dG_werrors(ref_workestimator):
     fig, ax = plt.subplots()
-    assert hasattr(ref_workestimator, 's_dG_') == True
+    assert hasattr(ref_workestimator, 's_dG_')  # noqa: WPS421
     plot_dG_werrors(ref_workestimator, ax)
     # one for dG and one for the error bounds
     assert len(ax.lines) >= 2
