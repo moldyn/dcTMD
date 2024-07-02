@@ -39,7 +39,12 @@ def fig_sizehalfA4width():
 """
 
 
-def plot_dcTMD_results(workestimator, friction=None, x=None):
+def plot_dcTMD_results(
+    estimator,
+    friction=None,
+    x=None,
+    figsize=(4, 4),
+):
     """Plot dcTMD results overview in two subplots.
 
     Top subplot constains free energy, dissipative work and mean work.
@@ -48,18 +53,24 @@ def plot_dcTMD_results(workestimator, friction=None, x=None):
     fig, axs = plt.subplots(ncols=1,
                             nrows=2,
                             sharex=True,
-                            #figsize=fig_sizehalfA4width(),
+                            figsize=figsize,
                             )
     if x is None:
-        x = workestimator.position_
-    plot_dG_Wdiss(workestimator, axs[0], x=x)
+        x = estimator.position_
+    plot_dG_Wdiss(estimator, axs[0], x=x)
     if friction is None:
-        friction = workestimator.friction_
+        friction = estimator.friction_
+        if hasattr(estimator, 'friction_smooth_'):
+            friction = estimator.friction_smooth_
     plot_Gamma(x, friction, axs[1])
-    axs[0].legend(loc='lower left', mode='expand',
-                  bbox_to_anchor=(0, 0.9, 1, 0.2),
-                  frameon=False,
-                  ncol=3,)
+    axs[0].legend(
+        loc='lower left',
+        mode='expand',
+        bbox_to_anchor=(0, 1.05, 1, 0.2),  # Adjust top margin
+        bbox_transform=axs[0].transAxes,  # Use axis coordinates
+        frameon=False,
+        ncol=3,
+    )
     axs[0].set_xlabel("")
     plt.tight_layout()
     return fig, axs
@@ -82,9 +93,10 @@ def plot_Gamma(x, friction, ax, label=None):
     """Plot friction factor vs position."""
     if label is None:
         ax.plot(x, friction)
-    ax.plot(x, friction, label=label)
+    else:
+        ax.plot(x, friction, label=label)
     ax.set(xlabel=r'position $x$ [nm]',
-           ylabel=r'$\Gamma$ [kJ/mol/(nm$^2$/ps)]',
+           ylabel=r'$\Gamma$ [kJ nm$^2$/(mol ps)]',
            xlim=[min(x), max(x)],
            )
 
@@ -103,11 +115,7 @@ def plot_dG(x, dG, ax, label=None):
 
 def plot_dG_werrors(workestimator, ax, labeldG=None):
     """Plot free energy with errors against position."""
-    if not hasattr(workestimator, 's_dG_'):
-        print(f'no errors are determined for {workestimator}')
-        print('use estimate_free_energy_errors() to determine errors')
-        return
-    else:
+    if hasattr(workestimator, 's_dG_'):
         x = workestimator.position_
         dG = workestimator.dG_
         sdG = workestimator.s_dG_
@@ -141,6 +149,10 @@ def plot_dG_werrors(workestimator, ax, labeldG=None):
                 facecolor=color,
                 alpha=0.3
             )
+    else:
+        print(f'no errors are determined for {workestimator}')
+        print('use estimate_free_energy_errors() to determine errors')
+        return
 
 
 def plot_worklines(workset, ax, x=None, color='#777', res=1):
@@ -186,15 +198,22 @@ def plot_histo_normaldist(data, ax, color='blue', label=None):
            )
 
 
-def plot_worknormalitychecks(workset, index, x=None, colors=None):
+def plot_worknormalitychecks(
+    workset,
+    index,
+    x=None,
+    colors=None,
+    figsize=(2, 6),
+):
     """Plots the work values of trajectories individually.
 
     Also adds histograms and normality plots for the indices given in `index`.
     """
-    fig, axs = plt.subplots(ncols=3,
-                            nrows=1,
-                            #figsize=fig_sizeA4width()
-                            )
+    fig, axs = plt.subplots(
+        ncols=3,
+        nrows=1,
+        figsize=figsize,
+    )
     if x is None:
         x = workset.position_
     plot_worklines(workset, axs[0], x=x)
