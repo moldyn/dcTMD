@@ -203,7 +203,7 @@ def plot_worknormalitychecks(
     index,
     x=None,
     colors=None,
-    figsize=(2, 6),
+    figsize=(6, 2),
 ):
     """Plots the work values of trajectories individually.
 
