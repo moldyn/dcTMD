@@ -113,7 +113,7 @@ $$
 	\Gamma(s)_{\text{EQ}} = \beta \int_{0}^{\infty} \left<\delta f_c(t)\delta f_c(0)\right>_{\text{EQ},s} \text{d}t,
 $$
 
-For further reading on langevin equations see [Zwanzig, R. "Brownian motion and Langevin equations." Nonequilibrium Statistical Mechanics 3 (2001).](http://vattay.web.elte.hu/lectures/Non-equilibrium%20Statistical%20Physics/Robert%20Zwanzig%20-%20Nonequilibrium%20Statistical%20Mechanics%20(2001,%20Oxford%20University%20Press,%20USA).pdf)
+For further reading on langevin equations see e.g., [Zwanzig 2001](https://global.oup.com/academic/product/nonequilibrium-statistical-mechanics-9780195140187?q=zwanzig&lang=en&cc=de)
 
 # Classes calculating the dcTMD quantities
 

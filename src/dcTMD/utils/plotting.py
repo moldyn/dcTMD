@@ -91,10 +91,7 @@ def plot_dG_Wdiss(workestimator, ax, x=None):
 
 def plot_Gamma(x, friction, ax, label=None):
     """Plot friction factor vs position."""
-    if label is None:
-        ax.plot(x, friction)
-    else:
-        ax.plot(x, friction, label=label)
+    ax.plot(x, friction, label=label)
     ax.set(xlabel=r'position $x$ [nm]',
            ylabel=r'$\Gamma$ [kJ nm$^2$/(mol ps)]',
            xlim=[min(x), max(x)],
@@ -103,8 +100,6 @@ def plot_Gamma(x, friction, ax, label=None):
 
 def plot_dG(x, dG, ax, label=None):
     """Plot free energy vs position."""
-    if label is None:
-        line, = ax.plot(x, dG)
     line, = ax.plot(x, dG, label=label)
     ax.set(xlabel=r'position $x$ [nm]',
            ylabel=r'$\Delta G$ [kJ/mol]',
@@ -122,24 +117,12 @@ def plot_dG_werrors(workestimator, ax, labeldG=None):
         line = plot_dG(x, dG, ax, label=labeldG)
         color = line.get_color()
         if len(sdG) == 2:
-            ax.plot(
-                x,
-                sdG[0],
-                facecolor=color,
-                ls='dotted',
-            )
-            ax.plot(
-                x,
-                sdG[1],
-                facecolor=color,
-                ls='dotted',
-            )
             ax.fill_between(
                 x,
                 sdG[0],
                 sdG[1],
                 facecolor=color,
-                alpha=0.3
+                alpha=0.3,
             )
         else:
             ax.fill_between(
@@ -147,7 +130,7 @@ def plot_dG_werrors(workestimator, ax, labeldG=None):
                 dG - sdG,
                 dG + sdG,
                 facecolor=color,
-                alpha=0.3
+                alpha=0.3,
             )
     else:
         print(f'no errors are determined for {workestimator}')

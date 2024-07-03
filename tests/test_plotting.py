@@ -91,7 +91,7 @@ def test_plot_dG_werrors(ref_workestimator):
     assert hasattr(ref_workestimator, 's_dG_')  # noqa: WPS421
     plot_dG_werrors(ref_workestimator, ax)
     # one for dG and one for the error bounds
-    assert len(ax.lines) >= 2
+    assert len(ax.lines) >= 1
     assert ax.get_ylabel() == r'$\Delta G$ [kJ/mol]'
     assert ax.get_xlabel() == r'position $x$ [nm]'
 
