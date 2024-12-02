@@ -83,6 +83,9 @@ def test_ForceEstimator(ref_forceestimator):
     estimator = storing.load(filename=forceestimator_name)
     assert_estimator_equality(estimator, ref_forceestimator)
 
+    # assert that memory kernel does not raise error
+    ref_forceestimator.memory_kernel([0])
+
 
 @pytest.mark.parametrize(
     "set, Estimator",
