@@ -35,7 +35,8 @@ def traj_feature_set3d(filenames_2d):
 
 def test_fill_array(traj_feature_set3d, feature_array_3d):
     """
-    Test that fill_array loads data into an array with the expected shape and values.
+    Test that fill_array loads data into an array with
+    the expected shape and values.
     """
     result_array = traj_feature_set3d.fill_array()
     assert result_array.shape == feature_array_3d.shape
@@ -67,7 +68,8 @@ def traj_feature_set2d(filenames_1d):
 
 def test_fill_array2d(traj_feature_set2d, feature_array_2d):
     """
-    Test that fill_array loads data into an array with the expected shape and values.
+    Test that fill_array loads data into an array with
+    the expected shape and values.
     """
     result_array = traj_feature_set2d.fill_array()
     assert result_array.shape == feature_array_2d.shape
@@ -80,7 +82,11 @@ def test_get_filenames(filenames_2d):
     Test that _get_filenames works correctly with filenameprefix and wildcard.
     """
     wildcard = os.path.join(TEST_FILE_DIR, "feature_2D_{}.txt")
-    tfs = FeatureSet(filenameprefix=filenames_2d, wildcard=wildcard, verbose=False)
+    tfs = FeatureSet(
+        filenameprefix=filenames_2d,
+        wildcard=wildcard,
+        verbose=False
+    )
     # Check that each file found exists.
     for fname in tfs.filenames:
         assert os.path.exists(fname), f"File {fname} does not exist."
@@ -88,7 +94,8 @@ def test_get_filenames(filenames_2d):
 
 def test_invalid_initialization():
     """
-    Test that initializing without either filenames or filenameprefix (with wildcard) raises ValueError.
+    Test that initializing without either filenames or
+    filenameprefix (with wildcard) raises ValueError.
     """
     with pytest.raises(ValueError):
         _ = FeatureSet()
@@ -96,7 +103,8 @@ def test_invalid_initialization():
 
 def test_shape_mismatch():
     """
-    Test that if one file has a shape mismatch, it gets skipped and the corresponding slice remains zeros.
+    Test that if one file has a shape mismatch, it
+    gets skipped and the corresponding slice remains zeros.
     """
     # Create a temporary directory with two files:
     d = Path(TEST_FILE_DIR) / "temp_data"

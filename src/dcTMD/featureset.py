@@ -9,10 +9,13 @@ from beartype.typing import List, Union
 class FeatureSet:
     """
     A class to create a array based on trajectory features.
-    This array is later on used to calculate similarities between trajectories.
+    This array is later on used to calculate similarities
+    between trajectories.
 
-    The class loads trajectory-specific features and organizes them into arrays for further analysis.
-    It assumes that all files have the same shape. The order in which they are loaded needs to be specified.
+    The class loads trajectory-specific features and organizes
+    them into arrays for further analysis. It assumes that all files
+    have the same shape.
+    The order in which they are loaded needs to be specified.
     """
 
     @beartype
@@ -29,7 +32,7 @@ class FeatureSet:
         Parameters
         ----------
         filenames :
-            A list or array of filenames. If provided, it will be used directly.
+            A list or array of filenames.
         filenameprefix :
             A list or array of names that contain the running number.
             Must be used together with wildcard.
@@ -56,8 +59,9 @@ class FeatureSet:
             self.filenames = self._get_filenames(filenameprefix, wildcard)
         else:
             raise ValueError(
-                "Either `filenames` must be provided directly, "
-                "or both `filenameprefix` and `wildcard` must be provided together."
+                'Either `filenames` must be provided directly, '
+                'or both `filenameprefix` and `wildcard` '
+                'must be provided together.'
             )
         if self.verbose:
             print(f"Loaded filenames: {self.filenames}")
@@ -70,13 +74,14 @@ class FeatureSet:
         """
         Generate filenames based on the provided wildcard.
 
-        This method searches for the running number in the filename prefixes and
-        inserts it into the wildcard pattern.
+        This method searches for the running number in filename_prefix
+        and inserts it into the wildcard pattern.
 
         Parameters
         ----------
         filename_prefix :
-            A list or array of filename prefixes that contain the running number/index.
+            A list or array of filenames/prefixes that contain
+            a running number.
         filename_wildcard :
             A wildcard pattern (e.g., "wildcard_{}.xvg") for filenames.
 
@@ -102,23 +107,29 @@ class FeatureSet:
                 name = filename_wildcard.format(running_number)
                 matched_name = glob.glob(name)
                 if not matched_name:
-                    raise FileNotFoundError(f'No file found matching pattern: {name}.')
+                    raise FileNotFoundError(
+                        f'No file found matching: {name}.'
+                    )
                 filenames.extend(matched_name)
 
         self.filenames = np.asarray(filenames).flatten()
         if len(filenames) != len(filename_prefix):
-            raise ValueError(f"Number of files: {len(filenames)} does not match number of prefixes: {len(filename_prefix)}.")
+            raise ValueError(
+                f'Number of files: {len(filenames)} does not match '
+                f'number of prefixes: {len(filename_prefix)}.'
+            )
         return self.filenames
 
     def _read_testfile(self) -> None:
         """
-        Read the first file in the list of filenames to initialize the array shape.
+        Read the first file in filenames to initialize the array.
 
         """
         testfile = np.loadtxt(self.filenames[0], comments=("@", "#"))
         self.fileshape = testfile.shape
         if self.verbose:
-            print(f"Using {self.filenames[0]} to initialize arrays with shape {self.fileshape}")
+            print(f'Using {self.filenames[0]} to initialize array ')
+            print(f'with shape {self.fileshape}')
 
     def fill_array(self) -> np.ndarray:
         """
@@ -152,20 +163,26 @@ class FeatureSet:
             total=len(self.filenames),
             desc='Loading files',
         ) as pbar:
-            for i, current_file_name in enumerate(self.filenames):
+            for i, current_fname in enumerate(self.filenames):
                 if self.verbose:
-                    print(f"Reading file {current_file_name}")
+                    print(f"Reading file {current_fname}")
                 try:
-                    input_data = np.loadtxt(current_file_name, comments=("@", "#"))
+                    input_data = np.loadtxt(
+                        current_fname,
+                        comments=("@", "#")
+                    )
                 except Exception:
-                    raise FileNotFoundError(f"File {current_file_name} not found")
+                    raise FileNotFoundError(
+                        f"File {current_fname} not found"
+                    )
 
                 if input_data.shape != self.fileshape:
-                    print(f"Skipping file {current_file_name} due to shape mismatch")
+                    print(
+                        f"Skipping file {current_fname} due to shape mismatch")
                     continue
 
                 array[i, :] = input_data
-                self.featureset_names.append(current_file_name)
+                self.featureset_names.append(current_fname)
                 pbar.update(1)
 
         self.array = array
