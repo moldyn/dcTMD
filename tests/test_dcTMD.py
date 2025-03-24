@@ -58,16 +58,16 @@ def assert_estimator_equality(estimator1, estimator2):
         estimator2.dG_,
         err_msg='Free energy test failed.',
     )
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         estimator1.friction_,
         estimator2.friction_,
-        decimal=6,
+        rtol=1e-07,
         err_msg='Friction test failed.',
     )
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         estimator1.friction_smooth_,
         estimator2.friction_smooth_,
-        decimal=6,
+        rtol=1e-07,
         err_msg='Smoothed friction test failed.',
     )
 
