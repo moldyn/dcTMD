@@ -44,12 +44,6 @@ def test_gaussfilter_friction(ref_workestimator, ref_friction):
         0.1,
         mode='reflect',
     )
-    #np.testing.assert_array_almost_equal(
-    #    smooth_friction,
-    #    ref_friction,
-    #    decimal=4,
-    #    err_msg='Filter friction test failed.',
-    #)
     np.testing.assert_allclose(
         smooth_friction,
         ref_friction,
