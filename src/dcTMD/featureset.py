@@ -46,7 +46,7 @@ class FeatureSet:
         >>> featureset = FeatureSet(filenames, verbose=True)
         >>> featureset.fill_array()
         >>> array = featureset.array
-        >>> 100%|████████████| X/X [XX:XX<00:00, X.XXit/s]
+        >>> 100%|████████████| X/X [XX:XX<00:00, X.XXit/s] # noqa
         """
         self.verbose = verbose
 
@@ -139,7 +139,7 @@ class FeatureSet:
         >>> featureset = FeatureSet(filenames, verbose=True)
         >>> featureset.fill_array()
         >>> array = featureset.array
-        >>> 100%|████████████| X/X [XX:XX<00:00, X.XXit/s]
+        >>> 100%|████████████| X/X [XX:XX<00:00, X.XXit/s] # noqa
         """
         self._read_testfile()
         array = np.zeros(shape=(
