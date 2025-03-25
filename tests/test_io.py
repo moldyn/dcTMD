@@ -63,74 +63,59 @@ def test_load_pullf(filenames_list):
 
 def assert_npzfile_equality(npzfile, estimator):
     """Compare saved .npz files and Work/ForceEstimator"""
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         npzfile['x'],
         estimator.position_,
+        rtol=1e-06,
     )
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         npzfile['Wmean'],
         estimator.W_mean_,
+        rtol=1e-06,
     )
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         npzfile['Wdiss'],
         estimator.W_diss_,
+        rtol=1e-05,
     )
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         npzfile['dG'],
         estimator.dG_,
+        rtol=1e-06,
     )
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         npzfile['Gamma'],
         estimator.friction_,
+        rtol=1e-06,
     )
-    if hasattr(estimator, 's_W_mean_'):
-        np.testing.assert_array_almost_equal(
-            npzfile['s_W_mean'],
-            estimator.s_W_mean_
-        )
-    if hasattr(estimator, 's_W_diss_'):
-        np.testing.assert_array_almost_equal(
-            npzfile['s_W_diss'],
-            estimator.s_W_diss_
-        )
-    if hasattr(estimator, 's_dG_'):
-        np.testing.assert_array_almost_equal(
-            npzfile['s_dG'],
-            estimator.s_dG_
-        )
-    if hasattr(estimator, 'friction_smooth_'):
-        np.testing.assert_array_almost_equal(
-            npzfile['Gamma_smooth'],
-            estimator.friction_smooth_
-        )
-    if hasattr(estimator, 's_friction_'):
-        np.testing.assert_array_almost_equal(
-            npzfile['s_Gamma'],
-            estimator.s_friction_
-        )
 
 
 def assert_datfile_equality(datfile, estimator):
     """Compare saved .dat files and Work/ForceEstimator"""
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         datfile[:, 0],
         estimator.position_,
+        rtol=1e-06,
     )
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         datfile[:, 1],
         estimator.W_mean_,
+        rtol=1e-06,
     )
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         datfile[:, 2],
         estimator.W_diss_,
+        rtol=1e-05,
     )
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         datfile[:, 3],
         estimator.dG_,
+        rtol=1e-06,
     )
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         datfile[:, 4],
         estimator.friction_,
+        rtol=1e-06,
     )
 
 

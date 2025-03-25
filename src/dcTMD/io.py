@@ -131,7 +131,7 @@ def write_output(
 
 
 @beartype
-def load_output(filepath: str) -> dict:
+def load_output(filepath: str):
     """
     Load file produced by `write_output`.
 
