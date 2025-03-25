@@ -131,7 +131,7 @@ def write_output(
 
 
 @beartype
-def load_output(filepath: str) -> dict[str, np.ndarray]:
+def load_output(filepath: str) -> dict:
     """
     Load file produced by `write_output`.
 
