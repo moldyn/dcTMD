@@ -5,7 +5,8 @@ import numpy as np
 from os.path import basename, dirname, join
 import pytest
 from dcTMD import storing, dcTMD
-from dcTMD.io import load_pullf, write_output
+from dcTMD.io import load_pullf, write_output, load_output
+
 
 VELOCITY = 0.001
 RESOLUTION = 1
@@ -17,7 +18,7 @@ TEST_FILE_DIR = join(HERE, 'testdata')
 
 
 @pytest.fixture
-def ref_workestimator(scope="session"):
+def ref_workestimator(scope='session'):
     workset_name = f'{TEST_FILE_DIR}/workset'
     workset = storing.load(filename=workset_name)
     print(workset)
@@ -27,7 +28,7 @@ def ref_workestimator(scope="session"):
 
 
 @pytest.fixture
-def ref_forceestimator(scope="session"):
+def ref_forceestimator(scope='session'):
     forceset_name = f'{TEST_FILE_DIR}/forceset'
     forceset = storing.load(filename=forceset_name)
     estimator = dcTMD.ForceEstimator(temperature=TEMPERATURE)
@@ -39,7 +40,7 @@ def ref_forceestimator(scope="session"):
 def filenames_list():
     return [f'{TEST_FILE_DIR}/t_middle_01_pullf.xvg',
             f'{TEST_FILE_DIR}/t_middle_03_pullf.xvg',
-            f'{TEST_FILE_DIR}/t_middle_04_pullf.xvg']
+            f'{TEST_FILE_DIR}/t_middle_04_pullf.xvg',]
 
 
 def test_load_pullf(filenames_list):
@@ -63,25 +64,50 @@ def test_load_pullf(filenames_list):
 def assert_npzfile_equality(npzfile, estimator):
     """Compare saved .npz files and Work/ForceEstimator"""
     np.testing.assert_almost_equal(
-        npzfile["x"],
+        npzfile['x'],
         estimator.position_,
     )
     np.testing.assert_almost_equal(
-        npzfile["Wmean"],
+        npzfile['Wmean'],
         estimator.W_mean_,
     )
     np.testing.assert_almost_equal(
-        npzfile["Wdiss"],
+        npzfile['Wdiss'],
         estimator.W_diss_,
     )
     np.testing.assert_almost_equal(
-        npzfile["dG"],
+        npzfile['dG'],
         estimator.dG_,
     )
     np.testing.assert_almost_equal(
-        npzfile["Gamma"],
+        npzfile['Gamma'],
         estimator.friction_,
     )
+    if hasattr(estimator, 's_W_mean_'):
+        np.testing.assert_array_almost_equal(
+            npzfile['s_W_mean'],
+            estimator.s_W_mean_
+        )
+    if hasattr(estimator, 's_W_diss_'):
+        np.testing.assert_array_almost_equal(
+            npzfile['s_W_diss'],
+            estimator.s_W_diss_
+        )
+    if hasattr(estimator, 's_dG_'):
+        np.testing.assert_array_almost_equal(
+            npzfile['s_dG'],
+            estimator.s_dG_
+        )
+    if hasattr(estimator, 'friction_smooth_'):
+        np.testing.assert_array_almost_equal(
+            npzfile['Gamma_smooth'],
+            estimator.friction_smooth_
+        )
+    if hasattr(estimator, 's_friction_'):
+        np.testing.assert_array_almost_equal(
+            npzfile['s_Gamma'],
+            estimator.s_friction_
+        )
 
 
 def assert_datfile_equality(datfile, estimator):
@@ -109,44 +135,99 @@ def assert_datfile_equality(datfile, estimator):
 
 
 def test_write_output_dat_workestimator(ref_workestimator, tmp_path):
-    out = tmp_path / "test"
+    out = tmp_path / 'test'
     estimator = ref_workestimator
-    write_output(str(out), estimator, filetype=['.dat'])
+    write_output(str(out), estimator, filetype=['dat'])
     n_traj = len(estimator.names_)
-    test_file = tmp_path / f"test_N{n_traj}_dG.dat"
+    test_file = tmp_path / f'test_N{n_traj}.dat'
     assert (test_file).is_file()
     datfile = np.loadtxt(test_file)
-    print(datfile.shape)
     assert_datfile_equality(datfile, estimator)
 
 
 def test_write_output_dat_forceestimator(ref_forceestimator, tmp_path):
-    out = tmp_path / "test"
+    out = tmp_path / 'test'
     estimator = ref_forceestimator
-    write_output(str(out), estimator, filetype=['.dat'])
+    write_output(str(out), estimator, filetype=['dat'])
     n_traj = len(estimator.names_)
-    test_file = tmp_path / f"test_N{n_traj}_dG.dat"
-    print(test_file)
+    test_file = tmp_path / f'test_N{n_traj}.dat'
     assert (test_file).is_file()
+    datfile = np.loadtxt(test_file)
+    assert_datfile_equality(datfile, estimator)
 
 
 def test_write_output_npz_workestimator(ref_workestimator, tmp_path):
-    out = tmp_path / "test"
+    out = tmp_path / 'test'
     estimator = ref_workestimator
-    write_output(str(out), estimator, filetype=['.npz'])
+    write_output(str(out), estimator, filetype=['npz'])
     n_traj = len(estimator.names_)
-    test_file = tmp_path / f"test_N{n_traj}_dG.npz"
+    test_file = tmp_path / f'test_N{n_traj}.npz'
     assert (test_file).is_file()
     npzfile = np.load(test_file)
     assert_npzfile_equality(npzfile, estimator)
 
 
 def test_write_output_npz_forceestimator(ref_forceestimator, tmp_path):
-    out = tmp_path / "test"
+    out = tmp_path / 'test'
     estimator = ref_forceestimator
-    write_output(str(out), estimator, filetype=['.npz'])
+    write_output(str(out), estimator, filetype=['npz'])
     n_traj = len(estimator.names_)
-    test_file = tmp_path / f"test_N{n_traj}_dG.npz"
+    test_file = tmp_path / f'test_N{n_traj}.npz'
     assert (test_file).is_file()
     npzfile = np.load(test_file)
     assert_npzfile_equality(npzfile, estimator)
+
+
+def test_load_output_dat_workestimator_fromfile(ref_workestimator):
+    filepath = f'{TEST_FILE_DIR}/workeestimator_dcTMDresults_N18.dat'
+    estimator = ref_workestimator
+    res_dict = load_output(filepath)
+    assert_npzfile_equality(res_dict, estimator)
+
+
+def test_load_output_npz_workestimator_fromfile(ref_workestimator):
+    filepath = f'{TEST_FILE_DIR}/workeestimator_dcTMDresults_N18.npz'
+    estimator = ref_workestimator
+    res_dict = load_output(filepath)
+    assert_npzfile_equality(res_dict, estimator)
+
+
+def test_load_output_dat_workestimator(ref_workestimator, tmp_path):
+    out = tmp_path / 'test'
+    estimator = ref_workestimator
+    write_output(str(out), estimator, filetype=['dat'])
+    n_traj = len(estimator.names_)
+    test_file = tmp_path / f'test_N{n_traj}.dat'
+    res_dict = load_output(str(test_file))
+    assert_npzfile_equality(res_dict, estimator)
+
+
+def test_load_output_dat_forceestimator(ref_forceestimator, tmp_path):
+    out = tmp_path / 'test'
+    estimator = ref_forceestimator
+    write_output(str(out), estimator, filetype=['dat'])
+    n_traj = len(estimator.names_)
+    test_file = tmp_path / f'test_N{n_traj}.dat'
+    res_dict = load_output(str(test_file))
+    assert_npzfile_equality(res_dict, estimator)
+
+
+def test_load_output_npz_workestimator(ref_workestimator, tmp_path):
+    out = tmp_path / 'test'
+    estimator = ref_workestimator
+    write_output(str(out), estimator, filetype=['npz'])
+    n_traj = len(estimator.names_)
+    test_file = tmp_path / f'test_N{n_traj}.npz'
+    res_dict = load_output(str(test_file))
+    print(res_dict)
+    assert_npzfile_equality(res_dict, estimator)
+
+
+def test_load_output_npz_forceestimator(ref_forceestimator, tmp_path):
+    out = tmp_path / 'test'
+    estimator = ref_forceestimator
+    write_output(str(out), estimator, filetype=['npz'])
+    n_traj = len(estimator.names_)
+    test_file = tmp_path / f'test_N{n_traj}.npz'
+    res_dict = load_output(str(test_file))
+    assert_npzfile_equality(res_dict, estimator)
