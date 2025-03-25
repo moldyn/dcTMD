@@ -69,7 +69,7 @@ def write_output(
     estimator :
         Either a ForceEstimator or WorkEstimator instance.
     filetype:
-        Output filetype, either 'dat', 'npz' or both ('dat', 'npz').    # noqa: WPS226
+        Output filetype, either 'dat', 'npz' or both ('dat', 'npz').
 
     Examples
     --------
@@ -192,4 +192,3 @@ def load_output(filepath: str) -> dict[str, np.ndarray]:
     else:
         print('Could not load file.')
         print(f'{filepath} needs to be .dat or .npz file.')
-
