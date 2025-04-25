@@ -66,8 +66,8 @@ def plot_dcTMD_results(
     axs[0].legend(
         loc='lower left',
         mode='expand',
-        bbox_to_anchor=(0, 1.05, 1, 0.2),  # Adjust top margin
-        bbox_transform=axs[0].transAxes,  # Use axis coordinates
+        bbox_to_anchor=(0, 1.05, 1, 0.2),
+        bbox_transform=axs[0].transAxes,
         frameon=False,
         ncol=3,
     )
@@ -83,7 +83,7 @@ def plot_dG_Wdiss(workestimator, ax, x=None):
     ax.plot(x, workestimator.dG_, label=r'$\Delta G$')
     ax.plot(x, workestimator.W_mean_, label=r'W$_{\mathrm{mean}}$')
     ax.plot(x, workestimator.W_diss_, label=r'W$_{\mathrm{diss}}$')
-    ax.set(xlabel=r'position $x$ [nm]',
+    ax.set(xlabel=r'$x$ [nm]',
            ylabel=r'[kJ/mol]',
            xlim=[min(x), max(x)],
            )
@@ -92,7 +92,7 @@ def plot_dG_Wdiss(workestimator, ax, x=None):
 def plot_Gamma(x, friction, ax, label=None):
     """Plot friction factor vs position."""
     ax.plot(x, friction, label=label)
-    ax.set(xlabel=r'position $x$ [nm]',
+    ax.set(xlabel=r'$x$ [nm]',
            ylabel=r'$\Gamma$ [kJ nm$^2$/(mol ps)]',
            xlim=[min(x), max(x)],
            )
@@ -101,7 +101,7 @@ def plot_Gamma(x, friction, ax, label=None):
 def plot_dG(x, dG, ax, label=None):
     """Plot free energy vs position."""
     line, = ax.plot(x, dG, label=label)
-    ax.set(xlabel=r'position $x$ [nm]',
+    ax.set(xlabel=r'$x$ [nm]',
            ylabel=r'$\Delta G$ [kJ/mol]',
            xlim=[min(x), max(x)],
            )
@@ -146,7 +146,7 @@ def plot_worklines(workset, ax, x=None, color='#777', res=1):
     for w in workset.work_:
         ax.plot(x[::res], w[::res], color=color, alpha=.3, lw=.5)
 
-    ax.set(xlabel=r'position $x$ [nm]',
+    ax.set(xlabel=r'$x$ [nm]',
            ylabel=r'work $W$ [kJ/mol]',
            xlim=[min(x), max(x)],
            )
@@ -187,19 +187,23 @@ def plot_worknormalitychecks(
     x=None,
     colors=None,
     figsize=(6, 2),
+    axs=None,
+    res=10,
 ):
     """Plots the work values of trajectories individually.
 
     Also adds histograms and normality plots for the indices given in `index`.
     """
-    fig, axs = plt.subplots(
-        ncols=3,
-        nrows=1,
-        figsize=figsize,
-    )
+    if axs is None:
+        print('No axs given. Create figure.')
+        fig, axs = plt.subplots(
+            ncols=3,
+            nrows=1,
+            figsize=figsize,
+        )
     if x is None:
         x = workset.position_
-    plot_worklines(workset, axs[0], x=x)
+    plot_worklines(workset, axs[0], x=x, res=res)
 
     if not colors:
         cmap = plt.get_cmap('Dark2')
@@ -212,7 +216,7 @@ def plot_worknormalitychecks(
         axs[0].axvline(x[idx],
                        color=colors[j],
                        zorder=3,
-                       label=rf'$x={x[idx]}$nm',
+                       label=rf'$x={x[idx]:.2f}$',
                        )
 
         probplot(work, plot=axs[2], fit=True)
@@ -220,6 +224,4 @@ def plot_worknormalitychecks(
         axs[2].set_title('Normality plot')
 
     axs[0].legend()
-    plt.tight_layout()
-
-    return fig, axs
+    return axs
