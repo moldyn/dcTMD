@@ -260,7 +260,8 @@ class WorkSet(TransformerMixin, BaseEstimator):
                 else:
                     pbar.write(f'skip file {file_name}')
                     pbar.write(
-                        f'shape is {file_data.shape} expected {expected_shape}',
+                        f'shape is {file_data.shape} '
+                        f'expected {expected_shape}',
                     )
             except ValueError as output:
                 pbar.write(
