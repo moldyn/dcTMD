@@ -245,26 +245,35 @@ class WorkSet(TransformerMixin, BaseEstimator):
         for idx, file_name in pbar:
             if self.verbose:
                 pbar.write(f'Reading file {file_name}')
-            file_data = np.loadtxt(
-                file_name,
-                comments=('@', '#'),
-                usecols=[1],
-            )
-            # test if file is not corrupted, else add it
-            expected_shape = self.time_.shape
-            if file_data.shape == expected_shape:
-                self.work_[idx, :] = _integrate_force(self, file_data)
-                short_name = basename(file_name)
-                self.names_ = np.append(self.names_, short_name)
-            else:
-                pbar.write(f'skip file {file_name}')
-                pbar.write(
-                    f'shape is {file_data.shape} expected {expected_shape}',
+            try:
+                file_data = np.loadtxt(
+                    file_name,
+                    comments=('@', '#'),
+                    usecols=[1],
                 )
+                # test if file is not corrupted, else add it
+                expected_shape = self.time_.shape
+                if file_data.shape == expected_shape:
+                    self.work_[idx, :] = _integrate_force(self, file_data)
+                    short_name = basename(file_name)
+                    self.names_ = np.append(self.names_, short_name)
+                else:
+                    pbar.write(f'skip file {file_name}')
+                    pbar.write(
+                        f'shape is {file_data.shape} '
+                        f'expected {expected_shape}',
+                    )
+            except ValueError as output:
+                pbar.write(
+                    f'ValueError while loading file {file_name}: '
+                    f'{output}'
+                )
+                continue
         # removing rows with only zero, reduce positions resolution
         empty_rows = np.all(self.work_ == 0, axis=1)
         self.work_ = self.work_[~empty_rows]
         self.position_ = self.position_[::self.resolution]
+        self.names_ = self.names_[~empty_rows]
 
 
 class ForceSet(TransformerMixin, BaseEstimator):
