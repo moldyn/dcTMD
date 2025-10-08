@@ -71,7 +71,9 @@ class _SmoothBasisEstimator(ABC):
             del self.friction_smooth_  # noqa: WPS420
 
 
-class WorkEstimator(TransformerMixin, BaseEstimator, _SmoothBasisEstimator):
+class WorkEstimator(
+    _SmoothBasisEstimator, TransformerMixin, BaseEstimator,
+):  # noqa: WPS230, WPS214
     """Class for performing dcTMD analysis on a work set.
 
     Parameters
@@ -174,10 +176,8 @@ dcTMD.WorkEstimator.estimate_free_energy_errors].
 
     @beartype
     def transform(
-        self,
-        X,
-        y=None,
-    ) -> Tuple[Float1DArray, Float1DArray]:
+        self, X, y=None,
+    ) -> Tuple[Float1DArray, Float1DArray]:  # noqa: WPS111
         """Return free energy and friction estimates."""
         return self.dG_, self.friction_
 
@@ -423,7 +423,9 @@ estimate_free_energy].
         self.friction_resampled_ = quantity_resampled[:, 0]
 
 
-class ForceEstimator(TransformerMixin, BaseEstimator, _SmoothBasisEstimator):
+class ForceEstimator(
+    _SmoothBasisEstimator, TransformerMixin, BaseEstimator,
+):  # noqa: WPS230
     """
     Class for performing dcTMD analysis on a force set.
 
@@ -497,10 +499,8 @@ class ForceEstimator(TransformerMixin, BaseEstimator, _SmoothBasisEstimator):
 
     @beartype
     def transform(
-        self,
-        X,
-        y=None,
-    ) -> Tuple[Float1DArray, Float1DArray]:
+        self, X, y=None,
+    ) -> Tuple[Float1DArray, Float1DArray]:  # noqa: WPS111
         """Return free energy and friction estimates."""
         return self.dG_, self.friction_
 

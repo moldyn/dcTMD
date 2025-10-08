@@ -6,6 +6,8 @@
 
 __all__ = ['bootstrapping']
 
+import sys
+import tqdm
 import numpy as np
 from beartype import beartype
 from beartype.typing import Callable, Optional, Union
@@ -42,6 +44,7 @@ def _bootstrap_reducer(
         Tuple of reduced statistics.
     """
     if descriptor['mode'] == 'std':
+        # Calculate the standard deviation of the resampled quantity.
         def reducer(resampled_quantity):  # noqa: WPS440
             return np.std(resampled_quantity, axis=0)
     else:
@@ -60,7 +63,46 @@ def _bootstrap_reducer(
             )
             # Return and the confidence interval as a tuple
             return lower_bound, upper_bound
-    return tuple(reducer(arg) for arg in args)
+    reduced_args = tuple(reducer(arg) for arg in args)
+    return np.asarray(reduced_args)
+
+
+@beartype
+def _bootstrap_resampling(  # noqa: WPS210
+    estimator,
+    func: Callable,
+    descriptor: dict,
+):
+    """Perform the resampling step of the bootstrap algorithm."""
+    # Set up an array in which the resampled quantities are saved.
+    # How many quantities are returned by func? If a tuple is returned,
+    # use its length. Else, only one quantitity is returned.
+    n_traj, length_data = np.shape(estimator.work_set.work_)
+    probe_return = func(estimator.work_set.work_)
+    if isinstance(probe_return, tuple):
+        len_of_return = len(probe_return)
+    else:
+        len_of_return = 1
+
+    quantity_resampled = np.empty((
+        descriptor['n_resamples'],
+        len_of_return,
+        length_data,
+    ))
+    # Initialize RNG.
+    rng = np.random.default_rng(descriptor['seed'])
+    for idx in tqdm.tqdm(
+        range(descriptor['n_resamples']),
+        desc='Bootstrapping progress',
+    ):
+        # Draw random work time traces
+        random_indices = rng.integers(0, n_traj, n_traj)
+        work_set_resampled = estimator.work_set.work_[random_indices]
+
+        # Calculate and save the relevant statistic
+        quantity = func(work_set_resampled)
+        quantity_resampled[idx] = quantity
+    return quantity_resampled
 
 
 @beartype
@@ -81,7 +123,7 @@ def bootstrapping(
     random number generator can be fed a `seed`, the second key of the
     `descriptor` which is optional. Thirdly, a `mode` must be in the
     `descriptor`, which can either be the string 'std' for a standard
-    distribution of the resampled quantitity or a number in the interval [0, 1)
+    distribution of the resampled quantity or a number in the interval [0, 1)
     which yields confidence intervals instead.
 
     Parameters
@@ -105,18 +147,15 @@ def bootstrapping(
     quantity_resampled :
         Quantities returned by `func` for the resampled work trajectories.
     """
-    import tqdm
 
-    # Set up an array in which the resampled quantities are saved.
-    # How many quantities are returned by func? If a tuple is returned,
-    # use its length. Else, only one quantitity is returned, thus len_of_return
-    # is 1.
+    """
     n_traj, length_data = np.shape(estimator.work_set.work_)
     probe_return = func(estimator.work_set.work_)
     if isinstance(probe_return, tuple):
         len_of_return = len(probe_return)
     else:
         len_of_return = 1
+
     quantity_resampled = np.empty((
         descriptor['n_resamples'],
         len_of_return,
@@ -124,8 +163,10 @@ def bootstrapping(
     ))
     # Initialize RNG.
     rng = np.random.default_rng(descriptor['seed'])
-    desc = 'Bootstrapping progress'
-    for idx in tqdm.tqdm(range(descriptor['n_resamples']), desc=desc):
+    for idx in tqdm.tqdm(
+        range(descriptor['n_resamples']),
+        desc='Bootstrapping progress',
+    ):
         # Draw random work time traces
         random_indices = rng.integers(0, n_traj, n_traj)
         work_set_resampled = estimator.work_set.work_[random_indices]
@@ -133,17 +174,22 @@ def bootstrapping(
         # Calculate and save the relevant statistic
         quantity = func(work_set_resampled)
         quantity_resampled[idx] = quantity
-    # There are now boostrapped quantities in the '_resampled' variables.
+    """
+    quantity_resampled = _bootstrap_resampling(
+        estimator,
+        func,
+        descriptor,
+    )
+    # There are now bootstrapped quantities in the '_resampled' variables.
     # We are interested in the element-wise distributions and thus
     # calculate (1) the standard distribution of the resampled quantity
     # at all points or (2) confidence intervals.
     if verbose:
-        print('Finished resampling, starting reduction.')
+        sys.stdout.write('Finished resampling, starting reduction.')
     s_quantity = _bootstrap_reducer(
         descriptor,
         quantity_resampled,
     )
-    s_quantity = np.array(s_quantity)
     # The distributions of the '_resampled' variables must be inspected
     # and are thus also returned.
     return s_quantity, quantity_resampled

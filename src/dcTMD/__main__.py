@@ -10,7 +10,7 @@ from dcTMD.dcTMD import WorkEstimator, ForceEstimator
 from dcTMD.io import load_pullf, write_output
 from dcTMD.storing import save
 from dcTMD.utils import plotting
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 
 MODES = ('work', 'force')
 
