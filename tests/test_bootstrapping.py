@@ -63,4 +63,3 @@ def test_bootstrapping(ref_workestimator):
     # Check if the output is of the expected type
     assert isinstance(s_quantity, np.ndarray)
     assert isinstance(quantity_resampled, np.ndarray)
-
