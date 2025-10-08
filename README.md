@@ -45,9 +45,9 @@ This package aids in the analysis of dissipation-corrected targeted molecular dy
 
 This package will be published soon:
 
-> V. Tänzel, M. Jäger, D. Nagel, and S. Wolf,  
+> M. Jäger, V. Tänzel, D. Nagel, and S. Wolf,  
 > *Dissipation Corrected Targeted Molecular Dynamics*,  
-> in preparation 2023
+> in preparation 2025
 
 We kindly ask you to cite these articles in case you use this software package for published works.
 
@@ -59,7 +59,7 @@ We kindly ask you to cite these articles in case you use this software package f
 
 ## Implemented Key Functionalities
 - Estimation of free energy profiles and friction factors along the unbinding coordinate of ligands as described by [Wolf and Stock 2018](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835).
-- Analysis of separate unbinding pathways as described by [Wolf et al. 2022](https://arxiv.org/abs/2212.07154).
+- Analysis of separate unbinding pathways as described by [Wolf et al. 2023](https://pubs.aip.org/aip/jcp/article/158/12/124106/2881566/Path-separation-of-dissipation-corrected-targeted).
 
 ## Installation
 The package will be available on PiPY and conda. Until then, install it via:
