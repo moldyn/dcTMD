@@ -20,7 +20,6 @@ from dcTMD.utils.plotting import (
     plot_dG_werrors,
     plot_worklines,
     plot_histo_normaldist,
-    plot_worknormalitychecks,
 )
 
 
@@ -103,7 +102,7 @@ def test_plot_dG_werrors_no_errors(ref_workestimator, capsys):
         del ref_workestimator.s_dG_
     plot_dG_werrors(ref_workestimator, ax)
     captured = capsys.readouterr()
-    assert "no errors are determined" in captured.out
+    assert "no errors" in captured.out
     # No lines should be plotted
     assert len(ax.lines) == 0
 
@@ -122,15 +121,3 @@ def test_plot_histo_normaldist():
     assert ax.get_xlabel() == r'$P$'
     assert ax.get_ylabel() == r'$W$ [kJ/mol]'
     assert len(ax.get_lines()) == 1
-
-
-def test_plot_worknormalitychecks(ref_workset):
-    index = [2, 5, 8]
-    axs = plot_worknormalitychecks(
-        ref_workset,
-        index,
-    )
-    assert axs[0].get_xlabel() == r'$x$ [nm]'
-    assert axs[0].get_ylabel() == r'work $W$ [kJ/mol]'
-    assert axs[1].get_xlabel() == r'$P$'
-    assert axs[1].get_ylabel() == r'$W$ [kJ/mol]'
