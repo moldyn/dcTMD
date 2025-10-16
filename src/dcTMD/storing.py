@@ -95,7 +95,7 @@ def _integrate_force(
         forceorworkset.position_,
         initial=0,
     )
-    return work_data[::forceorworkset.resolution]
+    return work_data
 
 
 @beartype
@@ -254,7 +254,8 @@ class WorkSet(TransformerMixin, BaseEstimator):
                 # test if file is not corrupted, else add it
                 expected_shape = self.time_.shape
                 if file_data.shape == expected_shape:
-                    self.work_[idx, :] = _integrate_force(self, file_data)
+                    current_work = _integrate_force(self, file_data)
+                    self.work_[idx, :] = current_work[::self.resolution]
                     short_name = basename(file_name)
                     self.names_ = np.append(self.names_, short_name)
                 else:
@@ -364,7 +365,7 @@ class ForceSet(TransformerMixin, BaseEstimator):
     @beartype
     def integrate(self) -> None:
         """Integrate forces."""
-        self.work_ = _integrate_force(self, self.force_)[::self.resolution]
+        self.work_ = _integrate_force(self, self.force_)
 
     @beartype
     def _fill_force(self) -> None:
