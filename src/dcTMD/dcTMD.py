@@ -526,42 +526,43 @@ class ForceEstimator(
         from scipy.integrate import cumulative_trapezoid
         RT = R * self.temperature / 1e3
 
-        # average and variance over all trajectories in each time step
+        # average over all trajectories in each time step
         force_mean = np.mean(self.force_set.force_, axis=0)
 
-        # calculate $\delta f_c(t) = f_c(t) - \left< f_c (t) \right>_N$
+        # calculate $\delta f(t) = f(t) - \left< f(t) \right>_N$
         self.delta_force_array = self.force_set.force_ - force_mean
 
-        # integrate over time
+        # integrate f(t) over time
         int_delta_force = cumulative_trapezoid(
             self.delta_force_array,
             self.force_set.time_,
             axis=-1,
             initial=0,
         )
+        # multiply $\delta f(t) \int_0^t \delta f(t') dt'$ for each N
         intcorr = np.multiply(
             self.delta_force_array,
             int_delta_force,
         )
-        friction_ = np.mean(intcorr, axis=0) / RT
+        friction = np.mean(intcorr, axis=0) / RT
 
-        W_mean_ = cumulative_trapezoid(
+        W_mean = cumulative_trapezoid(
             force_mean,
             self.force_set.position_,
             initial=0,
         )
         W_diss = cumulative_trapezoid(
-            friction_,
+            friction,
             self.force_set.position_,
             initial=0,
         ) * self.force_set.velocity
 
         # Reduce resolution
         self.position_ = self.force_set.position_[::self.force_set.resolution]
-        self.W_mean_ = W_mean_[::self.force_set.resolution]
+        self.W_mean_ = W_mean[::self.force_set.resolution]
         self.W_diss_ = W_diss[::self.force_set.resolution]
         self.dG_ = self.W_mean_ - self.W_diss_
-        self.friction_ = friction_[::self.force_set.resolution]
+        self.friction_ = friction[::self.force_set.resolution]
 
         return self.W_mean_, self.W_diss_, self.dG_, self.friction_
 
