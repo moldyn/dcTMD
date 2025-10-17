@@ -27,6 +27,7 @@ from dcTMD._typing import (
     NumInRange0to1,
     Float1DArray,
     Float2DArray,
+    Index1DArray,
 )
 
 
@@ -566,35 +567,96 @@ class ForceEstimator(
 
         return self.W_mean_, self.W_diss_, self.dG_, self.friction_
 
+    @beartype
+    def _kernel_at_ndx(self, ndx: Int) -> Float1DArray:
+        """
+        Calculate the kernel at a specific index.
+
+        Args:
+            ndx (Int): Index at which the kernel is calculated.
+
+        Returns:
+            Float1DArray: The mean force correlation
+            < df(t(x)) df(t) >_N at the given index.
+        """
+        delta_force_point = self.delta_force_array[:, ndx]
+        force_correlation_at_ndx = (
+            self.delta_force_array.T * delta_force_point
+        ).T
+        return np.mean(force_correlation_at_ndx, axis=0)
+
+    @beartype
     def memory_kernel(
         self,
-        x_indices: Float1DArray,
-    ) -> Float1DArray:
+        index: Union[Int, Index1DArray, None] = None,
+        ndx_striding: Union[Int, None] = None,
+    ) -> Float2DArray:
         """
-        Calculate memory kernel at positions X "forward" in time.
+        Calculate memory kernel at index.
 
-        From fluctuation-dissipation. See e.g. R. Zwanzig,
-        “Nonequilibrium statistical mechanics”, Oxford University Press (2001).
+        Either give a index (as Int or an array of indices) or
+        ndx_striding as an argument. The latter creates the index array
+        from the force data with striding.
 
         Parameters
         ----------
         x_indices :
-            Indices at which memory kernel is calculated.
+            Indices at which the memory kernel is calculated.
+            If None, indices will
+            be generated based on `ndx_striding`. Default is None.
+        ndx_striding:
+            Resolution for creating index array.
+            If provided, indices will be
+            generated at intervals of `ndx_resolution`. Default is None.
 
         Returns
         -------
-        corr_set :
-            shape: (len(X), length_data)
-            NaN are set to zero
-        """
-        _, length_data = self.delta_force_.shape
-        corr_set = np.zeros((len(x_indices), length_data))
+        numpy.ndarray
+            - A 2D NumPy array containing the memory kernel values.
 
-        for ind, tt in enumerate(range(length_data)):
-            entries = self.delta_force_[:, tt:-2] * \
-                self.delta_force_[:, tt + 1:-1]  # noqa: N400
-            corr_set[ind, tt:-2] = np.mean(
-                entries,
-                axis=0,
+        Examples
+        --------
+        Example usage with specific indices:
+
+        >>> kernel = force_estimator.memory_kernel(index=[10, 20, 30])
+        >>> print(kernel)
+
+        Example usage with resolution:
+
+        >>> force_estimator.memory_kernel(ndx_resolution=1000)
+        >>> print(force_estimator.memory_kernel_index_)
+        >>> print(force_estimator.memory_kernel_)
+        """
+        # Argument validation (mutual exclusion / requirement)
+        if index is not None and ndx_striding is not None:
+            raise ValueError(
+                'Only index or ndx_resolution can be given.'
             )
-        return corr_set
+        if index is None and ndx_striding is None:
+            raise ValueError(
+                'Either index or ndx_resolution must be given.'
+            )
+        # read in index or create index array
+        if index is not None:
+            if isinstance(index, (int, np.integer)):
+                print('create index with single int')
+                index = np.array([index])
+            elif np.any(index >= len(self.force_set.time_)):
+                raise ValueError(
+                    'Index values must be less than length of data.'
+                )
+        elif ndx_striding is not None:
+            print('create index with ndx_resolution')
+            index = np.arange(
+                ndx_striding,
+                len(self.force_set.time_) - 1,
+                ndx_striding,
+                dtype=int
+            )
+        # calculate memory kernel at given indices
+        correlation_set = np.zeros((len(index), len(self.force_set.time_)))
+        for i, ndx in enumerate(index):
+            correlation_set[i] = self._kernel_at_ndx(ndx)
+        self.memory_kernel_ = correlation_set
+        self.memory_kernel_index_ = index
+        return correlation_set
