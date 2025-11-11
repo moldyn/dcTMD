@@ -4,6 +4,7 @@ flake8:                       testing
 pytest:                       testing
 pytest-cov:                   testing
 pytest-rerunfailures:         testing
+pytest-xdist:                 testing
 mkdocs-material:              docs
 mkdocstrings:                 docs
 mkdocstrings-python:          docs
