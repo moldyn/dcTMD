@@ -568,7 +568,11 @@ class ForceEstimator(
         return self.W_mean_, self.W_diss_, self.dG_, self.friction_
 
     @beartype
-    def _kernel_at_ndx(self, ndx: Int) -> Float1DArray:
+    @staticmethod
+    def kernel_at_ndx(
+        delta_force_array: Float2DArray,
+        ndx: Int
+    ) -> Float1DArray:
         """
         Calculate the kernel at a specific index.
 
@@ -579,9 +583,9 @@ class ForceEstimator(
             Float1DArray: The mean force correlation
             < df(t(x)) df(t) >_N at the given index.
         """
-        delta_force_point = self.delta_force_array[:, ndx]
+        delta_force_point = delta_force_array[:, ndx]
         force_correlation_at_ndx = (
-            self.delta_force_array.T * delta_force_point
+            delta_force_array.T * delta_force_point
         ).T
         return np.mean(force_correlation_at_ndx, axis=0)
 
@@ -616,12 +620,12 @@ class ForceEstimator(
 
         Examples
         --------
-        Example usage with specific indices:
+        # Example usage with specific indices:
 
         >>> kernel = force_estimator.memory_kernel(index=[10, 20, 30])
         >>> print(kernel)
 
-        Example usage with resolution:
+        # Example usage with resolution:
 
         >>> force_estimator.memory_kernel(ndx_resolution=1000)
         >>> print(force_estimator.memory_kernel_index_)
@@ -641,7 +645,7 @@ class ForceEstimator(
             if isinstance(index, (int, np.integer)):
                 print('create index with single int')
                 index = np.array([index])
-            elif np.any(index >= len(self.force_set.time_)):
+            if np.any(index >= len(self.force_set.time_)):
                 raise ValueError(
                     'Index values must be less than length of data.'
                 )
@@ -656,7 +660,10 @@ class ForceEstimator(
         # calculate memory kernel at given indices
         correlation_set = np.zeros((len(index), len(self.force_set.time_)))
         for i, ndx in enumerate(index):
-            correlation_set[i] = self._kernel_at_ndx(ndx)
+            correlation_set[i] = self.kernel_at_ndx(
+                self.delta_force_array,
+                ndx
+            )
         self.memory_kernel_ = correlation_set
         self.memory_kernel_index_ = index
         return correlation_set
