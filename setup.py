@@ -75,6 +75,7 @@ setup(
         'beartype>=0.10.4',
         'scipy',
         'tqdm',
+        "tqdm_joblib",
         'click>=7.0.0',
         'typing_extensions>=3.9.0;python_version<"3.9"',
         'matplotlib>=3.7',
