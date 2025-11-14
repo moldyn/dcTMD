@@ -156,6 +156,8 @@ def main(  # noqa: WPS211, WPS216
             verbose=verbose,
         )
         estimator = ForceEstimator(temperature)
+    else:
+        raise ValueError(f'Invalide mode {mode}. Choose from {MODES}.')
 
     # Loading constraint force files
     filenames = load_pullf(pullf_files)

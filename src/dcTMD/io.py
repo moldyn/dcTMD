@@ -131,7 +131,7 @@ def write_output(
 
 
 @beartype
-def load_output(filepath: str):
+def load_output(filepath: Str):
     """
     Load file produced by `write_output`.
 
@@ -178,6 +178,7 @@ def load_output(filepath: str):
     elif '.dat' in filepath:
         with open(filepath, 'r') as datfile:
             # Read the header line, which starts with '#'
+            headers = None
             for line in datfile:
                 if line.startswith('#', 0, 5):
                     headers = line.split()
@@ -185,6 +186,15 @@ def load_output(filepath: str):
                     break
         dctmd_results = np.loadtxt(filepath)
         res_dict = {}
+        if headers is None:
+            raise ValueError(
+                f'No header line starting with "#" found in {filepath}'
+            )
+            headers = [str(i) for i in range(dctmd_results.shape[1])]
+        if len(headers) != dctmd_results.shape[1]:
+            raise ValueError(
+                'Number of headers does not match number of data columns.'
+            )
         for idx, key in enumerate(headers):
             res_dict[key] = dctmd_results[:, idx]
         print(f'Loaded data from {filepath}')
