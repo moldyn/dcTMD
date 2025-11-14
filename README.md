@@ -70,14 +70,5 @@ python3 -m pip install git+ssh://git@github.com/moldyn/dcTMD.git
 ## Usage
 Check out the documentation for an overview over all modules as well as the tutorials.
 
-## Roadmap
 
-- [ ] New Features:
-    - [ ] Gaussian error estimation
-    - [ ] 2d distribution WorkSet plots
-    - [x] Estimator plots: free energy, friction & both
-    - [x] Normality plot
-    - [x] Confidence intervals
-    - [ ] Exponential estimator class
-- [ ] Discuss gaussian kernel borders
 
