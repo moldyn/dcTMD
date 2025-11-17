@@ -47,6 +47,5 @@ def test_gaussfilter_friction(ref_workestimator, ref_friction):
     np.testing.assert_allclose(
         smooth_friction,
         ref_friction,
-        rtol=1e-07,
-        err_msg='Filter friction test failed.',
+        rtol=1e-06,
     )

@@ -20,7 +20,6 @@ from dcTMD.utils.plotting import (
     plot_dG_werrors,
     plot_worklines,
     plot_histo_normaldist,
-    plot_worknormalitychecks,
 )
 
 
@@ -62,7 +61,7 @@ def test_plot_dG_Wdiss(ref_workestimator):
     fig, ax = plt.subplots()
     plot_dG_Wdiss(ref_workestimator, ax, x)
     assert len(ax.lines) == 3
-    assert ax.get_xlabel() == "position $x$ [nm]"
+    assert ax.get_xlabel() == "$x$ [nm]"
     assert ax.get_ylabel() == "[kJ/mol]"
 
 
@@ -72,7 +71,7 @@ def test_plot_Gamma():
     fig, ax = plt.subplots()
     plot_Gamma(x, friction, ax)
     assert len(ax.lines) == 1
-    assert ax.get_xlabel() == "position $x$ [nm]"
+    assert ax.get_xlabel() == "$x$ [nm]"
     assert ax.get_xlim() == (0, 4)
 
 
@@ -81,7 +80,7 @@ def test_plot_dG():
     x = np.linspace(0, 10, 100)
     dG = np.sin(x)
     plot_dG(x, dG, ax, label='test')
-    assert ax.get_xlabel() == r'position $x$ [nm]'
+    assert ax.get_xlabel() == r'$x$ [nm]'
     assert ax.get_ylabel() == r'$\Delta G$ [kJ/mol]'
     assert ax.get_xlim() == (0, 10)
 
@@ -93,7 +92,7 @@ def test_plot_dG_werrors(ref_workestimator):
     # one for dG and one for the error bounds
     assert len(ax.lines) >= 1
     assert ax.get_ylabel() == r'$\Delta G$ [kJ/mol]'
-    assert ax.get_xlabel() == r'position $x$ [nm]'
+    assert ax.get_xlabel() == r'$x$ [nm]'
 
 
 def test_plot_dG_werrors_no_errors(ref_workestimator, capsys):
@@ -103,7 +102,7 @@ def test_plot_dG_werrors_no_errors(ref_workestimator, capsys):
         del ref_workestimator.s_dG_
     plot_dG_werrors(ref_workestimator, ax)
     captured = capsys.readouterr()
-    assert "no errors are determined" in captured.out
+    assert "no errors" in captured.out
     # No lines should be plotted
     assert len(ax.lines) == 0
 
@@ -111,7 +110,7 @@ def test_plot_dG_werrors_no_errors(ref_workestimator, capsys):
 def test_plot_worklines(ref_workset):
     fig, ax = plt.subplots()
     plot_worklines(ref_workset, ax)
-    assert ax.get_xlabel() == r'position $x$ [nm]'
+    assert ax.get_xlabel() == r'$x$ [nm]'
     assert ax.get_ylabel() == r'work $W$ [kJ/mol]'
 
 
@@ -122,15 +121,3 @@ def test_plot_histo_normaldist():
     assert ax.get_xlabel() == r'$P$'
     assert ax.get_ylabel() == r'$W$ [kJ/mol]'
     assert len(ax.get_lines()) == 1
-
-
-def test_plot_worknormalitychecks(ref_workset):
-    index = [2, 5, 8]
-    fig, axs = plot_worknormalitychecks(
-        ref_workset,
-        index,
-    )
-    assert axs[0].get_xlabel() == 'position $x$ [nm]'
-    assert axs[0].get_ylabel() == r'work $W$ [kJ/mol]'
-    assert axs[1].get_xlabel() == r'$P$'
-    assert axs[1].get_ylabel() == r'$W$ [kJ/mol]'

@@ -3,7 +3,7 @@
 import dcTMD
 from dcTMD.storing import save, WorkSet, ForceSet
 from dcTMD.dcTMD import WorkEstimator, ForceEstimator
-
+from dcTMD.io import write_output
 
 # define variables
 velocity = 0.001
@@ -55,3 +55,8 @@ workeestimator.smooth_friction(sigma, mode=mode)
 # error estimation vis bootstrapping
 workeestimator.estimate_free_energy_errors(n_resamples, bootstrapmode, seed)
 save('testdata/workeestimator', workeestimator)
+write_output(
+    'testdata/workeestimator_dcTMDresults',
+    workeestimator,
+    filetype=('dat', 'npz')
+)

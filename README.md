@@ -39,27 +39,27 @@
 This package aids in the analysis of dissipation-corrected targeted molecular dynamics (dcTMD) simulations. The method enforces rare unbinding events of ligands from proteins via a constraint pulling bias. Subsequently, free energy profiles and friction factors are estimated along the unbinding coordinate. For a methodological overview, see our [article](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835).
 
 > S. Wolf, and G. Stock,  
-> *Targeted molecular dynamics calculations of free energy profiles using a nonequilibrium friction correction.*,
+> *Targeted molecular dynamics calculations of free energy profiles using a nonequilibrium friction correction.*,  
 > **J. Chem. Theory Comput.** 2018 14 (12), 6175-6182,  
 > doi: [10.1021/acs.jctc.8b00835](https://pubs.acs.org/doi/10.1021/acs.jctc.8b00835)
 
 This package will be published soon:
 
-> V. Tänzel, M. Jäger, D. Nagel, and S. Wolf,  
-> *Dissipation Corrected Targeted Molecular Dynamics*,  
-> in preparation 2023
+> M. Jäger, V. Tänzel, D. Nagel, and S. Wolf,  
+> *Dissipation Corrected Targeted Molecular Dynamics*,    
+> in preparation 2025
 
 We kindly ask you to cite these articles in case you use this software package for published works.
 
 ## Features
 - Intuitive usage via module and CI
 - Sklearn-style API for fast integration into your Python workflow
-- Supports Python 3.8-3.12
+- Supports Python 3.9-3.14
 - Multitude of [publications](https://www.moldyn.uni-freiburg.de/publications.html) with dcTMD
 
 ## Implemented Key Functionalities
 - Estimation of free energy profiles and friction factors along the unbinding coordinate of ligands as described by [Wolf and Stock 2018](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835).
-- Analysis of separate unbinding pathways as described by [Wolf et al. 2022](https://arxiv.org/abs/2212.07154).
+- Analysis of separate unbinding pathways as described by [Wolf et al. 2023](https://pubs.aip.org/aip/jcp/article/158/12/124106/2881566/Path-separation-of-dissipation-corrected-targeted).
 
 ## Installation
 The package will be available on PiPY and conda. Until then, install it via:
@@ -70,14 +70,5 @@ python3 -m pip install git+ssh://git@github.com/moldyn/dcTMD.git
 ## Usage
 Check out the documentation for an overview over all modules as well as the tutorials.
 
-## Roadmap
 
-- [ ] New Features:
-    - [ ] Gaussian error estimation
-    - [ ] 2d distribution WorkSet plots
-    - [x] Estimator plots: free energy, friction & both
-    - [x] Normality plot
-    - [x] Confidence intervals
-    - [ ] Exponential estimator class
-- [ ] Discuss gaussian kernel borders
 

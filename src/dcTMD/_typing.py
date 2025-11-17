@@ -23,14 +23,14 @@ except ImportError:
 class NDim:
     """Class for creating Validators checking for desired dimensions."""
 
-    def __class_getitem__(self, ndim):
+    def __class_getitem__(cls, ndim):
         return IsAttr['ndim', IsEqual[ndim]]
 
 
 class DType:
     """Class for creating Validators checking for desired dtype."""
 
-    def __class_getitem__(self, dtype):
+    def __class_getitem__(cls, dtype):
         return Is[lambda arr: np.issubdtype(arr.dtype, dtype)]
 
 

@@ -1,18 +1,17 @@
 window.MathJax = {
   tex: {
-    inlineMath: [["\\(", "\\)"]],
-    displayMath: [["\\[", "\\]"]],
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
     processEscapes: true,
     processEnvironments: true
   },
   options: {
-    ignoreHtmlClass: ".*|",
-    processHtmlClass: "arithmatex"
+    // Process ALL HTML content including notebook cells
+    ignoreHtmlClass: "no-mathjax",
+    processHtmlClass: ".*"
   }
 };
 
-document$.subscribe(() => { 
-
-
+document$.subscribe(() => {
   MathJax.typesetPromise()
 })

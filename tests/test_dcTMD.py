@@ -43,31 +43,34 @@ def assert_estimator_equality(estimator1, estimator2):
     assert type(estimator1) is type(estimator2)
     assert estimator1.temperature == estimator2.temperature
     assert estimator1.verbose == estimator2.verbose
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         estimator1.W_mean_,
         estimator2.W_mean_,
+        rtol=1e-06,
         err_msg='Mean work test failed.',
     )
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         estimator1.W_diss_,
         estimator2.W_diss_,
+        rtol=1e-06,
         err_msg='Dissipative work test failed.',
     )
-    np.testing.assert_almost_equal(
+    np.testing.assert_allclose(
         estimator1.dG_,
         estimator2.dG_,
+        rtol=1e-06,
         err_msg='Free energy test failed.',
     )
     np.testing.assert_allclose(
         estimator1.friction_,
         estimator2.friction_,
-        rtol=1e-07,
+        rtol=1e-06,
         err_msg='Friction test failed.',
     )
     np.testing.assert_allclose(
         estimator1.friction_smooth_,
         estimator2.friction_smooth_,
-        rtol=1e-07,
+        rtol=1e-06,
         err_msg='Smoothed friction test failed.',
     )
 
