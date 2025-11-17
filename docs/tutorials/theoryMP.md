@@ -20,7 +20,7 @@ done to move the atom, or subset of atoms, along the pulling coordinate. Note th
 
 # Jarzynski's Equality
 
-In order to obtain equilibrium estimates, such as the free energy profile $\Delta G$ along the pulling coordinate $s$, from the nonequilibrium simulations described above, we use the method proposed by [Jarzynski 2004](https://doi.org/10.1088/1742-5468/2004/09/P09005). While for finite pulling times, the average work $\left<W(x)\right>$ is always higher that $\Delta G = G(x)-G(x_0)$, it is also possible to give an exact relation between the work and free energy, namely
+In order to obtain equilibrium estimates, such as the free energy profile $\Delta G$ along the pulling coordinate $s$, from the non-equilibrium simulations described above, we use the method proposed by [Jarzynski 2004](https://doi.org/10.1088/1742-5468/2004/09/P09005). While for finite pulling times, the average work $\left<W(x)\right>$ is always higher that $\Delta G = G(x)-G(x_0)$, it is also possible to give an exact relation between the work and free energy, namely
 
 $$
 \begin{align}
@@ -108,7 +108,7 @@ assuming a Gaussian work distribution.
 
 ### WorkEstimator
 
-One way to analyze nonequilibrium force time traces from constraint pulling simulations is by calculating the work first and then estimating the free energy  $\Delta G$ via Eq. (2), as well as the friction ${\it{\Gamma}}$ via Eq. (5). This approach is implemented in the WorkEstimator class.
+One way to analyze non-equilibrium force time traces from constraint pulling simulations is by calculating the work first and then estimating the free energy  $\Delta G$ via Eq. (2), as well as the friction ${\it{\Gamma}}$ via Eq. (5). This approach is implemented in the WorkEstimator class.
 
 
 ### ForceEstimator 

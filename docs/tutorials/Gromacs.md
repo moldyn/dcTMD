@@ -47,7 +47,7 @@ posre_ben.itp
 
 * Index file:
     + *3ptb_AMBER99SB_ben.ndx*
-    + **Important:** the index file needs to include an anchor group from whose center of mass the ligand is pulled away (in this case: the group *[sheet]* containing C-alpha atoms from the central beta-sheet) and the ligand itself (or better, the heavy atoms of the ligand, here group *[ BEN_heavy ]*). If you want to create a respective anchor index for your own simulation problem, choose an anchor group that is tighly connected to the remainder of the protein (such as C-alpha atoms in alpha-helices and beta-sheets). The vector connecting the centers of mass of anchor and ligand needs to roughly point into the direction of a putative unbinding path.
+    + **Important:** the index file needs to include an anchor group from whose center of mass the ligand is pulled away (in this case: the group *[sheet]* containing C-alpha atoms from the central beta-sheet) and the ligand itself (or better, the heavy atoms of the ligand, here group *[ BEN_heavy ]*). If you want to create a respective anchor index for your own simulation problem, choose an anchor group that is tightly connected to the remainder of the protein (such as C-alpha atoms in alpha-helices and beta-sheets). The vector connecting the centers of mass of anchor and ligand needs to roughly point into the direction of a putative unbinding path.
 
 
 ### Carrying out pulling MD simulations
@@ -66,7 +66,7 @@ gmx grompp -f ../3ptb_AMBER99SB_ben_pushEQUIBRUN.mdp -c ../3ptb_AMBER99SB_ben.gr
 done
 ```
 
-and run the individual simulations via e.g.
+and run the individual simulations via, e.g.,
 ```console
 gmx mdrun -v -deffnm 3ptb_AMBER99SB_ben_pushEQUIBRUN_001
 ```
@@ -84,7 +84,7 @@ do
 gmx grompp -f ../3ptb_AMBER99SB_ben_pushRUN_v0.001.mdp -c ../equib/3ptb_AMBER99SB_ben_pushEQUIBRUN_"$i".gro -p ../3ptb_AMBER99SB_ben.top -n ../3ptb_AMBER99SB_ben.ndx -o 3ptb_AMBER99SB_ben_pushRUN_0.001_"$i".tpr
 done
 ```
-Note that the notation ***\_0.001\_*** stands for a velocity in Gromacs units of 0.001~nm/ps, i.e., 1~m/s. To our current experience, this is a sweet-spot velocity with the best trade-off between slow pulling and minimal computational effort. Run the simulations via e.g.:
+Note that the notation ***\_0.001\_*** stands for a velocity in Gromacs units of $0.001~\text{nm}/\text{ps}$, i.e., $1~\text{m}/\text{s}$. To our current experience, this is a sweet-spot velocity with the best trade-off between slow pulling and minimal computational effort. Run the simulations via, e.g.,
 ```console
 gmx mdrun -v -deffnm 3ptb_AMBER99SB_ben_pushRUN_0.001_000
 ```
