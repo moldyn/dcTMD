@@ -12,7 +12,7 @@ Please ensure that,
 
 ## Upload to PyPI
 
-There is an CI to publish new versions automatically. Therefore, a new relase needs to be published. Please ensure that each release is based on a tag.
+There is an CI to publish new versions automatically. Therefore, a new release needs to be published. Please ensure that each release is based on a tag.
 
 ## Build and Upload to PyPI (admin only)
 
