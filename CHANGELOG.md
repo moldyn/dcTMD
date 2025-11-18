@@ -14,6 +14,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.0.0
 ## [Unreleased]
 ### Added Features:
 - New `FeatureSet` class for loading multidimensional trajectory features.
+- added ForceEstimator.memory_kernel to analyse force correlations at a fixed reference time point.
+- Added tutorials for both new features
   
 ### API changes warning ⚠️:
 - Drop python 3.8 support
@@ -26,6 +28,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.0.0
 - Fix newlines in docs
 - Add generalized smoothing of estimators
 - Many minor bugfixes and improvements in the docs
+- Changed syntax of plotting functions
 
 
 ## [0.3.0] - 2023-03-28
