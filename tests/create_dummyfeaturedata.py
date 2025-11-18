@@ -34,7 +34,7 @@ for j, name_string in enumerate(pullf_filenames):
     np.savetxt(f'testdata/feature_2D_{running_number}.txt', rnddist2D)
     names2D.append(f'feature_2D_{running_number}.txt')
 
-clusters = [np.asarray(cluster1), np.array(cluster2)]
+clusters = np.array([cluster1, cluster2], dtype=object)
 save_clusters('testdata/clusters.txt', clusters)
 np.save('testdata/feature_array_2D.npy', feature_array_2D)
 np.savetxt('testdata/feature_1D_filenamesname.txt', names1D, fmt='%s')
