@@ -12,6 +12,9 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.0.0
 
 
 ## [Unreleased]
+### Added Features:
+- New `FeatureSet` class for loading multidimensional trajectory features.
+  
 ### API changes warning ⚠️:
 - Drop python 3.8 support
 
