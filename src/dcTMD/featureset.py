@@ -64,7 +64,7 @@ class FeatureSet:
                 'must be provided together.'
             )
         if self.verbose:
-            print(f"Loaded filenames: {self.filenames}")
+            print(f'Loaded filenames: {self.filenames}')
 
     def _get_filenames(
         self,
@@ -83,7 +83,7 @@ class FeatureSet:
             A list or array of filenames/prefixes that contain
             a running number.
         filename_wildcard :
-            A wildcard pattern (e.g., "wildcard_{}.xvg") for filenames.
+            A wildcard pattern (e.g., 'wildcard_{}.xvg') for filenames.
 
         Returns
         -------
@@ -125,11 +125,20 @@ class FeatureSet:
         Read the first file in filenames to initialize the array.
 
         """
-        testfile = np.loadtxt(self.filenames[0], comments=("@", "#"))
+        testfile = np.loadtxt(self.filenames[0], comments=('@', '#'))
         self.fileshape = testfile.shape
         if self.verbose:
             print(f'Using {self.filenames[0]} to initialize array ')
             print(f'with shape {self.fileshape}')
+
+    def _safe_loadtxt(self, fname):
+        """
+        Helper to handle FilenotFoundError.
+        """
+        try:
+            return np.loadtxt(fname, comments=('@', '#'))
+        except OSError:
+            raise FileNotFoundError(f'File {fname} not found')
 
     def fill_array(self) -> np.ndarray:
         """
@@ -157,7 +166,7 @@ class FeatureSet:
             len(self.filenames),
             *self.fileshape,
         ))
-        self.featureset_names = []
+        self.names_ = []
 
         with tqdm(
             total=len(self.filenames),
@@ -165,24 +174,17 @@ class FeatureSet:
         ) as pbar:
             for i, current_fname in enumerate(self.filenames):
                 if self.verbose:
-                    print(f"Reading file {current_fname}")
-                try:
-                    input_data = np.loadtxt(
-                        current_fname,
-                        comments=("@", "#")
-                    )
-                except Exception:
-                    raise FileNotFoundError(
-                        f"File {current_fname} not found"
-                    )
+                    print(f'Reading file {current_fname}')
 
-                if input_data.shape != self.fileshape:
+                file_data = self._safe_loadtxt(current_fname)
+
+                if file_data.shape != self.fileshape:
                     print(
-                        f"Skipping file {current_fname} due to shape mismatch")
+                        f'Skipping file {current_fname} due to shape mismatch')
                     continue
 
-                array[i, :] = input_data
-                self.featureset_names.append(current_fname)
+                array[i, :] = file_data
+                self.names_.append(current_fname)
                 pbar.update(1)
 
         self.array = array
