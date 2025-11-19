@@ -19,6 +19,7 @@ nav:
   - Create trajectories with Gromacs: tutorials/Gromacs.md
   - dcTMD via Work: tutorials/work.ipynb
   - dcTMD via Force: tutorials/force.ipynb
+  - Cluster trajectories: tutorials/create_featureset.ipynb
   - CLI: tutorials/CLI.ipynb
 - Code Reference: reference/
 - FAQ: faq.md

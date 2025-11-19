@@ -31,6 +31,6 @@ python3 -m pip install git+ssh://git@github.com/moldyn/dcTMD.git
 
 - [**Create pulling trajectories with Gromacs:**](tutorials/Gromacs.md): Here, you will learn how you can set up constraint targeted MD simulations using the pull code implemented in Gromacs. 
 
-- **dcTMD Analysis:** In section [dcTMD via Work](tutorials/work.ipynb) and [dcTMD via Force](tutorials/force.ipynb) you will learn how to analyze the constraint pulling trajectories with dcTMD as described in [Theory](tutorials/theory.md).
+- **dcTMD Analysis:** In section [dcTMD via Work](tutorials/work.ipynb) and [dcTMD via Force](tutorials/force.ipynb) you will learn how to analyse the constraint pulling trajectories with dcTMD as described in [Theory](tutorials/theory.md). In section [cluster trajectories](tutorials/create_featureset.ipynb) you find a quick guide on reading in features and clustering trajectories.
 
 - [**Command Line Interface:**](tutorials/CLI.ipynb) In this section, we will provide a short guide to the command line interface of `dcTMD`, which provides some common analysis and visualization functionality.
