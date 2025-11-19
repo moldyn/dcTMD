@@ -8,4 +8,6 @@ The module is structured into the following submodules:
 
 - [**dcTMD:**][dcTMD.dcTMD] This submodule contains two classes, `WorkEstimator` and `ForceEstimator`, which are used for the dcTMD analysis of constraint force time traces. Both classes can be used to calculate the mean work, dissipative work, free energy and friction estimate of a set of constraint force time traces.
 
+- [**featureset:**][dcTMD.featureset] This class loads, and stores trajectory-specific feature data into a consistent NumPy array format for downstream analyses such as trajectory similarity calculations. It supports direct filename input as well as filename generation via wildcard patterns.
+
 - [**utils:**][dcTMD.utils] This submodule provides utility functions such as smoothing, plotting and error estimation via bootstrapping. The functions in this submodule can be used in conjunction with other parts of the software.
