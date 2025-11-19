@@ -27,6 +27,7 @@ from dcTMD._typing import (
     NumInRange0to1,
     Float1DArray,
     Float2DArray,
+    Index1DArray,
 )
 
 
@@ -526,74 +527,143 @@ class ForceEstimator(
         from scipy.integrate import cumulative_trapezoid
         RT = R * self.temperature / 1e3
 
-        # average and variance over all trajectories in each time step
+        # average over all trajectories in each time step
         force_mean = np.mean(self.force_set.force_, axis=0)
 
-        # calculate $\delta f_c(t) = f_c(t) - \left< f_c (t) \right>_N$
+        # calculate $\delta f(t) = f(t) - \left< f(t) \right>_N$
         self.delta_force_array = self.force_set.force_ - force_mean
 
-        # integrate over time
+        # integrate f(t) over time
         int_delta_force = cumulative_trapezoid(
             self.delta_force_array,
             self.force_set.time_,
             axis=-1,
             initial=0,
         )
+        # multiply $\delta f(t) \int_0^t \delta f(t') dt'$ for each N
         intcorr = np.multiply(
             self.delta_force_array,
             int_delta_force,
         )
-        friction_ = np.mean(intcorr, axis=0) / RT
+        friction = np.mean(intcorr, axis=0) / RT
 
-        W_mean_ = cumulative_trapezoid(
+        W_mean = cumulative_trapezoid(
             force_mean,
             self.force_set.position_,
             initial=0,
         )
         W_diss = cumulative_trapezoid(
-            friction_,
+            friction,
             self.force_set.position_,
             initial=0,
         ) * self.force_set.velocity
 
         # Reduce resolution
         self.position_ = self.force_set.position_[::self.force_set.resolution]
-        self.W_mean_ = W_mean_[::self.force_set.resolution]
+        self.W_mean_ = W_mean[::self.force_set.resolution]
         self.W_diss_ = W_diss[::self.force_set.resolution]
         self.dG_ = self.W_mean_ - self.W_diss_
-        self.friction_ = friction_[::self.force_set.resolution]
+        self.friction_ = friction[::self.force_set.resolution]
 
         return self.W_mean_, self.W_diss_, self.dG_, self.friction_
 
-    def memory_kernel(
-        self,
-        x_indices: Float1DArray,
+    @beartype
+    @staticmethod
+    def kernel_at_ndx(
+        delta_force_array: Float2DArray,
+        ndx: Int
     ) -> Float1DArray:
         """
-        Calculate memory kernel at positions X "forward" in time.
+        Calculate the kernel at a specific index.
 
-        From fluctuation-dissipation. See e.g. R. Zwanzig,
-        “Nonequilibrium statistical mechanics”, Oxford University Press (2001).
+        Args:
+            ndx (Int): Index at which the kernel is calculated.
+
+        Returns:
+            Float1DArray: The mean force correlation
+            < df(t(x)) df(t) >_N at the given index.
+        """
+        delta_force_point = delta_force_array[:, ndx]
+        force_correlation_at_ndx = (
+            delta_force_array.T * delta_force_point
+        ).T
+        return np.mean(force_correlation_at_ndx, axis=0)
+
+    @beartype
+    def memory_kernel(
+        self,
+        index: Union[Int, Index1DArray, None] = None,
+        ndx_striding: Union[Int, None] = None,
+    ) -> Float2DArray:
+        """
+        Calculate memory kernel at index.
+
+        Either give a index (as Int or an array of indices) or
+        ndx_striding as an argument. The latter creates the index array
+        from the force data with striding.
 
         Parameters
         ----------
         x_indices :
-            Indices at which memory kernel is calculated.
+            Indices at which the memory kernel is calculated.
+            If None, indices will
+            be generated based on `ndx_striding`. Default is None.
+        ndx_striding:
+            Resolution for creating index array.
+            If provided, indices will be
+            generated at intervals of `ndx_resolution`. Default is None.
 
         Returns
         -------
-        corr_set :
-            shape: (len(X), length_data)
-            NaN are set to zero
-        """
-        _, length_data = self.delta_force_.shape
-        corr_set = np.zeros((len(x_indices), length_data))
+        numpy.ndarray
+            - A 2D NumPy array containing the memory kernel values.
 
-        for ind, tt in enumerate(range(length_data)):
-            entries = self.delta_force_[:, tt:-2] * \
-                self.delta_force_[:, tt + 1:-1]  # noqa: N400
-            corr_set[ind, tt:-2] = np.mean(
-                entries,
-                axis=0,
+        Examples
+        --------
+        # Example usage with specific indices:
+
+        >>> kernel = force_estimator.memory_kernel(index=[10, 20, 30])
+        >>> print(kernel)
+
+        # Example usage with resolution:
+
+        >>> force_estimator.memory_kernel(ndx_resolution=1000)
+        >>> print(force_estimator.memory_kernel_index_)
+        >>> print(force_estimator.memory_kernel_)
+        """
+        # Argument validation (mutual exclusion / requirement)
+        if index is not None and ndx_striding is not None:
+            raise ValueError(
+                'Only index or ndx_resolution can be given.'
             )
-        return corr_set
+        if index is None and ndx_striding is None:
+            raise ValueError(
+                'Either index or ndx_resolution must be given.'
+            )
+        # read in index or create index array
+        if index is not None:
+            if isinstance(index, (int, np.integer)):
+                print('create index with single int')
+                index = np.array([index])
+            if np.any(index >= len(self.force_set.time_)):
+                raise ValueError(
+                    'Index values must be less than length of data.'
+                )
+        elif ndx_striding is not None:
+            print('create index with ndx_resolution')
+            index = np.arange(
+                ndx_striding,
+                len(self.force_set.time_) - 1,
+                ndx_striding,
+                dtype=int
+            )
+        # calculate memory kernel at given indices
+        correlation_set = np.zeros((len(index), len(self.force_set.time_)))
+        for i, ndx in enumerate(index):
+            correlation_set[i] = self.kernel_at_ndx(
+                self.delta_force_array,
+                ndx
+            )
+        self.memory_kernel_ = correlation_set
+        self.memory_kernel_index_ = index
+        return correlation_set
