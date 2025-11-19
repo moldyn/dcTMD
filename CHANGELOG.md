@@ -12,6 +12,9 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.0.0
 
 
 ## [Unreleased]
+
+
+## [0.4.0] - 2025-11-19
 ### Added Features:
 - New `FeatureSet` class for loading multidimensional trajectory features.
 - added ForceEstimator.memory_kernel to analyse force correlations at a fixed reference time point.
