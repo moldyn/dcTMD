@@ -620,6 +620,13 @@ class ForceEstimator(
 
         Examples
         --------
+        >>> from dcTMD.dcTMD import ForceEstimator
+        >>> from dcTMD.storing import load
+        >>> force = load('my_force_set')
+        >>> # Instantiate a ForceEstimator instance and fit it with the
+        >>> # ForceSet instance
+        >>> force_estimator = ForceEstimator(temperature=290.15)
+
         # Example usage with specific indices:
 
         >>> kernel = force_estimator.memory_kernel(index=[10, 20, 30])
