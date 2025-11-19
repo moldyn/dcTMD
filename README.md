@@ -62,7 +62,19 @@ We kindly ask you to cite these articles in case you use this software package f
 - Analysis of separate unbinding pathways as described by [Wolf et al. 2023](https://pubs.aip.org/aip/jcp/article/158/12/124106/2881566/Path-separation-of-dissipation-corrected-targeted).
 
 ## Installation
-The package will be available on PiPY and conda. Until then, install it via:
+`dcTMD` is available on **PyPI** and **conda-forge**.
+#### Install with pip
+```bash
+pip install dcTMD
+```
+PyPI project page: [https://pypi.org/project/dcTMD/](https://pypi.org/project/dcTMD/)
+#### Install with conda
+```bash
+conda install conda-forge::dctmd
+```
+Conda-forge package page:
+[https://anaconda.org/conda-forge/dcTMD](https://anaconda.org/conda-forge/dcTMD)
+#### Install from GitHub
 ```bash
 python3 -m pip install git+ssh://git@github.com/moldyn/dcTMD.git
 ```

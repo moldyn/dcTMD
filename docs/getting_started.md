@@ -1,5 +1,5 @@
 ## Introduction
-This python package aids with the analysis of targeted molecular dynamics (TMD) trajectories according to   dissipation-corrected TMD method. TMD simulations enforce rare unbinding events of ligands from proteins via a constraint pulling bias. With dcTMD, free energy profiles and friction factors are estimated along the unbinding coordinate. For a methodological overview, see our [article](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835)
+This python package aids with the analysis of targeted molecular dynamics (TMD) trajectories according to the dissipation-corrected TMD method. TMD simulations enforce rare unbinding events of ligands from proteins via a constraint pulling bias. With dcTMD, free energy profiles and friction factors are estimated along the unbinding coordinate. For a methodological overview, see our [article](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835)
 
 
 ## Disclaimer
@@ -13,18 +13,40 @@ This python package aids with the analysis of targeted molecular dynamics (TMD) 
 
 This package will be published soon:
 
-> V. Tänzel, and M. Jäger, and S. Wolf,
-> *Dissipation Corrected Targeted Molecular Dynamics*,
-> in preparation (2022)
+> M. Jäger, V. Tänzel, D. Nagel, and S. Wolf,  
+> *Dissipation Corrected Targeted Molecular Dynamics*,    
+> in preparation 2025
 
 We kindly ask you to cite these articles in case you use this software package for published works.
 
 
 ## Installation
-The package will be available on pipy and conda. Until then, install it via:
+
+`dcTMD` is available on **PyPI** and **conda-forge**.
+
+#### Install with pip
+
+```bash
+pip install dcTMD
+```
+
+PyPI project page: [https://pypi.org/project/dcTMD/](https://pypi.org/project/dcTMD/)
+
+#### Install with conda
+
+```bash
+conda install conda-forge::dctmd
+```
+
+Conda-forge package page:
+[https://anaconda.org/conda-forge/dcTMD](https://anaconda.org/conda-forge/dcTMD)
+
+#### Install from GitHub
+
 ```bash
 python3 -m pip install git+ssh://git@github.com/moldyn/dcTMD.git
 ```
+
 
 ## Sections:
 - [**Theoretical Background:**](tutorials/theory.md): Here, you will learn the basic theory behind dcTMD. Including Jarzinskys equality, the derivation of the free energy and friction estimate as well as the main assumptions made on the way.
