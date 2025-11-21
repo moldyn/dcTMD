@@ -176,9 +176,9 @@ def load_output(filepath: Str):
         print(f'Loaded data from {filepath}')
         return res_dict
     elif '.dat' in filepath:
+        headers = None
         with open(filepath, 'r') as datfile:
             # Read the header line, which starts with '#'
-            headers = None
             for line in datfile:
                 if line.startswith('#', 0, 5):
                     headers = line.split()
@@ -190,7 +190,6 @@ def load_output(filepath: Str):
             raise ValueError(
                 f'No header line starting with "#" found in {filepath}'
             )
-            headers = [str(i) for i in range(dctmd_results.shape[1])]
         if len(headers) != dctmd_results.shape[1]:
             raise ValueError(
                 'Number of headers does not match number of data columns.'
