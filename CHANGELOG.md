@@ -14,10 +14,16 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.0.0
 ## [Unreleased]
 
 
+## [0.4.1] - 2025-11-24
+### Bugfix 🐛:
+- Remove unused deps to fix publishing to conda, #32
+- Fix unreachable code in input method
+
+
 ## [0.4.0] - 2025-11-19
 ### Added Features:
 - New `FeatureSet` class for loading multidimensional trajectory features.
-- added ForceEstimator.memory_kernel to analyse force correlations at a fixed reference time point.
+- added `ForceEstimator.memory_kernel` to analyse force correlations at a fixed reference time point.
 - Added tutorials for both new features
   
 ### API changes warning ⚠️:
@@ -51,7 +57,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.0.0
 - Alpha candidate
 
 
-[Unreleased]: https://github.com/moldyn/dcTMD/compare/v0.4.0...main
+[Unreleased]: https://github.com/moldyn/dcTMD/compare/v0.4.1...main
+[0.4.1]: https://github.com/moldyn/dcTMD/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/moldyn/dcTMD/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/moldyn/dcTMD/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/moldyn/dcTMD/compare/v0.2.0...v0.2.1
