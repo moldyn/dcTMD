@@ -62,7 +62,7 @@ The user loads all pulling trajectories into an appropriate container:
 * `ForceSet` for the force-correlation route.
 
 Each trajectory contains the constraint force $f(t)$ along a pulling coordinate $x(t) = x_0 + vt$ with a constraint velocity $v$. The work along each trajectory is computed as $W(x) = \int_{x_0}^{x} \mathrm{d}x' f(x')$.
-test
+
 #### 2. Perform dcTMD analysis via an estimator
 * **Work-based estimator (`WorkEstimator`)**
 
