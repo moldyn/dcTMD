@@ -61,29 +61,22 @@ The user loads all pulling trajectories into an appropriate container:
 * `WorkSet` for the work-based route, which is computationally cheaper, as the resolution of the trajectories can be reduced after integration.
 * `ForceSet` for the force-correlation route.
 
-Each trajectory contains the constraint force $f(t)$ along a pulling coordinate $x(t) = x_0 + vt$ with a constraint velocity $v$. The work along each trajectory is computed as $W(x) = \int_{x_0}^{x} \mathrm{d}x' f(x')$.
+Each trajectory contains the constraint force $f(t)$ from which the work along the pulling coordinate is computed as $W(x) = \int_{x_0}^{x} \mathrm{d}x' f(x')$.
 
 #### 2. Perform dcTMD analysis via an estimator
 * **Work-based estimator (`WorkEstimator`)**
-
     The free-energy profile is estimated as $\Delta G(x) = \langle W(x) \rangle - \frac{\beta}{2}\langle \delta W(x)^2 \rangle$, with $\delta W = W - \langle W \rangle$, $\beta = (k_\mathrm{B}T)^{-1}$, and $\langle . \rangle$ denoting a trajectory ensemble mean. The dissipated work is $W_\mathrm{diss}(x) = \frac{\beta}{2}\langle \delta W(x)^2 \rangle$. The non-equilibrium position-dependent friction is obtained from its derivative as $\Gamma(x) = \frac{1}{v} \frac{\mathrm{d}}{\mathrm{d}x} W_\mathrm{diss}(x)$.
 
 * **Force-correlation-based estimator (`ForceEstimator`)**
   In this approach, $\Delta G$ and $\Gamma$ are computed directy from the force data as $\Delta G(x) = \int_{x_0}^{x} \mathrm{d}x' \langle f(x') \rangle - v \int_{x_0}^{x} \mathrm{d}x' \Gamma(x')$ and $\Gamma(x) = \beta \int_0^{t(x)} \mathrm{d}\tau \langle \delta f(t(x)) \delta f(\tau) \rangle$. The two-time force autocorrelation function $C_t(\tau) = \langle \delta f(t(x)) \delta f(\tau) \rangle$ can be plotted to gain insight into timescales within degrees of freedom orthogonal to $x$.
 
-#### 3. Visualize and interpret results
-`dcTMD` provides plotting and export tools for:
-
-* work distributions
-* free-energy profiles $\Delta G(x)$
-* friction profiles $\Gamma(x)$
-
-In addition, the tool supports trajectory separation, enabling analysis of different dissociation routes (see @Taenzel2024_CommunityPaths).
+#### 3. Visualize
+`dcTMD` provides plotting tools for work distribution analysis, free-energy $\Delta G(x)$ and friction profiles $\Gamma(x)$.
 
 #### 4. Example
 ![Figures crated using data taken from  @Wolf2020_MultisecondDissociation of trypsin-benzamidine unbinding.  a)-c) work distribution analysis. d) Decomposition of mean work $W_{\rm mean} = \langle W(x) \rangle$ into free energy $\Delta G(x)$ and dissipation work $W_{\rm diss}(x)$. e) non-equilibrium friction coefficient $\Gamma (x)$ along the pulling coordinate $x$.](figures/image2.png){width=\linewidth}
 
-Figure 1 displays a common analysis of a set of unbinding trajectories from TMD simulations of the trypsin-benzamidine complex [@Wolf2020_MultisecondDissociation]. The analysis of the work distribution displays good agreement with a normal distribution at two different exaluated positions of the pulling coordinate $x$. The mean work $W_{\rm mean} = \langle W(x) \rangle$, which shows no features on its own, yields a free energy profile $\Delta G(x)$, which displays a clearly defined transition state at $x \approx 0.45$ nm as well as a bound state in form of a free energy minimum at $x \approx 0.0$ nm and an unbound continuum for $x > 0.6$ nm. The maximum in friction $\Gamma$ around $x = 0.5$ nm is indicative of changes in the hydration of both ligand and binding site.
+Figure 1 displays a common analysis of a set of unbinding trajectories from TMD simulations of the trypsin-benzamidine complex [@Wolf2020_MultisecondDissociation]. The analysis of the work distribution displays good agreement with a normal distribution at two different evaluated positions of the pulling coordinate $x$. The mean work $W_{\rm mean} = \langle W(x) \rangle$, which shows no features on its own, yields a free energy profile $\Delta G(x)$, which displays a clearly defined transition state at $x \approx 0.45$ nm as well as a bound state in form of a free energy minimum at $x \approx 0.0$ nm and an unbound continuum for $x > 0.6$ nm. The maximum in friction $\Gamma$ around $x = 0.5$ nm is indicative of changes in the hydration of both ligand and binding site.
 
 # Impact
 By providing an open and reproducible implementation of the dcTMD methodology, the software lowers the barrier for researchers to apply dissipation-corrected targeted molecular dynamics to ligand unbinding problems as well as other condensed soft matter systems. This enables broader exploration of nonequilibrium binding kinetics, supports mechanistic interpretation of frictional contributions, and provides access to position-dependent friction from targeted MD trajectories.  We anticipate the tool will be adopted in academic molecular simulation groups and in pharmaceutical research exploring unbinding free energies and kinetics.

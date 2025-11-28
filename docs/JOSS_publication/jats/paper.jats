@@ -176,17 +176,15 @@ a Creative Commons Attribution 4.0 International License (CC BY
     </list-item>
     <list-item>
       <p>Core functionality for computing free energy and
-      non-equilibrium friction profiles along the biasing coordinate.
-      </p>
+      non-equilibrium friction profiles along the biasing
+      coordinate.</p>
     </list-item>
     <list-item>
-      <p>Support for analysis of multiple unbinding pathways.
-      </p>
+      <p>Support for analysis of multiple unbinding pathways.</p>
     </list-item>
     <list-item>
       <p>Force correlation analysis for non-equilibrium friction
-      analysis.
-      </p>
+      analysis.</p>
     </list-item>
     <list-item>
       <p>Continuous integration and testing via GitHub Actions;
@@ -233,13 +231,7 @@ a Creative Commons Attribution 4.0 International License (CC BY
       <inline-formula><alternatives>
       <tex-math><![CDATA[f(t)]]></tex-math>
       <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>f</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>t</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>
-      along a pulling coordinate <inline-formula><alternatives>
-      <tex-math><![CDATA[x(t) = x_0 + vt]]></tex-math>
-      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>x</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>t</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:msub><mml:mi>x</mml:mi><mml:mn>0</mml:mn></mml:msub><mml:mo>+</mml:mo><mml:mi>v</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:math></alternatives></inline-formula>
-      with a constraint velocity <inline-formula><alternatives>
-      <tex-math><![CDATA[v]]></tex-math>
-      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>v</mml:mi></mml:math></alternatives></inline-formula>.
-      The work along each trajectory is computed as
+      from which the work along the pulling coordinate is computed as
       <inline-formula><alternatives>
       <tex-math><![CDATA[W(x) = \int_{x_0}^{x} \mathrm{d}x' f(x')]]></tex-math>
       <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>W</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:msubsup><mml:mo>∫</mml:mo><mml:msub><mml:mi>x</mml:mi><mml:mn>0</mml:mn></mml:msub><mml:mi>x</mml:mi></mml:msubsup><mml:mi mathvariant="normal">d</mml:mi><mml:mi>x</mml:mi><mml:mi>′</mml:mi><mml:mi>f</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mi>′</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>.</p>
@@ -249,9 +241,8 @@ a Creative Commons Attribution 4.0 International License (CC BY
       <list list-type="bullet">
         <list-item>
           <p><bold>Work-based estimator
-          (<monospace>WorkEstimator</monospace>)</bold></p>
-          <p>The free-energy profile is estimated as
-          <inline-formula><alternatives>
+          (<monospace>WorkEstimator</monospace>)</bold> The free-energy
+          profile is estimated as <inline-formula><alternatives>
           <tex-math><![CDATA[\Delta G(x) = \langle W(x) \rangle - \frac{\beta}{2}\langle \delta W(x)^2 \rangle]]></tex-math>
           <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>Δ</mml:mi><mml:mi>G</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:mo stretchy="false" form="prefix">⟨</mml:mo><mml:mi>W</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo stretchy="false" form="postfix">⟩</mml:mo><mml:mo>−</mml:mo><mml:mfrac><mml:mi>β</mml:mi><mml:mn>2</mml:mn></mml:mfrac><mml:mo stretchy="false" form="prefix">⟨</mml:mo><mml:mi>δ</mml:mi><mml:mi>W</mml:mi><mml:msup><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mn>2</mml:mn></mml:msup><mml:mo stretchy="false" form="postfix">⟩</mml:mo></mml:mrow></mml:math></alternatives></inline-formula>,
           with <inline-formula><alternatives>
@@ -263,8 +254,8 @@ a Creative Commons Attribution 4.0 International License (CC BY
           and <inline-formula><alternatives>
           <tex-math><![CDATA[\langle . \rangle]]></tex-math>
           <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mo stretchy="false" form="prefix">⟨</mml:mo><mml:mi>.</mml:mi><mml:mo stretchy="false" form="postfix">⟩</mml:mo></mml:mrow></mml:math></alternatives></inline-formula>
-          denoting a mean over the ensemble of trajectories. The
-          dissipated work is <inline-formula><alternatives>
+          denoting a trajectory ensemble mean. The dissipated work is
+          <inline-formula><alternatives>
           <tex-math><![CDATA[W_\mathrm{diss}(x) = \frac{\beta}{2}\langle \delta W(x)^2 \rangle]]></tex-math>
           <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>W</mml:mi><mml:mrow><mml:mi mathvariant="normal">d</mml:mi><mml:mi mathvariant="normal">i</mml:mi><mml:mi mathvariant="normal">s</mml:mi><mml:mi mathvariant="normal">s</mml:mi></mml:mrow></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:mfrac><mml:mi>β</mml:mi><mml:mn>2</mml:mn></mml:mfrac><mml:mo stretchy="false" form="prefix">⟨</mml:mo><mml:mi>δ</mml:mi><mml:mi>W</mml:mi><mml:msup><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mn>2</mml:mn></mml:msup><mml:mo stretchy="false" form="postfix">⟩</mml:mo></mml:mrow></mml:math></alternatives></inline-formula>.
           The non-equilibrium position-dependent friction is obtained
@@ -275,7 +266,7 @@ a Creative Commons Attribution 4.0 International License (CC BY
         <list-item>
           <p><bold>Force-correlation-based estimator
           (<monospace>ForceEstimator</monospace>)</bold> In this
-          approach the <inline-formula><alternatives>
+          approach, <inline-formula><alternatives>
           <tex-math><![CDATA[\Delta G]]></tex-math>
           <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>Δ</mml:mi><mml:mi>G</mml:mi></mml:mrow></mml:math></alternatives></inline-formula>
           and <inline-formula><alternatives>
@@ -288,42 +279,26 @@ a Creative Commons Attribution 4.0 International License (CC BY
           and <inline-formula><alternatives>
           <tex-math><![CDATA[\Gamma(x) = \beta \int_0^{t(x)} \mathrm{d}\tau \langle \delta f(t(x)) \delta f(\tau) \rangle]]></tex-math>
           <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>Γ</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:mi>β</mml:mi><mml:msubsup><mml:mo>∫</mml:mo><mml:mn>0</mml:mn><mml:mrow><mml:mi>t</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:msubsup><mml:mi mathvariant="normal">d</mml:mi><mml:mi>τ</mml:mi><mml:mo stretchy="false" form="prefix">⟨</mml:mo><mml:mi>δ</mml:mi><mml:mi>f</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>t</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mi>δ</mml:mi><mml:mi>f</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>τ</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo stretchy="false" form="postfix">⟩</mml:mo></mml:mrow></mml:math></alternatives></inline-formula>.
-          Furthermore, the two-time force autocorrelation function
+          The two-time force autocorrelation function
           <inline-formula><alternatives>
           <tex-math><![CDATA[C_t(\tau) = \langle \delta f(t(x)) \delta f(\tau) \rangle]]></tex-math>
           <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>C</mml:mi><mml:mi>t</mml:mi></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>τ</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:mo stretchy="false" form="prefix">⟨</mml:mo><mml:mi>δ</mml:mi><mml:mi>f</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>t</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mi>δ</mml:mi><mml:mi>f</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>τ</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo stretchy="false" form="postfix">⟩</mml:mo></mml:mrow></mml:math></alternatives></inline-formula>
-          can be plotted for selected values of
-          <inline-formula><alternatives>
-          <tex-math><![CDATA[t(x)]]></tex-math>
-          <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>t</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>
-          to gain insight into timescales within the ‘’bath’’ degrees of
-          freedom constituting dissipation channels and thus friction
-          sources.</p>
+          can be plotted to gain insight into timescales within degrees
+          of freedom orthogonal to <inline-formula><alternatives>
+          <tex-math><![CDATA[x]]></tex-math>
+          <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>x</mml:mi></mml:math></alternatives></inline-formula>.</p>
         </list-item>
       </list>
     </sec>
-    <sec id="visualize-and-interpret-results">
-      <title>3. Visualize and interpret results</title>
-      <p><monospace>dcTMD</monospace> provides plotting and export tools
-      for:</p>
-      <list list-type="bullet">
-        <list-item>
-          <p>work distributions</p>
-        </list-item>
-        <list-item>
-          <p>free-energy profiles <inline-formula><alternatives>
-          <tex-math><![CDATA[\Delta G(x)]]></tex-math>
-          <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>Δ</mml:mi><mml:mi>G</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula></p>
-        </list-item>
-        <list-item>
-          <p>friction profiles <inline-formula><alternatives>
-          <tex-math><![CDATA[\Gamma(x)]]></tex-math>
-          <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>Γ</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula></p>
-        </list-item>
-      </list>
-      <p>In addition, the tool supports trajectory separation, enabling
-      analysis of different dissociation routes (see Tänzel et al.
-      (<xref alt="2024" rid="ref-Taenzel2024_CommunityPaths" ref-type="bibr">2024</xref>)).</p>
+    <sec id="visualize">
+      <title>3. Visualize</title>
+      <p><monospace>dcTMD</monospace> provides plotting tools for work
+      distribution analysis, free-energy <inline-formula><alternatives>
+      <tex-math><![CDATA[\Delta G(x)]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>Δ</mml:mi><mml:mi>G</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>
+      and friction profiles <inline-formula><alternatives>
+      <tex-math><![CDATA[\Gamma(x)]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>Γ</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>.</p>
     </sec>
     <sec id="example">
       <title>4. Example</title>
@@ -353,7 +328,7 @@ a Creative Commons Attribution 4.0 International License (CC BY
       (<xref alt="Wolf et al., 2020" rid="ref-Wolf2020_MultisecondDissociation" ref-type="bibr">Wolf
       et al., 2020</xref>). The analysis of the work distribution
       displays good agreement with a normal distribution at two
-      different exaluated positions of the pulling coordinate
+      different evaluated positions of the pulling coordinate
       <inline-formula><alternatives>
       <tex-math><![CDATA[x]]></tex-math>
       <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>x</mml:mi></mml:math></alternatives></inline-formula>.
