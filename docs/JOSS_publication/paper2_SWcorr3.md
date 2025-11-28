@@ -39,9 +39,9 @@ Key architectural features include:
 
 * A modular API following `fit`/`transform` conventions familiar from *scikit-learn*, easing integration into analysis pipelines.
 * Input support for *GROMACS* pulling trajectories.
-* Core functionality for computing free energy and non-equilibrium friction profiles along the biasing coordinate.  
-* Support for analysis of multiple unbinding pathways.  
-* Force correlation analysis for non-equilibrium friction analysis.  
+* Core functionality for computing free energy and non-equilibrium friction profiles along the biasing coordinate.
+* Support for analysis of multiple unbinding pathways.
+* Force correlation analysis for non-equilibrium friction analysis.
 * Continuous integration and testing via GitHub Actions; documentation hosted at [https://moldyn.github.io/dcTMD](https://moldyn.github.io/dcTMD).  
 
 ## Use case
@@ -66,10 +66,10 @@ Each trajectory contains the constraint force $f(t)$ along a pulling coordinate 
 #### 2. Perform dcTMD analysis via an estimator
 * **Work-based estimator (`WorkEstimator`)**
 
-    The free-energy profile is estimated as $\Delta G(x) = \langle W(x) \rangle - \frac{\beta}{2}\langle \delta W(x)^2 \rangle$, with $\delta W = W - \langle W \rangle$, $\beta = (k_\mathrm{B}T)^{-1}$, and $\langle . \rangle$ denoting a mean over the ensemble of trajectories. The dissipated work is $W_\mathrm{diss}(x) = \frac{\beta}{2}\langle \delta W(x)^2 \rangle$. The non-equilibrium position-dependent friction is obtained from its derivative as $\Gamma(x) = \frac{1}{v} \frac{\mathrm{d}}{\mathrm{d}x} W_\mathrm{diss}(x)$.
+    The free-energy profile is estimated as $\Delta G(x) = \langle W(x) \rangle - \frac{\beta}{2}\langle \delta W(x)^2 \rangle$, with $\delta W = W - \langle W \rangle$, $\beta = (k_\mathrm{B}T)^{-1}$, and $\langle . \rangle$ denoting a trajectory ensemble mean. The dissipated work is $W_\mathrm{diss}(x) = \frac{\beta}{2}\langle \delta W(x)^2 \rangle$. The non-equilibrium position-dependent friction is obtained from its derivative as $\Gamma(x) = \frac{1}{v} \frac{\mathrm{d}}{\mathrm{d}x} W_\mathrm{diss}(x)$.
 
 * **Force-correlation-based estimator (`ForceEstimator`)**
-  In this approach the $\Delta G$ and $\Gamma$ are computed directy from the force data as $\Delta G(x) = \int_{x_0}^{x} \mathrm{d}x' \langle f(x') \rangle - v \int_{x_0}^{x} \mathrm{d}x' \Gamma(x')$ and $\Gamma(x) = \beta \int_0^{t(x)} \mathrm{d}\tau \langle \delta f(t(x)) \delta f(\tau) \rangle$. Furthermore, the two-time force autocorrelation function $C_t(\tau) = \langle \delta f(t(x)) \delta f(\tau) \rangle$ can be plotted for selected values of $t(x)$ to gain insight into timescales within the ''bath'' degrees of freedom constituting dissipation channels and thus friction sources.
+  In this approach, $\Delta G$ and $\Gamma$ are computed directy from the force data as $\Delta G(x) = \int_{x_0}^{x} \mathrm{d}x' \langle f(x') \rangle - v \int_{x_0}^{x} \mathrm{d}x' \Gamma(x')$ and $\Gamma(x) = \beta \int_0^{t(x)} \mathrm{d}\tau \langle \delta f(t(x)) \delta f(\tau) \rangle$. Furthermore, the two-time force autocorrelation function $C_t(\tau) = \langle \delta f(t(x)) \delta f(\tau) \rangle$ can be plotted to gain insight into timescales within degrees of freedom orthogonal to $x$.
 
 #### 3. Visualize and interpret results
 `dcTMD` provides plotting and export tools for:
