@@ -23,20 +23,21 @@ bibliography: paper.bib
 `dcTMD` is a Python package designed to extract free-energy and nonequilibrium friction estimates from targeted molecular dynamics (TMD) simulations [@Schlitter1994_TMD]. The method implemented here is called *dissipation-corrected targeted molecular dynamics* (dcTMD) by @Wolf2018_dcTMD.
 Given a set of non-equilibrium simulations where, for example, a ligand is pulled from a binding site via a velocity constraint, this tool performs automated post-processing of the bias-force time traces to estimate the underlying free-energy landscape and the friction (dissipation) along the unbinding coordinate.  
 
-The method is based on a second-order cumulant expansion of *Jarzynski’s equality* [@Jarzynski1997_NonEq], which connects nonequilibrium work distributions to equilibrium free-energy differences. Combined with a Markovian Langevin Equation, dcTMD further allows the extraction of *position- and velocity-dependent friction coefficients* from the same nonequilibrium data. This approach has been succesfully applied in multiple studies [@Wolf2020_MultisecondDissociation @Jaeger2022_IonChannelConductance @Bray_2022_JCIM @Post2022_JCTC @Cai_2023_anisotropic @Taenzel2024_CommunityPaths @Jaeger2025_SimilarityMeasures @Milster_2025_NEQ].
+The method is based on a second-order cumulant expansion of *Jarzynski’s equality* [@Jarzynski1997_NonEq], which connects nonequilibrium work distributions to equilibrium free-energy differences. Combined with a Markovian Langevin Equation, dcTMD further allows the extraction of *position- and velocity-dependent friction coefficients* from the same nonequilibrium data. This approach has been succesfully applied in multiple studies (@Wolf2020_MultisecondDissociation @Jaeger2022_IonChannelConductance @Bray_2022_JCIM @Post2022_JCTC @Cai_2023_anisotropic @Taenzel2024_CommunityPaths @Jaeger2025_SimilarityMeasures @Milster_2025_NEQ).
 The resulting free-energy and friction profiles can subsequently be used to estimate *binding and unbinding rate constants* following @Wolf2020_MultisecondDissociation.  
 
 The software is intended for molecular dynamics practitioners interested in ligand–protein unbinding, mechanistic interpretation of binding kinetics, and quantitative modeling of non-equilibrium effects in soft condensed matter and biomolecular systems.  
 
 # Statement of need
-Ligand unbinding from proteins is of fundamental interest in computational biophysics [@Copeland_2016_drugtarget @Schuetz_2017_kinetics]. In many cases, the unbinding event is rare and requires enhanced-sampling or biased-simulation strategies to observe within computationally feasible timescales. 
+Ligand unbinding from proteins is of fundamental interest in computational biophysics (@Copeland_2016_drugtarget @Schuetz_2017_kinetics). In many cases, the unbinding event is rare and requires enhanced-sampling or biased-simulation strategies to observe within computationally feasible timescales. 
 dcTMD-based workflows have been shown to yield accurate free energy and non-equilibrium friction coefficients from velocity-constrained pulling simulations. The dcTMD package builds on this work by offering a unified, documented, and extensible implementation (including pathway separation analysis, see @Wolf_2023_path) that is currently not available, thereby lowering the barrier for applying dcTMD to new biomolecular systems and for reproducing published dcTMD studies.
 ​The *dcTMD* tool offers:  
-- automatic parsing of Gromacs pulling simulation outputs,  
-- estimation of work distributions from trajectory ensembles,  
-- estimation of free-energy profiles along the biasing coordinate,  
-- estimation of non-equilibrium friction coefficients along the same coordinate,  
-- force autocorrelation analysis.
+
+* automatic parsing of Gromacs pulling simulation outputs,  
+* estimation of work distributions from trajectory ensembles,  
+* estimation of free-energy profiles along the biasing coordinate,  
+* estimation of non-equilibrium friction coefficients along the same coordinate,  
+* force autocorrelation analysis.
 
 By providing a dedicated Python framework with an `scikit-learn`-style API, `dcTMD` enables users to integrate dissipation-corrected analysis into existing workflows, ensuring reproducibility and broad accessibility.
 The software has already been successfully applied in several studies (e.g. [@Taenzel2024_CommunityPaths], [@Jaeger2025_SimilarityMeasures]), and is expected to promote the wider adoption of the dissipation-corrected targeted MD approach in computational chemistry and biophysics.  
@@ -46,12 +47,13 @@ The code is written in Python (versions 3.9–3.14) and is available under the M
 **Repository:** [https://github.com/moldyn/dcTMD](https://github.com/moldyn/dcTMD)
 
 Key architectural features include:  
-- A modular API following `fit`/`transform` conventions familiar from *scikit-learn*, easing integration into analysis pipelines.
-- Input support for *GROMACS* pulling trajectories.
-- Core functionality for computing free energy and non-equilibrium friction profiles along the biasing coordinate.  
-- Support for analysis of multiple unbinding pathways.  
-- Force correlation analysis for non-equilibrium friction analysis.  
-- Continuous integration and testing via GitHub Actions; documentation hosted at [https://moldyn.github.io/dcTMD](https://moldyn.github.io/dcTMD).  
+
+* A modular API following `fit`/`transform` conventions familiar from *scikit-learn*, easing integration into analysis pipelines.
+* Input support for *GROMACS* pulling trajectories.
+* Core functionality for computing free energy and non-equilibrium friction profiles along the biasing coordinate.  
+* Support for analysis of multiple unbinding pathways.  
+* Force correlation analysis for non-equilibrium friction analysis.  
+* Continuous integration and testing via GitHub Actions; documentation hosted at [https://moldyn.github.io/dcTMD](https://moldyn.github.io/dcTMD).  
 
 ## Use case
 A typical workflow begins with the user performing at least 100 independent velocity-constraint pulling simulations. `dcTMD` provides two analysis routes, both following the same workflow pattern:
@@ -82,6 +84,7 @@ Each trajectory contains the constraint force $f(t)$ along a pulling coordinate 
 
 #### 3. Visualize and interpret results
 `dcTMD` provides plotting and export tools for:
+
 * free-energy profiles $\Delta G(x)$
 * friction profiles $\Gamma(x)$
 * work distributions
