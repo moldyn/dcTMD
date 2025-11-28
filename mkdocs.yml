@@ -113,7 +113,7 @@ plugins:
     handlers:
       python:
         paths: [src]
-        import:
+        inventories:
         - https://numpy.org/doc/stable/objects.inv
         options:
           members_order: "source"
