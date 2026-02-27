@@ -8,7 +8,7 @@ authors:
   - name: Daniel Nagel
     affiliation: 2
   - name: Steffen Wolf
-    affiliation: 1 3
+    affiliation: "1,3"
 affiliations:
   - index: 1
     name: University of Freiburg, Institute of Physics, Freiburg, Germany
