@@ -49,6 +49,7 @@ dissipation-corrected targeted molecular dynamics</article-title>
 <given-names>Steffen</given-names>
 </name>
 <xref ref-type="aff" rid="aff-1"/>
+<xref ref-type="aff" rid="aff-3"/>
 </contrib>
 <aff id="aff-1">
 <institution-wrap>
@@ -62,10 +63,16 @@ Germany</institution>
 Heidelberg, Germany</institution>
 </institution-wrap>
 </aff>
+<aff id="aff-3">
+<institution-wrap>
+<institution>Darmstadt University of Applied Science, Faculty of
+Chemical Engineering and Biotechnology, Darmstadt, Germany</institution>
+</institution-wrap>
+</aff>
 </contrib-group>
-<pub-date date-type="pub" publication-format="electronic" iso-8601-date="2025-11-27">
+<pub-date date-type="pub" publication-format="electronic" iso-8601-date="2025-01-27">
 <day>27</day>
-<month>11</month>
+<month>1</month>
 <year>2025</year>
 </pub-date>
 <volume>¿VOL?</volume>
@@ -90,34 +97,34 @@ a Creative Commons Attribution 4.0 International License (CC BY
   <title>Summary</title>
   <p><monospace>dcTMD</monospace> is a Python package designed to
   extract free-energy and non-equilibrium friction estimates from
-  targeted molecular dynamics (TMD) simulations
-  (<xref alt="Schlitter et al., 1994" rid="ref-Schlitter1994_TMD" ref-type="bibr">Schlitter
-  et al., 1994</xref>). The method implemented here is called
-  <italic>dissipation-corrected targeted molecular dynamics</italic>
-  (dcTMD) by Wolf &amp; Stock
+  targeted molecular dynamics (TMD) simulations by Schlitter et al.
+  (<xref alt="1994" rid="ref-Schlitter1994_TMD" ref-type="bibr">1994</xref>).
+  The method implemented here is called <italic>dissipation-corrected
+  targeted molecular dynamics</italic> (dcTMD) by Wolf &amp; Stock
   (<xref alt="2018" rid="ref-Wolf2018_dcTMD" ref-type="bibr">2018</xref>).
   Given a set of non-equilibrium simulations where, for example, a
-  ligand is pulled from a binding site via a velocity constraint, this
-  tool performs automated post-processing of the bias-force time traces
-  to estimate the underlying free-energy landscape and the friction
-  (dissipation) along the unbinding coordinate.</p>
-  <p>The method is based on a second-order cumulant expansion of
-  <italic>Jarzynski’s equality</italic>
-  (<xref alt="Jarzynski, 1997" rid="ref-Jarzynski1997_NonEq" ref-type="bibr">Jarzynski,
-  1997</xref>), which connects non-equilibrium work distributions to
-  equilibrium free-energy differences. Combined with a Markovian
-  Langevin Equation, dcTMD further allows the extraction of
-  <italic>position- and velocity-dependent friction
-  coefficients</italic> from the same non-equilibrium data. This
-  approach has been succesfully applied in multiple studies (Wolf et al.
-  (<xref alt="2020" rid="ref-Wolf2020_MultisecondDissociation" ref-type="bibr">2020</xref>)
+  ligand is pulled from a protein binding site via a velocity
+  constraint, this tool performs automated post-processing of the
+  bias-force time traces to estimate the underlying free-energy
+  landscape and the friction (dissipation) along the unbinding
+  coordinate.</p>
+  <p>The method is based on a second-order cumulant expansion of the
+  <italic>Jarzynski equality</italic> (Jarzynski
+  (<xref alt="1997" rid="ref-Jarzynski1997_NonEq" ref-type="bibr">1997</xref>)),
+  which connects non-equilibrium work distributions to equilibrium
+  free-energy differences. Combined with a Markovian Langevin Equation,
+  dcTMD further allows the extraction of <italic>position- and
+  velocity-dependent friction coefficients</italic> from the same
+  non-equilibrium data. This approach has been succesfully applied in
+  multiple studies (Wolf et al.
+  (<xref alt="2020" rid="ref-Wolf2020_MultisecondDissociation" ref-type="bibr">2020</xref>),
   Jäger et al.
-  (<xref alt="2022" rid="ref-Jaeger2022_IonChannelConductance" ref-type="bibr">2022</xref>)
+  (<xref alt="2022" rid="ref-Jaeger2022_IonChannelConductance" ref-type="bibr">2022</xref>),
   Post et al.
-  (<xref alt="2022" rid="ref-Post2022_JCTC" ref-type="bibr">2022</xref>)
+  (<xref alt="2022" rid="ref-Post2022_JCTC" ref-type="bibr">2022</xref>),
   Tänzel et al.
-  (<xref alt="2024" rid="ref-Taenzel2024_CommunityPaths" ref-type="bibr">2024</xref>)
-  Jäger &amp; Wolf
+  (<xref alt="2024" rid="ref-Taenzel2024_CommunityPaths" ref-type="bibr">2024</xref>),
+  and Jäger &amp; Wolf
   (<xref alt="2025" rid="ref-Jaeger2025_SimilarityMeasures" ref-type="bibr">2025</xref>)
   Milster et al.
   (<xref alt="2025" rid="ref-Milster_2025_NEQ" ref-type="bibr">2025</xref>)).
@@ -144,32 +151,124 @@ a Creative Commons Attribution 4.0 International License (CC BY
   extensible implementation that is currently not available, thereby
   lowering the barrier for applying dcTMD to new biomolecular systems
   and for reproducing published dcTMD studies. By providing a dedicated
-  Python framework with an <monospace>scikit-learn</monospace>-style
-  API, <monospace>dcTMD</monospace> enables users to integrate
+  Python framework with a <monospace>scikit-learn</monospace>-style API,
+  <monospace>dcTMD</monospace> enables users to integrate
   dissipation-corrected analysis into existing workflows, ensuring
-  reproducibility and broad accessibility. The software has already been
-  successfully applied in several studies (e.g.
-  (<xref alt="Tänzel et al., 2024" rid="ref-Taenzel2024_CommunityPaths" ref-type="bibr">Tänzel
-  et al., 2024</xref>),
-  (<xref alt="Jäger &amp; Wolf, 2025" rid="ref-Jaeger2025_SimilarityMeasures" ref-type="bibr">Jäger
-  &amp; Wolf, 2025</xref>)), and is expected to promote the wider
-  adoption of the dissipation-corrected targeted MD approach in
-  computational chemistry and biophysics.</p>
+  reproducibility and broad accessibility.</p>
 </sec>
-<sec id="implementation-and-architecture">
-  <title>Implementation and architecture</title>
+<sec id="state-of-the-field">
+  <title>State of the field</title>
+  <p>Enhanced sampling methods are readily integrated in simulation
+  software packages, e.g., umbrella sampling, or steered MD in GROMACS
+  (Abraham et al.
+  (<xref alt="2015" rid="ref-abraham2015gromacs" ref-type="bibr">2015</xref>)).
+  Furthermore, dedicated frameworks such as PLUMED (The PLUMED
+  consortium
+  (<xref alt="2019" rid="ref-plumed2019promoting" ref-type="bibr">2019</xref>)),
+  PySAGES (Zubieta Rico et al.
+  (<xref alt="2024" rid="ref-zubieta2024pysages" ref-type="bibr">2024</xref>)),
+  and Colvars (Fiorin et al.
+  (<xref alt="2013" rid="ref-fiorin2013using" ref-type="bibr">2013</xref>))
+  provide infrastructure for collective variable definition, enhanced
+  sampling and biasing during simulation across multiple molecular
+  dynamics engines.</p>
+  <p>The present software targets the analysis of an ensemble of
+  constant-velocity pulling trajectories required for dcTMD. This
+  approach relies on constraint pulling simulations created with GROMACS
+  in which the reaction coordinate is enforced via holonomic
+  constraints. The corresponding constraint forces are recorded for
+  subsequent analysis. PLUMED and Colvars employ steered molecular
+  dynamics through moving harmonic restraints rather than
+  constraint-based TMD pulling, while PySAGES does not provide support
+  for GROMACS constraint pulling workflows.</p>
+  <p>To address this gap, we developed a standalone analysis package
+  that handles ensembles of GROMACS constraint pulling simulations and
+  provides a dedicated workflow for dcTMD post-processing.</p>
+</sec>
+<sec id="software-design">
+  <title>Software design</title>
+  <p>dcTMD is implemented in Python, since it allows rapid development
+  and community contributions. Potential performance trade-offs
+  associated with an interpreted language are mitigated through the
+  usage of optimized numerical backend libraries such as NumPy and
+  SciPy.</p>
+  <p>The package inherits the core base classes
+  <monospace>BaseEstimator</monospace> and
+  <monospace>TransformerMixin</monospace> from
+  <italic>scikit-learn</italic> (Pedregosa et al.
+  (<xref alt="2011" rid="ref-scikit-learn" ref-type="bibr">2011</xref>)).
+  Thus, the design follows the familiar
+  <monospace>fit</monospace>/<monospace>transform</monospace>
+  conventions and ensures interoperability with scikit-learn’s
+  ecosystem. This simplifies integration into analysis pipelines and
+  promotes a familiar workflow for users. The software architecture has
+  a modular design with five top-level submodules:
+  <monospace>dcTMD</monospace>, <monospace>storing</monospace>,
+  <monospace>io</monospace>, <monospace>utils</monospace>, and
+  <monospace>featureset</monospace>.</p>
+  <p>Because trajectory parsing constitutes the dominant runtime cost,
+  we separate data ingestion from model evaluation. Saving of trajectory
+  data into numpy arrays and the evaluation routines are separated into
+  two core submodules: <monospace>storing</monospace> and
+  <monospace>dcTMD</monospace>. The <monospace>storing</monospace>
+  submodule defines the dataset objects <monospace>WorkSet</monospace>
+  and <monospace>ForceSet</monospace>. These are data handlers that
+  standardize the trajectory files into aligned NumPy arrays and allow
+  the processed datasets to be saved to disk and reloaded without
+  reprocessing the original trajectory files. The estimators reside in
+  the <monospace>dcTMD</monospace> submodule and operate directly on
+  these dataset objects. This separation reduces redundant I/O during
+  iterative analyses.</p>
+  <p>The <monospace>io</monospace> and <monospace>utils</monospace>
+  modules isolate file handling, bootstrapping, smoothing, and plotting
+  utilities. Finally, the <monospace>featureset</monospace> enables
+  pathway-level analysis by loading trajectory-specific feature files
+  into a consistent array representation, enabling downstream
+  similarity/clustering workflows.</p>
+</sec>
+<sec id="research-impact-statement">
+  <title>Research impact statement</title>
+  <p>As mentioned above, dcTMD has been already shown to efficiently
+  coarse-grain system dynamics for such diverse systems as
+  protein-ligand complexes (Wolf et al.
+  (<xref alt="2020" rid="ref-Wolf2020_MultisecondDissociation" ref-type="bibr">2020</xref>)),
+  ion channels (Jäger et al.
+  (<xref alt="2022" rid="ref-Jaeger2022_IonChannelConductance" ref-type="bibr">2022</xref>))
+  or to gain insight into shear-dependent viscosities in solvents and
+  lubricants (Post et al.
+  (<xref alt="2022" rid="ref-Post2022_JCTC" ref-type="bibr">2022</xref>),
+  Milster et al.
+  (<xref alt="2025" rid="ref-Milster_2025_NEQ" ref-type="bibr">2025</xref>)).
+  The method thus has proven its capabilities to the scientific
+  community. Its distribution so far was hampered by the necessity to
+  manually implement dcTMD in the form of self-written scripts. The
+  presented package represents a comprehensive and easy-to-use tool to
+  allow other groups who are interested in applying dcTMD to their
+  problems, that has been optimized for fast and efficient data
+  evaluation with minimal runtime and memory requirements. We allow not
+  only for dissipation correction or friction coefficient calculation
+  via a work-based analysis, but to gain insight into bath degrees of
+  freedom via a force-correlation analysis. Furthermore, the
+  standardised outputs allow for data evaluation quality control across
+  research groups and allow for the establishment of best practices in
+  the usage of dcTMD. The software has already been successfully applied
+  in the following studies: Tänzel et al.
+  (<xref alt="2024" rid="ref-Taenzel2024_CommunityPaths" ref-type="bibr">2024</xref>),
+  Lalis et al.
+  (<xref alt="2025" rid="ref-Lalis2025" ref-type="bibr">2025</xref>),
+  Jäger &amp; Wolf
+  (<xref alt="2025" rid="ref-Jaeger2025_SimilarityMeasures" ref-type="bibr">2025</xref>),
+  and Milster et al.
+  (<xref alt="2025" rid="ref-Milster_2025_NEQ" ref-type="bibr">2025</xref>).</p>
+</sec>
+<sec id="implementation">
+  <title>Implementation</title>
   <p>The code is written in Python (versions 3.9–3.14) and is available
   under the MIT license.
   <bold>Repository:</bold>
   <ext-link ext-link-type="uri" xlink:href="https://github.com/moldyn/dcTMD">https://github.com/moldyn/dcTMD</ext-link></p>
-  <p>Key architectural features include:</p>
+  <p>Key features include:</p>
   <list list-type="bullet">
-    <list-item>
-      <p>A modular API following
-      <monospace>fit</monospace>/<monospace>transform</monospace>
-      conventions familiar from <italic>scikit-learn</italic>, easing
-      integration into analysis pipelines.</p>
-    </list-item>
     <list-item>
       <p>Input support for <italic>GROMACS</italic> pulling
       trajectories.</p>
@@ -360,33 +459,33 @@ a Creative Commons Attribution 4.0 International License (CC BY
     </sec>
   </sec>
 </sec>
-<sec id="impact">
-  <title>Impact</title>
-  <p>By providing an open and reproducible implementation of the dcTMD
-  methodology, the software lowers the barrier for researchers to apply
-  dissipation-corrected targeted molecular dynamics to ligand unbinding
-  problems as well as other condensed soft matter systems. This enables
-  broader exploration of non-equilibrium binding kinetics, supports
-  mechanistic interpretation of frictional contributions, and provides
-  access to position-dependent friction from targeted MD trajectories.
-  We anticipate the tool will be adopted in academic molecular
-  simulation groups and in pharmaceutical research exploring unbinding
-  free energies and kinetics.</p>
+<sec id="ai-usage-disclosure">
+  <title>AI usage disclosure</title>
+  <p>Generative AI (ChatGPT with models GPT-4, GPT-4o and GPT-5) was
+  used in a limited capacity during development. It assisted by drafting
+  portions of the documentation, drafting code for selected tests,
+  utility functions, and parts of the <monospace>featureset</monospace>
+  module, and preparing an initial draft of the manuscript text. All
+  scientific concepts, core design decisions, and implementation of the
+  core modules (<monospace>dcTMD</monospace>, <monospace>io</monospace>,
+  and <monospace>storing</monospace>) were developed without generative
+  AI. The authors guarantee that they reviewed, edited, and validated
+  all AI-assisted outputs.</p>
 </sec>
 <sec id="acknowledgements">
   <title>Acknowledgements</title>
   <p>The implementation of dcTMD builds on the Python scientific stack,
-  relying on <bold>NumPy</bold>
-  (<xref alt="Harris et al., 2020" rid="ref-numpy2020" ref-type="bibr">Harris
-  et al., 2020</xref>) for numerical operations, <bold>Matplotlib</bold>
-  (<xref alt="Hunter, 2007" rid="ref-matplotlib" ref-type="bibr">Hunter,
-  2007</xref>) for visualization, and <bold>Click</bold>
-  (<xref alt="The Pallets Projects, 2023" rid="ref-click" ref-type="bibr">The
-  Pallets Projects, 2023</xref>) for the command-line interface. We
-  thank Gerhard Stock, Matthias Post and Georg Diez for valuable
-  discussions, and Fabian Rohrbach and Leo Küchler for testing the
-  software. This work has been supported by the Deutsche
-  Forschungsgemeinschaft (DFG) via the Research Unit FOR 5099
+  relying on <bold>NumPy</bold> (Harris et al.
+  (<xref alt="2020" rid="ref-numpy2020" ref-type="bibr">2020</xref>))
+  for numerical operations, <bold>Matplotlib</bold> (Hunter
+  (<xref alt="2007" rid="ref-matplotlib" ref-type="bibr">2007</xref>))
+  for visualization, and <bold>Click</bold> (The Pallets Projects
+  (<xref alt="2023" rid="ref-click" ref-type="bibr">2023</xref>)) for
+  the command-line interface. We thank Gerhard Stock, Matthias Post and
+  Georg Diez for valuable discussions, and Fabian Rohrbach and Leo
+  Küchler for testing the software. This work has been supported by the
+  Deutsche Forschungsgemeinschaft (DFG) via grants WO2410/2-1 and
+  WO2410/2-2 within the framework of the Research Unit FOR 5099
   <italic>“Reducing complexity of nonequilibrium systems”</italic>
   (project No. 431945604). The authors acknowledge support by the High
   Performance and Cloud Computing Group at the Zentrum für
@@ -645,6 +744,27 @@ a Creative Commons Attribution 4.0 International License (CC BY
       <lpage>362</lpage>
     </element-citation>
   </ref>
+  <ref id="ref-abraham2015gromacs">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Abraham</surname><given-names>Mark J.</given-names></name>
+        <name><surname>Murtola</surname><given-names>Teemu</given-names></name>
+        <name><surname>Schulz</surname><given-names>Roland</given-names></name>
+        <name><surname>Páll</surname><given-names>Szilárd</given-names></name>
+        <name><surname>Smith</surname><given-names>Jeremy C.</given-names></name>
+        <name><surname>Hess</surname><given-names>Berk</given-names></name>
+        <name><surname>Lindahl</surname><given-names>Erik</given-names></name>
+      </person-group>
+      <article-title>GROMACS: High performance molecular simulations through multi-level parallelism from laptops to supercomputers</article-title>
+      <source>SoftwareX</source>
+      <year iso-8601-date="2015">2015</year>
+      <volume>1–2</volume>
+      <issn>2352-7110</issn>
+      <pub-id pub-id-type="doi">10.1016/j.softx.2015.06.001</pub-id>
+      <fpage>19</fpage>
+      <lpage>25</lpage>
+    </element-citation>
+  </ref>
   <ref id="ref-click">
     <element-citation publication-type="software">
       <person-group person-group-type="author">
@@ -653,6 +773,118 @@ a Creative Commons Attribution 4.0 International License (CC BY
       <article-title>Click: Python composable command line interface toolkit</article-title>
       <year iso-8601-date="2023">2023</year>
       <uri>https://palletsprojects.com/p/click</uri>
+    </element-citation>
+  </ref>
+  <ref id="ref-zubieta2024pysages">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Zubieta Rico</surname><given-names>Pablo F</given-names></name>
+        <name><surname>Schneider</surname><given-names>Ludwig</given-names></name>
+        <name><surname>Pérez-Lemus</surname><given-names>Gustavo R</given-names></name>
+        <name><surname>Alessandri</surname><given-names>Riccardo</given-names></name>
+        <name><surname>Dasetty</surname><given-names>Siva</given-names></name>
+        <name><surname>Nguyen</surname><given-names>Trung D</given-names></name>
+        <name><surname>Menéndez</surname><given-names>Cintia A</given-names></name>
+        <name><surname>Wu</surname><given-names>Yiheng</given-names></name>
+        <name><surname>Jin</surname><given-names>Yezhi</given-names></name>
+        <name><surname>Xu</surname><given-names>Yinan</given-names></name>
+        <name><surname>others</surname></name>
+      </person-group>
+      <article-title>PySAGES: Flexible, advanced sampling methods accelerated with GPUs</article-title>
+      <source>npj Computational Materials</source>
+      <publisher-name>Nature Publishing Group UK London</publisher-name>
+      <year iso-8601-date="2024">2024</year>
+      <volume>10</volume>
+      <issue>1</issue>
+      <fpage>35</fpage>
+      <lpage></lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-fiorin2013using">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Fiorin</surname><given-names>Giacomo</given-names></name>
+        <name><surname>Klein</surname><given-names>Michael L</given-names></name>
+        <name><surname>Hénin</surname><given-names>Jérôme</given-names></name>
+      </person-group>
+      <article-title>Using collective variables to drive molecular dynamics simulations</article-title>
+      <source>Molecular Physics</source>
+      <publisher-name>Taylor &amp; Francis</publisher-name>
+      <year iso-8601-date="2013">2013</year>
+      <volume>111</volume>
+      <issue>22-23</issue>
+      <fpage>3345</fpage>
+      <lpage>3362</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-plumed2019promoting">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <string-name>The PLUMED consortium</string-name>
+      </person-group>
+      <article-title>Promoting transparency and reproducibility in enhanced molecular simulations</article-title>
+      <source>Nature Methods</source>
+      <year iso-8601-date="2019">2019</year>
+      <volume>16</volume>
+      <issue>8</issue>
+      <pub-id pub-id-type="doi">10.1038/s41592-019-0506-8</pub-id>
+      <fpage>670</fpage>
+      <lpage>673</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-scikit-learn">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Pedregosa</surname><given-names>F.</given-names></name>
+        <name><surname>Varoquaux</surname><given-names>G.</given-names></name>
+        <name><surname>Gramfort</surname><given-names>A.</given-names></name>
+        <name><surname>Michel</surname><given-names>V.</given-names></name>
+        <name><surname>Thirion</surname><given-names>B.</given-names></name>
+        <name><surname>Grisel</surname><given-names>O.</given-names></name>
+        <name><surname>Blondel</surname><given-names>M.</given-names></name>
+        <name><surname>Prettenhofer</surname><given-names>P.</given-names></name>
+        <name><surname>Weiss</surname><given-names>R.</given-names></name>
+        <name><surname>Dubourg</surname><given-names>V.</given-names></name>
+        <name><surname>Vanderplas</surname><given-names>J.</given-names></name>
+        <name><surname>Passos</surname><given-names>A.</given-names></name>
+        <name><surname>Cournapeau</surname><given-names>D.</given-names></name>
+        <name><surname>Brucher</surname><given-names>M.</given-names></name>
+        <name><surname>Perrot</surname><given-names>M.</given-names></name>
+        <name><surname>Duchesnay</surname><given-names>E.</given-names></name>
+      </person-group>
+      <article-title>Scikit-learn: Machine learning in Python</article-title>
+      <source>Journal of Machine Learning Research</source>
+      <year iso-8601-date="2011">2011</year>
+      <volume>12</volume>
+      <pub-id pub-id-type="doi">10.5555/1953048.2078195</pub-id>
+      <fpage>2825</fpage>
+      <lpage>2830</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-Lalis2025">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Lalis</surname><given-names>Maxence</given-names></name>
+        <name><surname>Moitrier</surname><given-names>Lucie</given-names></name>
+        <name><surname>Jäger</surname><given-names>Miriam</given-names></name>
+        <name><surname>Meinert</surname><given-names>Cornelia</given-names></name>
+        <name><surname>Brulé</surname><given-names>Marine</given-names></name>
+        <name><surname>Belloir</surname><given-names>Christine</given-names></name>
+        <name><surname>Jones</surname><given-names>Nykola C.</given-names></name>
+        <name><surname>Hoffmann</surname><given-names>Søren V.</given-names></name>
+        <name><surname>Fiorucci</surname><given-names>Sébastien</given-names></name>
+        <name><surname>Wolf</surname><given-names>Steffen</given-names></name>
+        <name><surname>Briand</surname><given-names>Loïc</given-names></name>
+        <name><surname>Topin</surname><given-names>Jérémie</given-names></name>
+      </person-group>
+      <article-title>How allosteric mutations control ligand binding in lipocalin protein: Odorant binding protein as a test case</article-title>
+      <source>Cellular and Molecular Life Sciences</source>
+      <year iso-8601-date="2025">2025</year>
+      <volume>82</volume>
+      <issue>1</issue>
+      <pub-id pub-id-type="doi">10.1007/s00018-025-05777-8</pub-id>
+      <fpage>250</fpage>
+      <lpage></lpage>
     </element-citation>
   </ref>
 </ref-list>
