@@ -62,7 +62,13 @@ cd equib/
 
 for i in {000..009}
 do
-gmx grompp -f ../3ptb_AMBER99SB_ben_pushEQUIBRUN.mdp -c ../3ptb_AMBER99SB_ben.gro -r ../3ptb_AMBER99SB_ben.gro -p ../3ptb_AMBER99SB_ben.top -n ../3ptb_AMBER99SB_ben.ndx -o 3ptb_AMBER99SB_ben_pushEQUIBRUN_"$i".tpr -maxwarn 1 
+gmx grompp -f ../3ptb_AMBER99SB_ben_pushEQUIBRUN.mdp \
+            -c ../3ptb_AMBER99SB_ben.gro \
+            -r ../3ptb_AMBER99SB_ben.gro \
+            -p ../3ptb_AMBER99SB_ben.top \
+            -n ../3ptb_AMBER99SB_ben.ndx \
+            -o 3ptb_AMBER99SB_ben_pushEQUIBRUN_"$i".tpr \
+            -maxwarn 2
 done
 ```
 
@@ -81,7 +87,11 @@ cd v0.001/
 
 for i in {000..009}
 do
-gmx grompp -f ../3ptb_AMBER99SB_ben_pushRUN_v0.001.mdp -c ../equib/3ptb_AMBER99SB_ben_pushEQUIBRUN_"$i".gro -p ../3ptb_AMBER99SB_ben.top -n ../3ptb_AMBER99SB_ben.ndx -o 3ptb_AMBER99SB_ben_pushRUN_0.001_"$i".tpr
+gmx grompp -f ../3ptb_AMBER99SB_ben_pushRUN_v0.001.mdp \
+            -c ../equib/3ptb_AMBER99SB_ben_pushEQUIBRUN_"$i".gro \
+            -p ../3ptb_AMBER99SB_ben.top \
+            -n ../3ptb_AMBER99SB_ben.ndx \
+            -o 3ptb_AMBER99SB_ben_pushRUN_0.001_"$i".tpr
 done
 ```
 Note that the notation ***\_0.001\_*** stands for a velocity in Gromacs units of $0.001~\text{nm}/\text{ps}$, i.e., $1~\text{m}/\text{s}$. To our current experience, this is a sweet-spot velocity with the best trade-off between slow pulling and minimal computational effort. Run the simulations via, e.g.,
