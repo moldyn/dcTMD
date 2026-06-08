@@ -19,6 +19,7 @@ from beartype.typing import Union, Tuple, Optional
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from dcTMD import utils
+from dcTMD.storing import WorkSet, ForceSet
 from dcTMD._typing import (
     Int,
     Float,
@@ -32,8 +33,8 @@ from dcTMD._typing import (
 
 
 class _SmoothBasisEstimator(ABC):
-    """Class with the smoothing method for `WorkEstimator`, `ForceEstimator`.
-    """
+    """Class with the smoothing method for `WorkEstimator`, `ForceEstimator`."""
+
     @beartype
     def smooth_friction(
         self,
@@ -73,7 +74,9 @@ class _SmoothBasisEstimator(ABC):
 
 
 class WorkEstimator(
-    _SmoothBasisEstimator, TransformerMixin, BaseEstimator,
+    _SmoothBasisEstimator,
+    TransformerMixin,
+    BaseEstimator,
 ):  # noqa: WPS230, WPS214
     """Class for performing dcTMD analysis on a work set.
 
@@ -151,7 +154,7 @@ dcTMD.WorkEstimator.estimate_free_energy_errors].
     @beartype
     def fit(
         self,
-        work_set,
+        work_set: WorkSet,
     ):
         """
         Estimate free energy and friction.
@@ -177,15 +180,17 @@ dcTMD.WorkEstimator.estimate_free_energy_errors].
 
     @beartype
     def transform(
-        self, X, y=None,
-    ) -> Tuple[Float1DArray, Float1DArray]:  # noqa: WPS111
+        self,
+        X: Optional[WorkSet] = None,
+        y: Optional[np.ndarray] = None,
+    ) -> Tuple[Float1DArray, Float1DArray]:
         """Return free energy and friction estimates."""
         return self.dG_, self.friction_
 
     @beartype
     def estimate_free_energy(
         self,
-        work_set=None,
+        work_set: Optional[Float2DArray] = None,
     ) -> Tuple[Float1DArray, Float1DArray, Float1DArray]:
         """
         Estimate free energy.
@@ -193,8 +198,9 @@ dcTMD.WorkEstimator.estimate_free_energy_errors].
         Parameters
         ----------
         work_set : optional
-            Instance of a WorkSet containing constraint forces, for which the
-            free energy and friction are estimated.
+            2D array of work time traces, for which the free energy and
+            friction are estimated. Passed when called during bootstrapping;
+            otherwise the work traces of the fitted WorkSet are used.
 
         Returns
         -------
@@ -216,6 +222,7 @@ dcTMD.WorkEstimator.estimate_free_energy_errors].
             is_bootstrapping = True
 
         from scipy.constants import R  # noqa: WPS347
+
         RT = R * self.temperature / 1e3
 
         W_mean = np.mean(work_set, axis=0)
@@ -235,10 +242,11 @@ dcTMD.WorkEstimator.estimate_free_energy_errors].
         n_resamples: Int,
         mode: Union[StrStd, NumInRange0to1],
         seed: Optional[Int] = None,
-    ) -> Tuple[Union[Float1DArray, Float2DArray],
-               Union[Float1DArray, Float2DArray],  # noqa: WPS318
-               Union[Float1DArray, Float2DArray],
-               ]:
+    ) -> Tuple[
+        Union[Float1DArray, Float2DArray],
+        Union[Float1DArray, Float2DArray],  # noqa: WPS318
+        Union[Float1DArray, Float2DArray],
+    ]:
         """
         Estimate bootstrapping errors for the free energy estimate.
 
@@ -288,9 +296,11 @@ estimate_free_energy].
         self,
     ) -> None:
         """Use utils/bootstrapper.py for error estimation."""
+
         # Prepare and run bootstrapper
         def func(my_work_set):
             return self.estimate_free_energy(my_work_set)
+
         s_quantity, quantity_resampled = utils.bootstrapping(
             self,
             func=func,
@@ -348,7 +358,8 @@ estimate_free_energy].
         if self.verbose:
             print(f'calculating friction, delta_x: {delta_x}nm')
         friction = np.diff(
-            W_diss, prepend=W_diss[0],
+            W_diss,
+            prepend=W_diss[0],
         ) / (delta_x * self.work_set.velocity)
         if not is_bootstrapping:
             self.friction_ = friction
@@ -406,11 +417,13 @@ estimate_free_energy].
         self,
     ) -> None:
         """Use utils/bootstrapper.py for error estimation."""
+
         # Prepare and run bootstrapper
         def func(my_work_set):
             return self.estimate_friction(
                 self.estimate_free_energy(my_work_set)[1],
             )
+
         s_quantity, quantity_resampled = utils.bootstrapping(
             self,
             func=func,
@@ -425,7 +438,9 @@ estimate_free_energy].
 
 
 class ForceEstimator(
-    _SmoothBasisEstimator, TransformerMixin, BaseEstimator,
+    _SmoothBasisEstimator,
+    TransformerMixin,
+    BaseEstimator,
 ):  # noqa: WPS230
     """
     Class for performing dcTMD analysis on a force set.
@@ -476,7 +491,7 @@ class ForceEstimator(
     @beartype
     def fit(
         self,
-        force_set,
+        force_set: ForceSet,
     ):
         """
         Estimate free energy and friction.
@@ -500,8 +515,10 @@ class ForceEstimator(
 
     @beartype
     def transform(
-        self, X, y=None,
-    ) -> Tuple[Float1DArray, Float1DArray]:  # noqa: WPS111
+        self,
+        X: Optional[ForceSet] = None,
+        y: Optional[np.ndarray] = None,
+    ) -> Tuple[Float1DArray, Float1DArray]:
         """Return free energy and friction estimates."""
         return self.dG_, self.friction_
 
@@ -525,6 +542,7 @@ class ForceEstimator(
         """
         from scipy.constants import R  # noqa: WPS347
         from scipy.integrate import cumulative_trapezoid
+
         RT = R * self.temperature / 1e3
 
         # average over all trajectories in each time step
@@ -552,27 +570,27 @@ class ForceEstimator(
             self.force_set.position_,
             initial=0,
         )
-        W_diss = cumulative_trapezoid(
-            friction,
-            self.force_set.position_,
-            initial=0,
-        ) * self.force_set.velocity
+        W_diss = (
+            cumulative_trapezoid(
+                friction,
+                self.force_set.position_,
+                initial=0,
+            )
+            * self.force_set.velocity
+        )
 
         # Reduce resolution
-        self.position_ = self.force_set.position_[::self.force_set.resolution]
-        self.W_mean_ = W_mean[::self.force_set.resolution]
-        self.W_diss_ = W_diss[::self.force_set.resolution]
+        self.position_ = self.force_set.position_[:: self.force_set.resolution]
+        self.W_mean_ = W_mean[:: self.force_set.resolution]
+        self.W_diss_ = W_diss[:: self.force_set.resolution]
         self.dG_ = self.W_mean_ - self.W_diss_
-        self.friction_ = friction[::self.force_set.resolution]
+        self.friction_ = friction[:: self.force_set.resolution]
 
         return self.W_mean_, self.W_diss_, self.dG_, self.friction_
 
     @beartype
     @staticmethod
-    def kernel_at_ndx(
-        delta_force_array: Float2DArray,
-        ndx: Int
-    ) -> Float1DArray:
+    def kernel_at_ndx(delta_force_array: Float2DArray, ndx: Int) -> Float1DArray:
         """
         Calculate the kernel at a specific index.
 
@@ -584,9 +602,7 @@ class ForceEstimator(
             < df(t(x)) df(t) >_N at the given index.
         """
         delta_force_point = delta_force_array[:, ndx]
-        force_correlation_at_ndx = (
-            delta_force_array.T * delta_force_point
-        ).T
+        force_correlation_at_ndx = (delta_force_array.T * delta_force_point).T
         return np.mean(force_correlation_at_ndx, axis=0)
 
     @beartype
@@ -640,37 +656,25 @@ class ForceEstimator(
         """
         # Argument validation (mutual exclusion / requirement)
         if index is not None and ndx_striding is not None:
-            raise ValueError(
-                'Only index or ndx_resolution can be given.'
-            )
+            raise ValueError('Only index or ndx_resolution can be given.')
         if index is None and ndx_striding is None:
-            raise ValueError(
-                'Either index or ndx_resolution must be given.'
-            )
+            raise ValueError('Either index or ndx_resolution must be given.')
         # read in index or create index array
         if index is not None:
             if isinstance(index, (int, np.integer)):
                 print('create index with single int')
                 index = np.array([index])
             if np.any(index >= len(self.force_set.time_)):
-                raise ValueError(
-                    'Index values must be less than length of data.'
-                )
+                raise ValueError('Index values must be less than length of data.')
         elif ndx_striding is not None:
             print('create index with ndx_resolution')
             index = np.arange(
-                ndx_striding,
-                len(self.force_set.time_) - 1,
-                ndx_striding,
-                dtype=int
+                ndx_striding, len(self.force_set.time_) - 1, ndx_striding, dtype=int
             )
         # calculate memory kernel at given indices
         correlation_set = np.zeros((len(index), len(self.force_set.time_)))
         for i, ndx in enumerate(index):
-            correlation_set[i] = self.kernel_at_ndx(
-                self.delta_force_array,
-                ndx
-            )
+            correlation_set[i] = self.kernel_at_ndx(self.delta_force_array, ndx)
         self.memory_kernel_ = correlation_set
         self.memory_kernel_index_ = index
         return correlation_set

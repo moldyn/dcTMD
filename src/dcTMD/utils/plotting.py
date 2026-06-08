@@ -4,10 +4,23 @@
 # All rights reserved.
 """Simple plot functions for dcTMD results."""
 
+from __future__ import annotations
+
 import sys
+from typing import TYPE_CHECKING, Optional, Tuple, Union
+
 from matplotlib import pyplot as plt
 import numpy as np
 from scipy.stats import norm
+
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
+    from matplotlib.figure import Figure
+    from matplotlib.lines import Line2D
+
+    from dcTMD._typing import Float1DArray, Int, Str
+    from dcTMD.dcTMD import ForceEstimator, WorkEstimator
+    from dcTMD.storing import WorkSet
 
 
 # Constants
@@ -20,11 +33,11 @@ WORKLINES_WIDTH = 0.5  # line width for work lines
 
 
 def plot_dcTMD_results(
-    estimator,
-    friction=None,
-    x=None,
-    figsize=(4, 4),
-):
+    estimator: Union[WorkEstimator, ForceEstimator],
+    friction: Optional[Float1DArray] = None,
+    x: Optional[Float1DArray] = None,
+    figsize: Tuple[float, float] = (4, 4),
+) -> Tuple[Figure, np.ndarray]:
     """Plot dcTMD results overview in two subplots.
     This function generates a figure with two subplots.
     The top subplot contains free energy, dissipative work, and mean work.
@@ -54,11 +67,12 @@ def plot_dcTMD_results(
         ... )
         >>> plt.show()
     """
-    fig, axs = plt.subplots(ncols=1,
-                            nrows=2,
-                            sharex=True,
-                            figsize=figsize,
-                            )
+    fig, axs = plt.subplots(
+        ncols=1,
+        nrows=2,
+        sharex=True,
+        figsize=figsize,
+    )
     if x is None:
         x = estimator.position_
     plot_dG_Wdiss(estimator, axs[0], x=x)
@@ -75,12 +89,16 @@ def plot_dcTMD_results(
         frameon=False,
         ncol=3,
     )
-    axs[0].set_xlabel("")
+    axs[0].set_xlabel('')
     plt.tight_layout()
     return fig, axs
 
 
-def plot_dG_Wdiss(workestimator, ax, x=None):
+def plot_dG_Wdiss(
+    workestimator: Union[WorkEstimator, ForceEstimator],
+    ax: Axes,
+    x: Optional[Float1DArray] = None,
+) -> None:
     """Plot free energy, dissipative work and mean work vs position.
 
     Args:
@@ -110,13 +128,19 @@ def plot_dG_Wdiss(workestimator, ax, x=None):
     ax.plot(x, workestimator.dG_, label=LABEL_dG)
     ax.plot(x, workestimator.W_mean_, label=r'W$_{\mathrm{mean}}$')
     ax.plot(x, workestimator.W_diss_, label=r'W$_{\mathrm{diss}}$')
-    ax.set(xlabel=LABEL_POSITION_NM,
-           ylabel=UNIT_ENERGY,
-           xlim=[min(x), max(x)],
-           )
+    ax.set(
+        xlabel=LABEL_POSITION_NM,
+        ylabel=UNIT_ENERGY,
+        xlim=[min(x), max(x)],
+    )
 
 
-def plot_Gamma(x, friction, ax, label=None):
+def plot_Gamma(
+    x: Float1DArray,
+    friction: Float1DArray,
+    ax: Axes,
+    label: Optional[Str] = None,
+) -> None:
     """Plot friction factor (Γ) vs position.
 
     Args:
@@ -136,13 +160,20 @@ def plot_Gamma(x, friction, ax, label=None):
         >>> plt.show()
     """
     ax.plot(x, friction, label=label)
-    ax.set(xlabel=LABEL_POSITION_NM,
-           ylabel=LABEL_FRICTION,
-           xlim=[min(x), max(x)],
-           )
+    ax.set(
+        xlabel=LABEL_POSITION_NM,
+        ylabel=LABEL_FRICTION,
+        xlim=[min(x), max(x)],
+    )
 
 
-def plot_dG(x, dG, ax, label=None, color=None):
+def plot_dG(
+    x: Float1DArray,
+    dG: Float1DArray,
+    ax: Axes,
+    label: Optional[Str] = None,
+    color: Optional[Str] = None,
+) -> Line2D:
     """Plot free energy vs position.
 
     Args:
@@ -168,19 +199,20 @@ def plot_dG(x, dG, ax, label=None, color=None):
         >>> plt.show()
     """
     line = ax.plot(x, dG, label=label, color=color)[0]
-    ax.set(xlabel=LABEL_POSITION_NM,
-           ylabel=r'$\Delta G$ [kJ/mol]',
-           xlim=[min(x), max(x)],
-           )
+    ax.set(
+        xlabel=LABEL_POSITION_NM,
+        ylabel=r'$\Delta G$ [kJ/mol]',
+        xlim=[min(x), max(x)],
+    )
     return line
 
 
 def plot_dG_werrors(
-    workestimator,
-    ax,
-    labeldG=None,
-    color=None,
-):
+    workestimator: WorkEstimator,
+    ax: Axes,
+    labeldG: Optional[Str] = None,
+    color: Optional[Str] = None,
+) -> None:
     """Plot free energy with errors against position.
     This function generates a plot of the free energy change (ΔG)
     as a function of position (x), including error bands if available.
@@ -231,16 +263,18 @@ def plot_dG_werrors(
                 alpha=ALPHA_VALUE,
             )
     else:
-        sys.stdout.write(
-            f'no errors are determined for {workestimator}'
-        )
-        sys.stdout.write(
-            'use estimate_free_energy_errors() to determine errors'
-        )
+        sys.stdout.write(f'no errors are determined for {workestimator}')
+        sys.stdout.write('use estimate_free_energy_errors() to determine errors')
         return
 
 
-def plot_worklines(workset, ax, x=None, color='#777', res=1):
+def plot_worklines(
+    workset: WorkSet,
+    ax: Axes,
+    x: Optional[Float1DArray] = None,
+    color: Str = '#777',
+    res: Int = 1,
+) -> None:
     """Line plots of the individual work trajectories
     in the workset.
 
@@ -281,13 +315,19 @@ def plot_worklines(workset, ax, x=None, color='#777', res=1):
             alpha=ALPHA_VALUE,
             lw=WORKLINES_WIDTH,
         )
-    ax.set(xlabel=LABEL_POSITION_NM,
-           ylabel=r'work $W$ [kJ/mol]',
-           xlim=[min(x), max(x)],
-           )
+    ax.set(
+        xlabel=LABEL_POSITION_NM,
+        ylabel=r'work $W$ [kJ/mol]',
+        xlim=[min(x), max(x)],
+    )
 
 
-def plot_histo_normaldist(histodata, ax, color='None', label=None):
+def plot_histo_normaldist(
+    histodata: np.ndarray,
+    ax: Axes,
+    color: Str = 'None',
+    label: Optional[Str] = None,
+) -> None:
     """Plots a histogram of the input data and overlays a
     probability density function (PDF) of a normal distribution
     fitted to the data.
@@ -333,12 +373,14 @@ def plot_histo_normaldist(histodata, ax, color='None', label=None):
     )
     mu, std = norm.fit(histo)
     # Plot the PDF.
-    y = np.linspace(np.min(histo) - 10,
-                    np.max(histo) + 10,
-                    100,
-                    )
+    y = np.linspace(
+        np.min(histo) - 10,
+        np.max(histo) + 10,
+        100,
+    )
     p = norm.pdf(y, mu, std)
     ax.plot(p, y, color=color, zorder=1)
-    ax.set(xlabel=r'$P$',
-           ylabel=r'$W$ [kJ/mol]',
-           )
+    ax.set(
+        xlabel=r'$P$',
+        ylabel=r'$W$ [kJ/mol]',
+    )
