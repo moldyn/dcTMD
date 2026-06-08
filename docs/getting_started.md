@@ -1,21 +1,20 @@
 ## Introduction
-This python package aids with the analysis of targeted molecular dynamics (TMD) trajectories according to the dissipation-corrected TMD method. TMD simulations enforce rare unbinding events of ligands from proteins via a constraint pulling bias. With dcTMD, free energy profiles and friction factors are estimated along the unbinding coordinate. For a methodological overview, see our [article](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835)
+This python package aids with the analysis of targeted molecular dynamics (TMD) trajectories according to the dissipation-corrected TMD method. TMD simulations enforce rare unbinding events of ligands from proteins via a constraint pulling bias. With dcTMD, free energy profiles and friction factors are estimated along the unbinding coordinate. For a methodological overview, see our [article](https://pubs.acs.org/doi/full/10.1021/acs.jctc.8b00835):
 
+> S. Wolf, and G. Stock,
+> *Targeted molecular dynamics calculations of free energy profiles using a nonequilibrium friction correction.*,
+> Journal of chemical theory and computation (2018)
 
 ## Disclaimer
 > **Warning**
 > This package is still in beta stage. Please open an issue if you encounter
 > any bug/error.
 
-> S. Wolf, and G. Stock,
-> *Targeted molecular dynamics calculations of free energy profiles using a nonequilibrium friction correction.*,
-> Journal of chemical theory and computation (2018)
-
 This package will be published soon:
 
 > M. Jäger, V. Tänzel, D. Nagel, and S. Wolf,  
 > *Dissipation Corrected Targeted Molecular Dynamics*,    
-> in preparation 2025
+> in preparation 2026
 
 We kindly ask you to cite these articles in case you use this software package for published works.
 
