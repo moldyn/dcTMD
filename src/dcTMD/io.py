@@ -10,7 +10,9 @@ import glob
 from pathlib import Path
 import numpy as np
 from beartype import beartype
+from beartype.typing import Tuple, Union
 
+from dcTMD.dcTMD import ForceEstimator, WorkEstimator
 from dcTMD._typing import (
     Str,
     Str1DArray,
@@ -57,8 +59,8 @@ def load_pullf(pullf_files: Str) -> (List[Str], Str1DArray):
 @beartype
 def write_output(
     out: Str,
-    estimator,
-    filetype=('dat', 'npz'),
+    estimator: Union[ForceEstimator, WorkEstimator],
+    filetype: Union[Str, List[Str], Tuple[Str, ...]] = ('dat', 'npz'),
 ) -> None:
     """Take all calculated quantities and save them.
 
@@ -102,11 +104,13 @@ def write_output(
         'Gamma': estimator.friction_,
     }
     if hasattr(estimator, 's_dG_'):
-        results_dict.update({
-            's_W_mean': estimator.s_W_mean_,
-            's_W_diss': estimator.s_W_diss_,
-            's_dG': estimator.s_dG_,
-        })
+        results_dict.update(
+            {
+                's_W_mean': estimator.s_W_mean_,
+                's_W_diss': estimator.s_W_diss_,
+                's_dG': estimator.s_dG_,
+            }
+        )
     if hasattr(estimator, 'friction_smooth_'):
         results_dict['Gamma_smooth'] = estimator.friction_smooth_
     if hasattr(estimator, 's_friction_'):
