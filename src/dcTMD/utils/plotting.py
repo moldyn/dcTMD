@@ -264,7 +264,9 @@ def plot_dG_werrors(
             )
     else:
         sys.stdout.write(f'no errors are determined for {workestimator}')
-        sys.stdout.write('use estimate_free_energy_errors() to determine errors')
+        sys.stdout.write(
+            'use estimate_free_energy_errors() to determine errors'
+        )
         return
 
 

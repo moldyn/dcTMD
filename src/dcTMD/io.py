@@ -191,9 +191,13 @@ def load_output(filepath: Str):
         dctmd_results = np.loadtxt(filepath)
         res_dict = {}
         if headers is None:
-            raise ValueError(f'No header line starting with "#" found in {filepath}')
+            raise ValueError(
+                f'No header line starting with "#" found in {filepath}'
+            )
         if len(headers) != dctmd_results.shape[1]:
-            raise ValueError('Number of headers does not match number of data columns.')
+            raise ValueError(
+                'Number of headers does not match number of data columns.'
+            )
         for idx, key in enumerate(headers):
             res_dict[key] = dctmd_results[:, idx]
         print(f'Loaded data from {filepath}')

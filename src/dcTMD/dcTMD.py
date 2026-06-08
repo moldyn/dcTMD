@@ -33,7 +33,7 @@ from dcTMD._typing import (
 
 
 class _SmoothBasisEstimator(ABC):
-    """Class with the smoothing method for `WorkEstimator`, `ForceEstimator`."""
+    """Class with smoothing method for `WorkEstimator`, `ForceEstimator`."""
 
     @beartype
     def smooth_friction(
@@ -590,7 +590,9 @@ class ForceEstimator(
 
     @beartype
     @staticmethod
-    def kernel_at_ndx(delta_force_array: Float2DArray, ndx: Int) -> Float1DArray:
+    def kernel_at_ndx(
+        delta_force_array: Float2DArray, ndx: Int
+    ) -> Float1DArray:
         """
         Calculate the kernel at a specific index.
 
@@ -665,16 +667,23 @@ class ForceEstimator(
                 print('create index with single int')
                 index = np.array([index])
             if np.any(index >= len(self.force_set.time_)):
-                raise ValueError('Index values must be less than length of data.')
+                raise ValueError(
+                    'Index values must be less than length of data.'
+                )
         elif ndx_striding is not None:
             print('create index with ndx_resolution')
             index = np.arange(
-                ndx_striding, len(self.force_set.time_) - 1, ndx_striding, dtype=int
+                ndx_striding,
+                len(self.force_set.time_) - 1,
+                ndx_striding,
+                dtype=int,
             )
         # calculate memory kernel at given indices
         correlation_set = np.zeros((len(index), len(self.force_set.time_)))
         for i, ndx in enumerate(index):
-            correlation_set[i] = self.kernel_at_ndx(self.delta_force_array, ndx)
+            correlation_set[i] = self.kernel_at_ndx(
+                self.delta_force_array, ndx
+            )
         self.memory_kernel_ = correlation_set
         self.memory_kernel_index_ = index
         return correlation_set
