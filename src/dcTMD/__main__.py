@@ -31,8 +31,11 @@ MODES = ('work', 'force')
     '--file',
     'pullf_files',
     required=True,
-    help='Input: File containing list of all constraint force file names '
-    + 'or glob pattern e.g."*.xvg" to generate a list of all constraint '
+    help='Input: File containing a list of all constraint force file names '
+    + 'listing one constraint force file per line. Paths inside a list file '
+    + 'are resolved relative to the current working directory, not relative '
+    + 'to the location of the list file. '
+    + 'Or glob pattern e.g. "*.xvg" to generate a list of all constraint '
     + 'force files using glob.glob()',
 )
 @click.option(
