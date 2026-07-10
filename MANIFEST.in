@@ -1,1 +1,3 @@
+include requirements.txt
 include extra-requirements.txt
+include environment.yml
