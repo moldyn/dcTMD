@@ -1,0 +1,9 @@
+# Runtime dependencies of dcTMD.
+# Install with: python3 -m pip install -r requirements.txt
+numpy>=1.21.0
+scipy
+scikit-learn
+beartype>=0.10.4
+tqdm
+click>=7.0.0
+matplotlib>=3.7
