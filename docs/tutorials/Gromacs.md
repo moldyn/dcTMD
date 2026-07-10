@@ -1,9 +1,45 @@
+## About this tutorial
+
+This tutorial reproduces, on a reduced scale, the trypsin-benzamidine setup used in
+
+> S. Wolf, B. Lickert, S. Bray, and G. Stock,
+> *Multisecond ligand dissociation dynamics from atomistic simulations*,
+> Nat. Commun. **11**, 2918 (2020), doi: 10.1038/s41467-020-16655-1
+
+A small subset of that ensamble of pulling trajectories can be found in this package under `tests/testdata/`. See `tests/README.md` for details.
+
+!!! warning "Computational cost"
+
+    Running the simulations below requires roughly XXX core hours even for
+    the reduced set of 10 trajectories, and a converged dcTMD analysis needs far
+    more. If you only want to learn how the analysis works, skip this page and
+    go directly to the [work](work.ipynb) tutorial.
+
+## Simulation setup
+
+The parameters below follow the reference above. Consult the supplied `.mdp`
+files for the complete settings.
+
+| Property | Value |
+| --- | --- |
+| System | trypsin, PDB ID 3PTB, in complex with benzamidine |
+| Box | dodecahedral, 7.5 x 7.5 x 5.3 nm |
+| Solvent | TIP3P water, 8971 molecules |
+| Bias | moving distance constraint, Gromacs PULL code with SHAKE |
+| Pulling coordinate | distance between the center of mass of the benzamidine heavy atoms and that of the Calpha atoms of the central beta sheet |
+| Pulling velocity | 1 m/s, equivalently 0.001 nm/ps |
+| Pulling distance | 2 nm |
+
+![Trypsin-benzamidine render](./trypsinPullgoup.png)
+
+Benzamidine (sticks) and trypsin (cartoon). The pull groups center of mass of the benzamidine and trypsin are shown as teal and pink spheres, respectively. The distance between the two center of masses is visualized as a line.
+
 ### Input files
 
 Download the [tutorial\_files.tar.gz](https://github.com/moldyn/dcTMD/blob/484da088ad8e5e91886d4d057b7c452e7b7d9aab/docs/tutorials/tutorial_files.tar.gz) and unpack via
 
 ```console
-tar -xzvf ./tutorial_files.tar
+tar -xzvf ./tutorial_files.tar.gz
 ```
 You will find a folder with the following files:
 
