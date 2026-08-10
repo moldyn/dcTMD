@@ -102,4 +102,4 @@ These simulations will each require 1-2 hours on a modern workstation, so you be
 
 For all further analysis, you require the **3ptb\_AMBER99SB\_ben\_pushRUN\_0.001\_*\_pullf.xvg** files (with * denoting the respective run number).
 
-If you are interested in performing an example analysis, but do not have the HPC capacities to perform a sufficient number of simulations, you can find an example set of 84 trypsin-benzamidine unbinding simulations carried out with the above tutorial at [this NOMAD repository](https://nomad-lab.eu/prod/v1/gui/upload/id/BG7TgBEsR46vYAEiHDv6Hg).
+If you are interested in performing an example analysis, but do not have the HPC capacities to perform a sufficient number of simulations, you can find an example set of 84 trypsin-benzamidine unbinding simulation force files generated from the above tutorial at [this NOMAD repository](https://nomad-lab.eu/prod/v1/gui/upload/id/BG7TgBEsR46vYAEiHDv6Hg).
