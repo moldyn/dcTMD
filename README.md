@@ -63,20 +63,37 @@ We kindly ask you to cite these articles in case you use this software package f
 
 ## Installation
 `dcTMD` is available on **PyPI** and **conda-forge**.
-#### Install with pip
+
+#### From PyPI
 ```bash
 pip install dcTMD
 ```
 PyPI project page: [https://pypi.org/project/dcTMD/](https://pypi.org/project/dcTMD/)
-#### Install with conda
+
+#### From conda-forge
 ```bash
 conda install conda-forge::dctmd
 ```
 Conda-forge package page:
 [https://anaconda.org/conda-forge/dcTMD](https://anaconda.org/conda-forge/dcTMD)
-#### Install from GitHub
+
+#### From GitHub
 ```bash
 python3 -m pip install git+ssh://git@github.com/moldyn/dcTMD.git
+```
+
+### Local development environment
+The runtime dependencies are listed in [requirements.txt](requirements.txt) and [environment.yml](environment.yml). For a local checkout, install them with:
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+For conda users, create the environment with:
+
+```bash
+conda env create -f environment.yml
+conda activate dcTMD
 ```
 
 ## Usage

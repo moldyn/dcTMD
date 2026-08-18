@@ -4,6 +4,16 @@ from collections import defaultdict
 from setuptools import setup, find_packages
 
 
+def get_requirements(path):
+    """Parse runtime requirements file."""
+    with open(path) as depfile:
+        return [
+            line.strip()
+            for line in depfile
+            if line.strip() and not line.startswith('#')
+        ]
+
+
 def get_extra_requirements(path, add_all=True):
     """Parse extra-requirements file."""
     with open(path) as depfile:
@@ -70,16 +80,8 @@ setup(
     packages=find_packages(where='src'),
     include_package_data=True,
     python_requires='>=3.9',
-    install_requires=[
-        'numpy>=1.21.0',
-        'scikit-learn',
-        'beartype>=0.10.4',
-        'scipy',
-        'tqdm',
-        'click>=7.0.0',
-        'matplotlib>=3.7',
-    ],
-    extras_require=get_extra_requirements('extra-requirements.txt'),
+    install_requires=get_requirements(HERE / 'requirements.txt'),
+    extras_require=get_extra_requirements(HERE / 'extra-requirements.txt'),
     entry_points={
         'console_scripts': [
             'dcTMD = dcTMD.__main__:main',
