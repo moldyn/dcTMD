@@ -14,7 +14,7 @@ that is, the constraint force $f$ on $s$ is given by the Lagrange multiplier whi
 
 $$ W(x)=\int_{x_0}^{x}  \mathrm{d} x'  \; f(x') $$
 
-done to move the atom, or subset of atoms, along the pulling coordinate. Note that in the follwing we use the notations $f(x) \equiv f(t(x))$ interchangeable. 
+done to move the atom, or subset of atoms, along the pulling coordinate. Note that in the following we use the notations $f(x) \equiv f(t(x))$ interchangeable. 
 
 
 
