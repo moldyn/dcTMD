@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/prettypyplot
+      url: https://pypi.org/p/dcTMD
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
 

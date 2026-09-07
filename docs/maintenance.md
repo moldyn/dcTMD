@@ -1,13 +1,13 @@
 # Welcome to the `dcTMD` Maintenance Guideline
 
-This guide will give you an overview of how to publish a new version of dcTMD. In the following we will refer to the new version as `v0.*.*`. This needs to be substituted to the current version, e.g. `v0.1.3`.
+This guide will give you an overview of how to publish a new version of dcTMD. In the following we will refer to the new version as `v1.*.*`. This needs to be substituted to the current version, e.g. `v1.0.0`.
 
 ## Prepare New Release
 
 Please ensure that,
 
 1. the version number in `setup.py` and `src/dcTMD/__init__.py` are bumped,
-1. a new tag is created via `git tag v0.*.*` and pushed `git push --tags`, and 
+1. a new tag is created via `git tag v1.*.*` and pushed `git push --tags`, and
 1. the changelog includes the new tag and all changes of the release.
 
 ## Upload to PyPI
@@ -36,8 +36,8 @@ python3 -m build
 which will create the directory `dist` including the source distributions:
 ```bash
 dist/
-├── dcTMD-0.*.*-py3-none-any.whl
-└── dcTMD-0.*.*.tar.gz
+├── dcTMD-1.*.*-py3-none-any.whl
+└── dcTMD-1.*.*.tar.gz
 ```
 To upload the new files, run
 ```bash

@@ -14,6 +14,17 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.0.0
 ## [Unreleased]
 
 
+## [1.0.0] - 2026-09-07
+### Added Features and Improvements 🙌:
+- Add compatibility with current supported Python versions.
+- Improve packaging configuration and dependency handling.
+
+### Other changes:
+- Improve type annotations and linting.
+- Update documentation and continuous-integration configuration.
+- Add Zenodo release metadata.
+
+
 ## [0.4.1] - 2025-11-24
 ### Bugfix 🐛:
 - Remove unused deps to fix publishing to conda, #32
@@ -57,7 +68,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.0.0
 - Alpha candidate
 
 
-[Unreleased]: https://github.com/moldyn/dcTMD/compare/v0.4.1...main
+[Unreleased]: https://github.com/moldyn/dcTMD/compare/v1.0.0...main
+[1.0.0]: https://github.com/moldyn/dcTMD/compare/v0.4.1...v1.0.0
 [0.4.1]: https://github.com/moldyn/dcTMD/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/moldyn/dcTMD/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/moldyn/dcTMD/compare/v0.2.1...v0.3.0
