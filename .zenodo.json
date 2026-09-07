@@ -1,0 +1,26 @@
+{
+    "creators": [
+        {
+            "name": "Jäger, Miriam",
+            "orcid": "0000-0002-5983-5497",
+            "affiliation": "Biomolecular Dynamics, Institute of Physics, University of Freiburg"    
+        },
+        {
+            "name": "Tänzel, Victor",
+            "orcid": "0000-0002-1479-1910",
+            "affiliation": "Biomolecular Dynamics, Institute of Physics, University of Freiburg"    
+        },
+        {
+            "name": "Nagel, Daniel",
+            "orcid": "0000-0002-2863-2646",
+            "affiliation": "Institute of Theoretical Physics, University of Heidelberg"    
+        },
+        {
+            "name": "Wolf, Steffen",
+            "orcid": "0000-0003-1752-6175",
+            "affiliation": "Computational Biology, Faculty of Chemical Engineering and Biotechnology, Darmstadt University of Applied Sciences"
+        }
+    ],
+    "title": "dcTMD: a python package for performing dissipation-corrected targeted molecular dynamics",
+    "keywords": ["Python", "enhanced sampling", "biased simulations", "protein dynamics", "MD simulations", "friction", "Langevin Equation"]
+}
