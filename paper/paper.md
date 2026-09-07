@@ -3,12 +3,16 @@ title: "dcTMD: a python package for performing dissipation-corrected targeted mo
 authors:
   - name: Miriam Jäger
     affiliation: 1
+    orcid: 0000-0002-5983-5497
   - name: Victor Tänzel
     affiliation: 1
+    orcid: 0000-0002-1479-1910
   - name: Daniel Nagel
     affiliation: 2
+    orcid: 0000-0002-2863-2646
   - name: Steffen Wolf
-    affiliation: "1,3"
+    affiliation: "3,1"
+    orcid: 0000-0003-1752-6175
 affiliations:
   - index: 1
     name: University of Freiburg, Institute of Physics, Freiburg, Germany
