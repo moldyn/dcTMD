@@ -1,0 +1,46 @@
+cff-version: "1.2.0"
+authors:
+- family-names: Jäger
+  given-names: Miriam
+  orcid: "https://orcid.org/0000-0002-5983-5497"
+- family-names: Tänzel
+  given-names: Victor
+  orcid: "https://orcid.org/0000-0002-1479-1910"
+- family-names: Nagel
+  given-names: Daniel
+  orcid: "https://orcid.org/0000-0002-2863-2646"
+- family-names: Wolf
+  given-names: Steffen
+  orcid: "https://orcid.org/0000-0003-1752-6175"
+doi: 10.5281/zenodo.22650055
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Jäger
+    given-names: Miriam
+    orcid: "https://orcid.org/0000-0002-5983-5497"
+  - family-names: Tänzel
+    given-names: Victor
+    orcid: "https://orcid.org/0000-0002-1479-1910"
+  - family-names: Nagel
+    given-names: Daniel
+    orcid: "https://orcid.org/0000-0002-2863-2646"
+  - family-names: Wolf
+    given-names: Steffen
+    orcid: "https://orcid.org/0000-0003-1752-6175"
+  date-published: 2026-10-27
+  doi: 10.21105/joss.10244
+  issn: 2475-9066
+  issue: 126
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 10244
+  title: "dcTMD: a Python package for performing dissipation-corrected
+    targeted molecular dynamics"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.10244"
+  volume: 11
+title: "dcTMD: a Python package for performing dissipation-corrected
+  targeted molecular dynamics"
