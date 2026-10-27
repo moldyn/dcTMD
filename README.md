@@ -1,6 +1,7 @@
 <div align="center">
     <img  style="width: 400px;" src="https://raw.githubusercontent.com/moldyn/dcTMD/main/docs/dctmd_logo.svg" />
   <p>
+    <a href="https://joss.theoj.org/papers/3d56e1f9fb92fb0cae466f31ffa18f00"><img src="https://joss.theoj.org/papers/3d56e1f9fb92fb0cae466f31ffa18f00/status.svg"></a>
     <a href="https://github.com/wemake-services/wemake-python-styleguide" alt="wemake-python-styleguide">
         <img src="https://img.shields.io/badge/style-wemake-000000.svg" /></a>
     <a href="https://beartype.rtfd.io" alt="bear-ified">
@@ -46,8 +47,9 @@ This package aids in the analysis of dissipation-corrected targeted molecular dy
 This package will be published soon:
 
 > M. Jäger, V. Tänzel, D. Nagel, and S. Wolf,  
-> *Dissipation Corrected Targeted Molecular Dynamics*,    
-> in preparation 2025
+> *dcTMD: a Python package for performing dissipation-corrected targeted molecular dynamics*,    
+> **J. Open Source Soft.** 2026 11 (126), 10244,
+> doi: [https://doi.org/10.21105/joss.10244](10.21105/joss.10244)
 
 We kindly ask you to cite these articles in case you use this software package for published works.
 
