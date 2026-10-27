@@ -48,7 +48,7 @@ This package will be published soon:
 
 > M. Jäger, V. Tänzel, D. Nagel, and S. Wolf,  
 > *dcTMD: a Python package for performing dissipation-corrected targeted molecular dynamics*,    
-> **J. Open Source Soft.** 2026 11 (126), 10244,
+> **J. Open Source Soft.** 2026 11 (126), 10244,  
 > doi: [https://doi.org/10.21105/joss.10244](10.21105/joss.10244)
 
 We kindly ask you to cite these articles in case you use this software package for published works.
