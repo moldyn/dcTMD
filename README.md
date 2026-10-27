@@ -44,7 +44,7 @@ This package aids in the analysis of dissipation-corrected targeted molecular dy
 > **J. Chem. Theory Comput.** 2018 14 (12), 6175-6182,  
 > doi: [10.1021/acs.jctc.8b00835](https://pubs.acs.org/doi/10.1021/acs.jctc.8b00835)
 
-This package will be published soon:
+This package has been published in JOSS:
 
 > M. Jäger, V. Tänzel, D. Nagel, and S. Wolf,  
 > *dcTMD: a Python package for performing dissipation-corrected targeted molecular dynamics*,    
